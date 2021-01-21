@@ -1,0 +1,252 @@
+import os, glob, sys, datetime
+from os import path
+
+# This function adapts the config object to include full path information
+include: "misc_snake.py"
+#configfile: 'config_scTranscriptomics.json'
+
+# input files and folders
+SAMPLEMAPPING = config['inputOutput']['sample_map']
+#INPUTDIR = config['inputOutput']['input_fastqs']
+OUTDIR = config['inputOutput']['analysis_output_dir']
+TMPDIR = config['inputOutput']['analysis_temp_dir']
+
+DIFF_EXP_OUT = OUTDIR + 'diff_exp/'
+INPUTDIR = DIFF_EXP_OUT
+# Check if the uses specified the proper input and output directories
+if not 'INPUTDIR' in globals():
+    print('You have to specify the root directory of the cluster files!')
+    sys.exit(1)
+if not 'OUTDIR' in globals():
+    print('You have to specify the root directory where the results will be generated!')
+    sys.exit(1)
+if not 'TMPDIR' in globals():
+    print('You have to specify the root directory where temporary files will be stored!')
+    sys.exit(1)
+
+
+# This is the default order in which the programs are executed
+# Note: currently this is the default also specified in the rule files, so currently this is only for explanatory reasons displayed here
+# If the user specified a different order in the project specific snake file, the user specified version is chosen.
+
+CLUSTER_IDS  = [file.split(".")[-3] for file in glob.glob(INPUTDIR + '*DEgenes.tsv')]
+CLUSTER_IDS_MALIGNANT  = [file.split(".")[-3] for file in glob.glob(INPUTDIR + 'vs_other_malignant/*DEgenes.tsv')]
+print(CLUSTER_IDS)
+print(CLUSTER_IDS_MALIGNANT)
+
+CELLRANGER_IN = INPUTDIR
+CELLRANGER_OUT = OUTDIR + 'cellranger_run/'
+
+CREATEHD5_IN = CELLRANGER_OUT
+CREATEHD5_OUT = OUTDIR + 'rawCounts/'
+FILTER_GENES_CELLS_IN = CREATEHD5_OUT
+FILTER_GENES_CELLS_OUT = OUTDIR + 'filteredCounts/'
+SCTRANSFORM_IN = FILTER_GENES_CELLS_OUT
+SCTRANSFORM_OUT = OUTDIR + 'counts_corrected/'
+
+PHENOGRAPH_IN = SCTRANSFORM_OUT
+PHENOGRAPH_OUT = OUTDIR + 'clustering/'
+
+PREPARE_CELLTYPING_IN = SCTRANSFORM_OUT
+PREPARE_CELLTYPING_OUT = OUTDIR + 'prep_celltyping/'
+CELLTYPECLASS_IN = PREPARE_CELLTYPING_OUT
+CELLTYPECLASS_OUT = OUTDIR + 'celltype_classification/'
+
+REMOVE_ATYPICAL_IN = CELLTYPECLASS_OUT
+REMOVE_ATYPICAL_OUT = OUTDIR + 'atypical_removed/'
+GSVA_IN = REMOVE_ATYPICAL_OUT
+GSVA_OUT = OUTDIR + 'gsva/'
+PLOTTING_IN = REMOVE_ATYPICAL_OUT
+PLOTTING_OUT = OUTDIR + 'plotting/'
+
+ASSEMBLE_NONMALIG_OUT = OUTDIR + 'non_malignant_reference/'
+DIFF_EXP_IN = REMOVE_ATYPICAL_OUT
+DIFF_EXP_OUT = OUTDIR + 'diff_exp/'
+GENE_EXP_IN = REMOVE_ATYPICAL_OUT
+GENE_EXP_OUT = OUTDIR + 'gene_exp/'
+
+PROCESSDE_IN = DIFF_EXP_OUT
+PROCESSDE_OUT = OUTDIR + 'genes_DE/'
+
+DGIDB_IN = PROCESSDE_OUT
+DGIDB_OUT = OUTDIR + 'dgidb/'
+CLINICALTRIALS_OUT = OUTDIR + 'clinicalTrials/'
+PERCENTAGE_IN = REMOVE_ATYPICAL_OUT
+PERCENTAGE_OUT = OUTDIR + 'clustering/'
+DRUGCOMBINATION = OUTDIR + 'drugCombination/'
+
+ANNOTATECLINICAL_IN = PROCESSDE_OUT
+ANNOTATECLINICAL_OUT = OUTDIR + 'clinicalAnnotation/'
+CIVIC_IN = ANNOTATECLINICAL_OUT
+CIVIC_OUT = ANNOTATECLINICAL_OUT
+
+PLOT_DRUGS_IN = CIVIC_OUT
+PLOT_DRUGS_OUT = DRUGCOMBINATION
+GENESETANALYSIS_OUT = OUTDIR + 'geneSetAnalysis/'
+FILTERDRUGS_OUT = CLINICALTRIALS_OUT
+
+RESULTCOPY_OUT = OUTDIR + 'result_upload/'
+GENE_EXP_OUT = OUTDIR + 'gene_exp/'
+
+if not os.path.exists(GENESETANALYSIS_OUT):
+	os.mkdir(GENESETANALYSIS_OUT)
+
+# Include the rules
+#include: "clinical_rules_snake.py"
+
+# make sure that rules are only called when also input is there
+FINAL_FILE = []
+ONE_OR_MULTI_CLUSTER = ""
+NO_TUMOR_OR_MALIG_ONLY = ""
+if len(CLUSTER_IDS) > 0:
+	FINAL_FILE = OUTDIR + 'complete_clinical.txt'
+	if len(CLUSTER_IDS) > 1:
+		ONE_OR_MULTI_CLUSTER = "multi_cluster"
+	else:
+		ONE_OR_MULTI_CLUSTER = "one_cluster"
+	include: "clinical_rules_snake.py"
+elif len(CLUSTER_IDS_MALIGNANT) > 0:
+	FINAL_FILE = OUTDIR + 'complete_clinical_malignant_only.txt'
+	NO_TUMOR_OR_MALIG_ONLY = "malig_only"
+	include: "clinical_rules_snake.py"
+else:
+	FINAL_FILE = OUTDIR + 'complete_clinical_noTumor.txt'
+	NO_TUMOR_OR_MALIG_ONLY = "no_tumor"
+
+localrules: all_avoidEmptyInput
+rule all_avoidEmptyInput:
+	input:
+		FINAL_FILE
+	output:
+		finalOutfile = OUTDIR + 'completed_' + str(len(CLUSTER_IDS)) + '_clusters.txt'
+	shell:
+		'date > {output.finalOutfile}'
+
+
+
+# This rule defines which files should be created
+# in addtion, results copy paste is handled (tumor profiler specific!)
+localrules: clinical_scTranscriptomics,clinical_scTranscriptomics_malignant_only,clinical_scTranscriptomics_noTumor
+rule clinical_scTranscriptomics:
+	input:
+		expand(DRUGCOMBINATION + '{sample}.genes_cells_filtered.corrected.atypical_removed.drugCombination.allDrugs.txt', sample = getSampleNames()),
+		expand(ANNOTATECLINICAL_OUT + '{sample}.genes_cells_filtered.corrected.atypical_removed.{clusterid}.clinicalAnnotation.txt', sample = getSampleNames(), clusterid = CLUSTER_IDS),
+		expand(CIVIC_OUT + '{sample}.genes_cells_filtered.corrected.atypical_removed.{clusterid}.clinicalAnnotation.civic.txt', sample = getSampleNames(), clusterid = CLUSTER_IDS),
+		expand(DRUGCOMBINATION + '{sample}.genes_cells_filtered.corrected.atypical_removed.drugCombination.filteredDrugs.txt', sample = getSampleNames()),
+		expand(DRUGCOMBINATION + '{sample}.genes_cells_filtered.corrected.atypical_removed.drugToCluster.allDrugs.vennplot.png', sample = getSampleNames()),
+		expand(DRUGCOMBINATION + '{sample}.genes_cells_filtered.corrected.atypical_removed.drugToCluster.filteredDrugs.vennplot.png', sample = getSampleNames()),
+		expand(GENESETANALYSIS_OUT + '{sample}.genes_cells_filtered.corrected.atypical_removed.{clusterid}.enrichedGeneSets.txt', sample = getSampleNames(), clusterid = CLUSTER_IDS),
+		expand(GENESETANALYSIS_OUT + 'vs_other_malignant/{sample}.genes_cells_filtered.corrected.atypical_removed.DEmalignant.{clusterid_malig}.enrichedGeneSets.txt', sample = getSampleNames(), clusterid_malig = CLUSTER_IDS_MALIGNANT),
+		expand(GENESETANALYSIS_OUT + '{sample}.genes_cells_filtered.corrected.atypical_removed.heatmap_enrichment.png', sample = getSampleNames()),
+		expand(GENESETANALYSIS_OUT + 'vs_other_malignant/{sample}.genes_cells_filtered.corrected.atypical_removed.DEmalignant.heatmap_enrichment.png', sample = getSampleNames()),
+		expand(DRUGCOMBINATION + '{sample}.genes_cells_filtered.corrected.atypical_removed.full_druglist_to_subclones.txt', sample = getSampleNames()),
+		expand(PLOT_DRUGS_OUT + '{sample}.genes_cells_filtered.corrected.atypical_removed.drug_prediction_umap.png', sample = getSampleNames()),
+	output:
+		OUTDIR + 'complete_clinical.txt'
+		#OUTDIR + 'completed_results_copy.txt'
+	params:
+		outDir_copy = RESULTCOPY_OUT,
+		derivedList =  config['resources']['derived_suffixList'],
+		fastqDir = config['inputOutput']['input_fastqs'],
+		sampleName = expand('{sample}', sample = getSampleNames()),
+		cellrangerDir = CELLRANGER_OUT,
+		de_dir = DIFF_EXP_OUT,
+		clin_dir = ANNOTATECLINICAL_OUT,
+		fastqc_dir = config['inputOutput']['input_fastqc'],
+		enriched_dir = GENESETANALYSIS_OUT,
+		celltype_dir = CELLTYPECLASS_OUT,
+		rawH5_dir = CREATEHD5_OUT,
+		drugCombi_dir = DRUGCOMBINATION,
+		cluster_dir = PHENOGRAPH_OUT,
+		mean_dir = GENE_EXP_OUT,
+		filtered_dir = FILTER_GENES_CELLS_OUT,
+		atypical_dir = REMOVE_ATYPICAL_OUT,
+		plotting_dir = PLOTTING_OUT,
+		plotexpr_dir = PLOTTING_OUT + 'gene_expression/',
+		gsva_dir = GSVA_OUT,
+		sequencing_runName = config['inputOutput']['sequencing_runName'],
+		lsfoutfile = OUTDIR + 'complete_clinical.lsfout.log',
+		lsferrfile = OUTDIR + 'complete_clinical.lsferr.log',
+		mem = '1000',
+		scratch = '1000',
+		time = '500',
+		outdir_clinT = CLINICALTRIALS_OUT,
+		one_or_multi_cluster = ONE_OR_MULTI_CLUSTER,
+	benchmark:
+		OUTDIR + 'complete_clinical.txt.benchmark'
+	shell:
+		'if [ -d {params.outdir_clinT}cancer_clinicalTrials ] ;' +
+		'then rm -r {params.outdir_clinT}cancer_clinicalTrials ; echo "Deleted {params.outdir_clinT}cancer_clinicalTrials" ; ' +
+		'else echo "Directory {params.outdir_clinT}cancer_clinicalTrials does not exist." ; fi ; ' +
+		'{config[tools][organize_results_copy][call]} {params.outDir_copy} {params.derivedList} {params.fastqDir} {params.sampleName} {params.cellrangerDir} {params.de_dir} {params.clin_dir} {params.fastqc_dir} {params.enriched_dir} {params.celltype_dir} {params.atypical_dir} {params.rawH5_dir} {params.drugCombi_dir} {params.cluster_dir} {params.mean_dir} {params.filtered_dir} {params.plotting_dir} {params.plotexpr_dir} {params.gsva_dir} {params.sequencing_runName} {params.one_or_multi_cluster}; date > {output}'
+
+
+rule clinical_scTranscriptomics_malignant_only:
+	input:
+		expand(GENESETANALYSIS_OUT + 'vs_other_malignant/{sample}.genes_cells_filtered.corrected.atypical_removed.DEmalignant.{clusterid_malig}.enrichedGeneSets.txt', sample = getSampleNames(), clusterid_malig = CLUSTER_IDS_MALIGNANT),
+		expand(GENESETANALYSIS_OUT + 'vs_other_malignant/{sample}.genes_cells_filtered.corrected.atypical_removed.DEmalignant.heatmap_enrichment.png', sample = getSampleNames()),
+	output:
+		OUTDIR + 'complete_clinical_malignant_only.txt'
+	params:
+		outDir_copy = RESULTCOPY_OUT,
+		derivedList =  config['resources']['derived_suffixList'],
+		fastqDir = config['inputOutput']['input_fastqs'],
+		sampleName = expand('{sample}', sample = getSampleNames()),
+		cellrangerDir = CELLRANGER_OUT,
+		de_dir = DIFF_EXP_OUT,
+		fastqc_dir = config['inputOutput']['input_fastqc'],
+		enriched_dir = GENESETANALYSIS_OUT,
+		celltype_dir = CELLTYPECLASS_OUT,
+		rawH5_dir = CREATEHD5_OUT,
+		cluster_dir = PHENOGRAPH_OUT,
+		mean_dir = GENE_EXP_OUT,
+		filtered_dir = FILTER_GENES_CELLS_OUT,
+		atypical_dir = REMOVE_ATYPICAL_OUT,
+		plotting_dir = PLOTTING_OUT,
+		plotexpr_dir = PLOTTING_OUT + 'gene_expression/',
+		gsva_dir = GSVA_OUT,
+		sequencing_runName = config['inputOutput']['sequencing_runName'],
+		lsfoutfile = OUTDIR + 'complete_clinical.lsfout.log',
+		lsferrfile = OUTDIR + 'complete_clinical.lsferr.log',
+		mem = '1000',
+		scratch = '1000',
+		time = '500',
+		no_tumor_or_malig_only = NO_TUMOR_OR_MALIG_ONLY,
+	benchmark:
+		OUTDIR + 'complete_clinical_malignant_only.txt.benchmark'
+	shell:
+		'{config[tools][organize_results_copy][call_noTumor]} {params.outDir_copy} {params.derivedList} {params.fastqDir} {params.sampleName} {params.cellrangerDir} {params.de_dir} {params.fastqc_dir} {params.enriched_dir} {params.celltype_dir} {params.atypical_dir} {params.rawH5_dir} {params.cluster_dir} {params.mean_dir} {params.filtered_dir} {params.plotting_dir} {params.plotexpr_dir} {params.gsva_dir} {params.sequencing_runName} {params.no_tumor_or_malig_only}; date > {output}'
+
+rule clinical_scTranscriptomics_noTumor:
+	output:
+		OUTDIR + 'complete_clinical_noTumor.txt'
+	params:
+		outDir_copy = RESULTCOPY_OUT,
+		derivedList =  config['resources']['derived_suffixList'],
+		fastqDir = config['inputOutput']['input_fastqs'],
+		sampleName = expand('{sample}', sample = getSampleNames()),
+		cellrangerDir = CELLRANGER_OUT,
+		de_dir = DIFF_EXP_OUT,
+		fastqc_dir = config['inputOutput']['input_fastqc'],
+		enriched_dir = GENESETANALYSIS_OUT,
+		celltype_dir = CELLTYPECLASS_OUT,
+		rawH5_dir = CREATEHD5_OUT,
+		cluster_dir = PHENOGRAPH_OUT,
+		mean_dir = GENE_EXP_OUT,
+		filtered_dir = FILTER_GENES_CELLS_OUT,
+		atypical_dir = REMOVE_ATYPICAL_OUT,
+		plotting_dir = PLOTTING_OUT,
+		plotexpr_dir = PLOTTING_OUT + 'gene_expression/',
+		gsva_dir = GSVA_OUT,
+		sequencing_runName = config['inputOutput']['sequencing_runName'],
+		lsfoutfile = OUTDIR + 'complete_clinical.lsfout.log',
+		lsferrfile = OUTDIR + 'complete_clinical.lsferr.log',
+		mem = '1000',
+		scratch = '1000',
+		time = '500',
+		no_tumor_or_malig_only = NO_TUMOR_OR_MALIG_ONLY,
+	benchmark:
+		OUTDIR + 'complete_clinical_noTumor.txt.benchmark'
+	shell:
+		'{config[tools][organize_results_copy][call_noTumor]} {params.outDir_copy} {params.derivedList} {params.fastqDir} {params.sampleName} {params.cellrangerDir} {params.de_dir} {params.fastqc_dir} {params.enriched_dir} {params.celltype_dir} {params.atypical_dir} {params.rawH5_dir} {params.cluster_dir} {params.mean_dir} {params.filtered_dir} {params.plotting_dir} {params.plotexpr_dir} {params.gsva_dir} {params.sequencing_runName} {params.no_tumor_or_malig_only}; date > {output}'
+

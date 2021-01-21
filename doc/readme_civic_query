@@ -1,0 +1,25 @@
+## CIVIC query
+When executing the CIVIC query as part of the pipeline, the following file can be used to choose its cancer specific parameters (`--cancerTypeList`, `--blackList` and `--highLevelList`). It contains a list of the diseases that were available in CIVIC as of the date specified in **DATE**.
+```
+civic_available_diseases_**DATE**.txt
+```
+To update this list, run the following commands (using todays date):
+```
+> wget https://civicdb.org/downloads/nightly/nightly-ClinicalEvidenceSummaries.tsv
+> cut -f4 nightly-ClinicalEvidenceSummaries.tsv | tail -n+2 | sort | uniq > civic_available_diseases_**DATE**.txt; rm nightly-ClinicalEvidenceSummaries.tsv
+```
+
+## Use of cancer specific parameters
+For each evidence type (eg. Predictive, Diagnostic, Prognostic, Predisposing):
+    - Info on matched black-listed cancer types will be excluded from the query (partial matches sought), if any were provided.
+    - Return info on matched white-listed cancer types (partial matches sought). These will be considered as cancer-specific ('ct').
+    - If previous are not available or not provided, return info on matched high level cancer types (exact matches sought). These will be considered as general ('gt').
+    - If previous are not available or not provided, return info on all available cancer types for the given matched variant (except those included in the black list). These will be considered as off label ('nct').
+
+NOTE: only PARTIAL matches to the white and black list are allowed. Eg:
+    - including 'small' will remove 'non-small cell lung cancer' and 'lung small cell carcinoma'
+    - including 'non-small' will remove 'non-small cell lung cancer' but not 'lung small cell carcinoma'
+    - including 'melanoma' will match 'melanoma', 'skin melanoma' and 'uveal melanoma', but not 'skin cancer'
+    - including 'uveal melanoma' will match 'uveal melanoma' and not ‘melanoma’
+NOTE: In CIVIC, some 'general' cancer types are included as diseases (as of 2019-08-19: 'cancer' and 'solid tumor'). Hence, they must occur as exact matches since they are database specific. Eg:
+    - including 'cancer' will only match 'cancer' and not 'lung cancer'
