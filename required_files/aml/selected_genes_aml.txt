@@ -1,0 +1,378 @@
+SYMBOL	group	notes	known_mutations
+MECOM	priority_genes	;ALIAS:EVI1;	
+CD34	priority_genes	main HSC	
+KIT	priority_genes	main HSC	CD117
+CD33	priority_genes	main HSC	
+CD38	priority_genes	main HSC	
+IL3RA	priority_genes	main HSC;ALIAS:CD123;	CD123
+FLT3	priority_genes		
+NPM1	priority_genes		
+TP53	priority_genes		
+ASXL1	priority_genes		
+CEBPA	priority_genes		
+RUNX1	priority_genes		
+CD44	priority_genes	integrine subunit	NA
+PDCD1	priority_genes	PD-1, the gene was first included in this list as CD279;ALIAS:PD-1;	
+CD274	priority_genes	PD-L1;ALIAS:PD-L1;	
+PDCD1LG2	priority_genes	PD-L2	
+CTLA4	priority_genes		
+CD47	priority_genes		CD30, Immune marker
+BCL2	priority_genes	apoptosis	
+BCL2A1	priority_genes	apoptosis	
+MCL1	priority_genes	apoptosis	
+THY1	priority_genes	CD90, also as "other" marker	Mesenchymal stem cells
+IDH1	priority_genes		Adult/Cancer stem cells
+IDH2	priority_genes		Adult/Cancer stem cells
+CDK4	priority_genes	"amplifcations (overexpression) potentially sensitive to CDK4/6 in inhibitors, in case of CDKN2A loss CDK4_6 should be expressed"	NA
+CDK6	priority_genes	"amplifcations (overexpression) potentially sensitive to CDK4/6 in inhibitors, in case of CDKN2A loss CDK4_6 should be expressed"	NA
+KMT2A	priority_genes	;ALIAS:MLL;	NA
+DNMT3A	priority_genes		NA
+CCND1	drug_target	amplications (overexpression) potentially sensitive to CDK4/6 inhibitors	NA
+CDK4	drug_target	"amplifcations (overexpression) potentially sensitive to CDK4/6 in inhibitors, in case of CDKN2A loss CDK4_6 should be expressed"	NA
+CDK6	drug_target	"amplifcations (overexpression) potentially sensitive to CDK4/6 in inhibitors, in case of CDKN2A loss CDK4_6 should be expressed"	NA
+CDK9	drug_target		NA
+CDKN2A	drug_target	"loss in 15% of melanomas, loss of G1/S checkpoint, loss potentially sensitive to CDK4/6 inhibitors"	NA
+KITLG	drug_target	"ligand for cKIT receptor (expressed by CAFs?), should cooccur with cKIT expression"	NA
+MET	drug_target	"receptor for HGF, targetable with crizotinib etc."	exon 14 deletion (splice site and other mutations)
+MTOR	drug_target	"potentially expressed in PTEN loss melanomas, targetable by Everolimus"	activating mutations
+NF1	drug_target	loss of expression via mutation or genomic loss is indicative of MEKi sensitivity	loss of function mutations
+PDGFRA	drug_target	"expressed by some melanomas, targetable with regorafenib, imatinib etc, ligands are PDGF-AA and PDGF-BB which should be co-expressed (potentially by melanoma cells themselfes, https://www.ncbi.nlm.nih.gov/pubmed/8977709)"	NA
+PIK3CA	drug_target	"should be expressed in PTEN loss melanomas, targetable with PI3Ki or everolimus"	activating mutations
+PTEN	drug_target	"loss associated with PI3K pathway activation, targetable by mTOR inhibitors"	loss of function mutations
+TP53	drug_target		
+ERBB2	drug_target	;ALIAS:HER2;	
+ERBB3	drug_target	;ALIAS:HER3;	
+ITGAX	immunoregulatory	integrine subunit	NA
+CLEC12A	immunoregulatory	integrine subunit	NA
+HLA-A	immunoregulatory		NA
+HLA-B	immunoregulatory		NA
+HLA-C	immunoregulatory		NA
+LAG3	immunoregulatory		
+GZMB	immunoregulatory		
+HAVCR2	immunoregulatory	the gene was first included in this list as TIM3;ALIAS:TIM3;	
+TIGIT	immunoregulatory		
+ICOS	immunoregulatory		
+B2M	immunoregulatory		
+TNFRSF9	immunoregulatory	4-1BB	
+TNFRSF18	immunoregulatory	the gene was first included in this list as GITR	
+PTPRC	immunoregulatory	CD45;ALIAS:CD45;	
+VSIR	immunoregulatory	;ALIAS:VISTA;	
+IFNG	immunoregulatory	IFNG+	pro-inflammatory cytokine, activates macrophages and inhibits Th2 proliferation, stimulates B cells secrete antibodies
+MPO	celltype_marker	granulocyte	
+CD200R1	celltype_marker	M2 Macrophage	Limits inflammation by inhibiting expression of pro-inflammatory molecules (TNF-alpha, interferons, iNOS) in response to selected stimuli.
+TGFB1	celltype_marker	M2/TAM	Transforming growth factor beta, regulates cell proliferation, differentiation and growth, frequently upregulated in tumor cells
+KDR	celltype_marker	M2 Macrophage	key element of the urea cycle, metabolites proline and polyamides drive collagen synthesis and cell proliferation, critical regulator of innate and adaptive immune responses
+VEGFA	celltype_marker	TAM	Growth factor active in angiogenesis, vasculogenesis and endothelial cell growth. Induces endothelial cell proliferation, promotes cell migration, inhibits apoptosis and induces permeabilization of blood vessels
+VEGFB	celltype_marker	TAM	regulates the formation of blood vessels and are involved in endothelial cell physiology
+CD14	celltype_marker	general Macro marker	coreceptor for bacterial LPS
+CD68	celltype_marker	general Macro marker	Binds to tissue- and organ-specific lectins or selectins,  member of the scavenger receptor family clearing cell debris
+CD19	celltype_marker	general B cell marker	
+MS4A1	celltype_marker	general B cell marker	
+CD79A	celltype_marker	general B cell marker	
+CD24	celltype_marker	high on regulatory B cells	
+CD27	celltype_marker	pos for activated B cells including plasmablasts/cells	
+CD4	celltype_marker	CD4 pos, Treg	
+CD8A	celltype_marker	CD8 pos	
+CD8B	celltype_marker	CD8 pos	
+FOXP3	celltype_marker	Treg	
+IL2RA	celltype_marker	Treg	
+CD3E	celltype_marker	general	
+CD3G	celltype_marker	general	
+CD3D	celltype_marker	general	
+PRF1	celltype_marker	Perforin, cytotoxicity marker	
+TGFBR1	celltype_marker		
+CXCL12	celltype_marker	Stromal cell derived factor SDF-1alpha	Adult (tissue) stem cells
+CXCR4	celltype_marker		Adult (tissue) stem cells
+WT1	celltype_marker	Wilms Tumor Protein	Adult (tissue) stem cells
+CD44	celltype_marker		Mesenchymal stem cells
+IL3RA	celltype_marker	CD123	Mesenchymal stem cells
+PDGFRA	celltype_marker	CD140a	Mesenchymal stem cells
+PDGFRB	celltype_marker	CD140b	Mesenchymal stem cells
+DOT1L	celltype_marker		Adult/Cancer stem cells
+GYPA	celltype_marker	Late Erythroid	NA
+HBB	celltype_marker	Erythroid	NA
+HBD	celltype_marker	Erythroid	NA
+ANPEP	aml_celllines	CMK115,NB4	
+KIT	aml_celllines	CMK115	
+CD34	aml_celllines	CMK115	
+PTPRC	aml_celllines	CMK115;ALIAS:CD45;	
+HAVCR2	aml_celllines	CMK115;ALIAS:TIM3;	
+CD55	aml_celllines	CMK115	
+CD274	aml_celllines	CMK115;ALIAS:PD-L1;	
+CD7	aml_celllines	CMK115	
+ITGA2B	aml_celllines	CMK115	
+CD33	aml_celllines	CMK115	
+CDK6	aml_celllines	CMK115	
+TFRC	aml_celllines	CMK115	
+CD38	aml_celllines	NB4	
+TP53	aml_celllines	NB4	
+CD4	aml_celllines	NB4,MV411	
+FUT4	aml_celllines	NB4,MV411	
+CD70	aml_celllines	NB4	
+IL3RA	aml_celllines	MV411	
+BCL2	aml_celllines	MV411	
+THBD	aml_celllines	MV411	
+SPP1	stem_cell_markers		
+G3BP1	stem_cell_markers		
+ABCB1	stem_cell_markers		
+ALK	drug_targets_2		
+NRAS	drug_targets_2		
+BCOR	drug_targets_2		
+BCORL1	drug_targets_2		
+TET2	drug_targets_2		
+HDAC1	drug_targets_2		
+HDAC2	drug_targets_2		
+HDAC3	drug_targets_2		
+HDAC8	drug_targets_2		
+HDAC4	drug_targets_2		
+HDAC5	drug_targets_2		
+HDAC6	drug_targets_2		
+HDAC7	drug_targets_2		
+HDAC9	drug_targets_2		
+HDAC10	drug_targets_2		
+HDAC11	drug_targets_2		
+MST1R	drug_targets_2		
+CD4	Tcell_marker	CD4 pos, Treg	
+CD8A	Tcell_marker	CD8 pos	
+CD8B	Tcell_marker	CD8 pos	
+FOXP3	Tcell_marker	Treg	
+CTLA4	Tcell_marker	Treg	
+IL2RA	Tcell_marker	Treg	
+LAG3	Tcell_marker	CD8 pos	
+FASLG	Tcell_marker	CD8 pos	
+HAVCR2	Tcell_marker	CD8 pos;ALIAS:TIM3;	
+PDCD1	Tcell_marker	CD8 pos;ALIAS:PD-1;	
+CD38	Tcell_marker	CD8 pos	
+ENTPD1	Tcell_marker	CD8 pos	
+BATF	Tcell_marker	CD8 pos	
+PTPN6	Tcell_marker	CD8 pos	
+CD3E	Tcell_marker	general	
+CD3G	Tcell_marker	general	
+CD3D	Tcell_marker	general	
+TRAC	Tcell_marker	gamma delta	
+TRGC2	Tcell_marker	gamma delta	
+IL17A	Tcell_marker	activated, TH 17	
+IL17F	Tcell_marker	activated, TH17	
+IFNG	Tcell_marker	activates macrophages	
+TBX21	Tcell_marker	TH1 cells	
+IL4	Tcell_marker	activated, TH 2	
+IL13	Tcell_marker	activated TH2 cells	
+GATA3	Tcell_marker	TH2 cells	
+EBI3	Tcell_marker	Cd4 differentiation	
+IL21	Tcell_marker	potentially NK cell differentiation	
+TNF	Tcell_marker	activator and regulator of immune function	
+KLRD1	Tcell_marker	NK cells	
+NCAM1	Tcell_marker	NK cells	
+CCL4	Tcell_marker	NK cells	
+FCGR3A	Tcell_marker	NK cells	
+CD7	Tcell_marker	NK cells	
+PRF1	Tcell_marker	Perforin, cytotoxicity marker	
+CD19	Bcell_marker	general B cell marker	
+MS4A1	Bcell_marker	general B cell marker	
+CD79A	Bcell_marker	general B cell marker	
+CXCR5	Bcell_marker	pos for memory B cell	
+CR2	Bcell_marker	CD21, high for marginal zone B cells, pos for follicular B cells	
+FCER2	Bcell_marker	CD23, high for follicular B cells, pos for marginal zone B cells	
+CD24	Bcell_marker	high on regulatory B cells	
+CD1D	Bcell_marker	high on regulatory B cells	
+CD1	Bcell_marker	pos for marginal zone B cells	
+CD38	Bcell_marker	activated B cell marker	
+CD5	Bcell_marker	pos for regulatory B cells	
+PRDM1	Bcell_marker	BLIMP1, plasma cell transcription factor	
+CD27	Bcell_marker	pos for activated B cells including plasmablasts/cells	
+BCL6	Bcell_marker	germinal centre B cell specific transcription factor	
+AICDA	Bcell_marker	key germinal centre marker gene (dark zone), DNA editing	
+CD69	Bcell_marker	activated B cells	
+IL2RA	Bcell_marker	activated B cells	
+TNFRSF8	Bcell_marker	activated B cells	
+MME	Bcell_marker	CD10, pos for germinal centre B cells	
+SDC1	Bcell_marker	CD138, plasma cell marker	
+IRF4	Bcell_marker	plasma cell transcription marker	
+XBP1	Bcell_marker	plasma cell transcription factor	
+CD40	Bcell_marker	pos for memory B cells	
+CD83	Bcell_marker	high on germinal centre light zone cells	
+BCL2A1	Bcell_marker	apoptosis, high on GC light zone cells	
+IL10	Bcell_marker	cytokine of regulatory B cells	
+TGFB1	Bcell_marker	cytokine of regulatory B cells	
+IL12A	Bcell_marker	cytokine of regulatory B cells	
+IGHM	Bcell_marker	on naive B cells	
+IGHD	Bcell_marker	on naive B cells	
+IGHE	Bcell_marker	isotype switched B cell, allergy response	
+IGHA1	Bcell_marker	isotype switched B cell, secreted: mucosal surface and gut	
+IGHA2	Bcell_marker	isotype switched B cell, secreted: mucosal surface and gut	
+IGHG1	Bcell_marker	isotype switched B cell, IgG1, plasma antibody	
+IGHG2	Bcell_marker	isotype switched B cell, IgG2, plasma antibody	
+IGHG3	Bcell_marker	isotype switched B cell, IgG3, plasma antibody	
+IGKC	Bcell_marker	light chain constant kappa, high in plasma cells	
+IGLC1	Bcell_marker	light chain constant lambda 1, high in plasma cells	
+IGLC2	Bcell_marker	light chain constant lambda 2, high in plasma cells	
+JCHAIN	Bcell_marker	IGJ, on plasma cells secreting antibodies of either IgM or IgA isotype	
+CD47	Macro_marker	CD30, Immune marker	
+GATA6	Macro_marker	regulates tissue resident macrophages	
+CD14	Macro_marker	general Macro marker	coreceptor for bacterial LPS
+AIF1	Macro_marker	general Macro marker	coreceptor for bacterial LPS
+FCGR3A	Macro_marker	general Macro marker	CD16 (Fc-gamma receptor IIIB), recognition of antibody bound antigen
+FCGR1A	Macro_marker	general Macro marker	CD64 (Fc-gamma receptor I A1), recognition of antibody bound antigen
+CD68	Macro_marker	general Macro marker	Binds to tissue- and organ-specific lectins or selectins,  member of the scavenger receptor family clearing cell debris
+TFRC	Macro_marker	general Macro marker	CD71 (transferrin receptor), cellular iron uptake
+ITGAM	Macro_marker	general Macro marker	CD11b, implicated in various adhesive interactions of monocytes, macrophages and granulocytes, mediates uptake of complement-coated particles and pathogens
+HLA-DR	Macro_marker	general Macro marker	class II antigen presentation
+NOS2	Macro_marker	general Macro marker	production of nitric oxide (NO), enhances pro-inflammatory mediators such as IL6/CXCL8, in macros, NO mediates tumoricidal/bactericidal actions
+CXCL9	Macro_marker	M1 Macrophage	chemoattractant for lymphocytes but not neutrophils, chemotactic for activated T-cells, binds to CXCR3
+CXCL10	Macro_marker	M1 Macrophage	pro-inflammatory cytokine, binds CXCR3, recruitment of immune cells to site of infection
+CXCL11	Macro_marker	M1 Macrophage	pro-inflammatory cytokine, binds CXCR3, chemotactic for interleukin-activated T-cells but not unstimulated T-cells, neutrophils or monocytes.
+CD80	Macro_marker	M1 Macrophage	costimulatory signal for T-lymphocyte activation, ligand to CD28/CTLA-4, activates T cells when bound to CD28, inhibits T cells when bound to CTLA4
+CD86	Macro_marker	M1 Macrophage	paralog of CD80, costimulatory signal to T cells, CD28/CTLA-4 ligand -> induces/inhibits T cell activation
+STAT2	Macro_marker	M1 Macrophage	mediates singling by type I interferon (IFNA, IFNB), becomes phosphorylated, binds with STAT1, activates IFN-regulated genes -> antiviral cell state
+TLR2	Macro_marker	M1 Macrophage	pathogen recognition (PAMPs), mediates innate immune response to bacterial lipoproteins and lipopeptides
+IL18	Macro_marker	M1 Macrophage	pro-inflammatory cytokine that augments natural killer cell activity and stimulates interferon gamma production in T-helper type I cells
+IL6	Macro_marker	M1 Macrophage	pro-inflammatory cytokine (acute phase response), induces B cell maturation, pyrogen (fever-inducing)
+CIITA	Macro_marker	M1 Macrophage	controls MHC class II gene transcription
+SOCS3	Macro_marker	M1 Macrophage	negative regulators of cytokine signaling, regulates IL-6 signalling
+CCL17	Macro_marker	M2 Macrophage	Chemotactic factor for T-lymphocytes but not monocytes or granulocytes. May play a role in trafficking and activation of mature T-cells. Binds to CCR4.
+CCL18	Macro_marker	M2 Macrophage	Chemotactic, attracts lymphocytes but not monocytes/granulocytes.
+CCL22	Macro_marker	M2 Macrophage	Cytokine: Chemotactic for monocytes, dendritic cells, natural killer cells and for chronically activated T lymphocytes. Binds CCR4.
+CD209	Macro_marker	M2 Macrophage	Pathogen-recognition receptor (many viruses, ICAM2/3) expressed on immature dendritic cells and involved in initiation of primary immune response.
+CD163	Macro_marker	M2/TAM	Acute phase-regulated receptor involved in clearance and endocytosis of hemoglobin complexes. May thereby protect tissues from free oxidative damage. Soluble has anti-inflammatory activity.
+STAT3	Macro_marker	M2 Macrophage	mediates cellular responses to interleukins, KITLG/SCF, LEP and other growth factors. Acts as a regulator of inflammatory response by regulating differentiation of naive CD4(+) T-cells into T-helper Th17 or regulatory T-cells (Treg).
+STAT6	Macro_marker	M2 Macrophage	Involved in IL4/interleukin-4- and IL3/interleukin-3-mediated signaling. Humoral activity: differentiation of T helper 2 (Th2) cells
+IL10	Macro_marker	M2/TAM	Major immuneregulatory cytokine that acts on many cells of the immune system, it has profound anti-inflammatory functions limiting excessive tissue disruption caused by inflammation. Downregulates Th1 cytokine expression, MHCII expression and costimulatory receptors on macrophages, inhibits release of proinfl cytokines, enhances B cell activity
+MRC1	Macro_marker	M2/TAM/CD169+	CD206, Mannose Receptor, acts as phagocytic receptor for bacteria, fungi and other pathogens, mediates the endocytosis of glycoproteins by macrophages
+CD200R1	Macro_marker	M2 Macrophage	Limits inflammation by inhibiting expression of pro-inflammatory molecules (TNF-alpha, interferons, iNOS) in response to selected stimuli.
+TGFB1	Macro_marker	M2/TAM	Transforming growth factor beta, regulates cell proliferation, differentiation and growth, frequently upregulated in tumor cells
+KDR	Macro_marker	M2 Macrophage	key element of the urea cycle, metabolites proline and polyamides drive collagen synthesis and cell proliferation, critical regulator of innate and adaptive immune responses
+VEGFA	Macro_marker	TAM	Growth factor active in angiogenesis, vasculogenesis and endothelial cell growth. Induces endothelial cell proliferation, promotes cell migration, inhibits apoptosis and induces permeabilization of blood vessels
+VEGFB	Macro_marker	TAM	regulates the formation of blood vessels and are involved in endothelial cell physiology
+VEGFC	Macro_marker	TAM	Growth factor active in angiogenesis, and endothelial cell growth, stimulating their proliferation and migration and also has effects on the permeability of blood vessels
+VEGFD	Macro_marker	TAM	Growth factor active in angiogenesis, lymphangiogenesis and endothelial cell growth, stimulating their proliferation and migration and also has effects on the permeability of blood vessels.
+CD3G	Macro_marker	TAM/TCR+	CD3, universal T cell marker
+CD3E	Macro_marker	TAM/TCR+	CD3, universal T cell marker
+CD3D	Macro_marker	TAM/TCR+	CD3, universal T cell marker
+CCL2	Macro_marker	TAM/TCR+	cytokine, chemotactic activity for monocytes and basophils but not for neutrophils or eosinophils, binds CCR2/4
+STAT1	Macro_marker	TAM	Signal transducer and transcription activator that mediates cellular responses to interferons (IFNs)
+TRAC	Macro_marker	TCR+	Constant region of T cell receptor (TR) alpha chain
+TRGC2	Macro_marker	TCR+	Constant region of T cell receptor (TR) gamma chain that participates in the antigen recognition
+ZAP70	Macro_marker	TCR+	functions in the initial step of TCR-mediated signal transduction in combination with the Src family kinases, Lck and Fyn
+FYN	Macro_marker	TCR+	participates in negative feedback regulation of TCR signaling
+LCK	Macro_marker	TCR+	plays a key role in T-cell antigen receptor (TCR)-linked signal transduction pathways
+SIGLEC1	Macro_marker	CD169+	CD169, lectin-like adhesion molecule that binds glycoconjugate ligands, expressed by subpopulation of macrophages
+ITGAX	Macro_marker	CD169+ 	CD11c, mediates cell-cell interaction during inflammatory responses. It is especially important in monocyte adhesion and chemotaxis
+MARCO	Macro_marker	MARCO+	Pattern recognition receptor (PRR) which binds Gram-positive and Gram-negative bacteria
+IFNG	Macro_marker	IFNG+	pro-inflammatory cytokine, activates macrophages and inhibits Th2 proliferation, stimulates B cells secrete antibodies
+CLEC4C	pDC_marker	pDC - key marker distinguishing from conventional DCs	BDCA2
+NRP1	pDC_marker	pDC	BDCA4
+IL3RA	pDC_marker	pDC - key marker distinguishing from conventional DCs	CD123
+LILRA4	pDC_marker	pDC	ILT-7
+HLA-DR	pDC_marker	pDC	MHC II low
+CD68	pDC_marker	pDC	
+SELL	pDC_marker	pDC	CD62L
+LAIR1	pDC_marker	pDC	
+CD4	pDC_marker	pDC	
+CCR7	pDC_marker	pDC	
+TLR7	pDC_marker	pDC	
+FCGR2A	pDC_marker	pDC	CD32
+CXCL8	pDC_marker	pDC	
+IL6	pDC_marker	pDC	
+GZMB	pDC_marker	pDC	
+IL2RA	pDC_marker	pDC	
+FAP	fibroblast_markers	exploratory cell type specific genes	
+THY1	fibroblast_markers	exploratory cell type specific genes	
+DCN	fibroblast_markers	exploratory cell type specific genes	
+COL1A1	fibroblast_markers	exploratory cell type specific genes	
+COL1A2	fibroblast_markers	exploratory cell type specific genes	
+COL6A1	fibroblast_markers	exploratory cell type specific genes	
+COL6A2	fibroblast_markers	exploratory cell type specific genes	
+COL6A3	fibroblast_markers	exploratory cell type specific genes	
+LUM	fibroblast_markers	exploratory cell type specific genes	
+COL3A1	fibroblast_markers	exploratory cell type specific genes	
+PODN	fibroblast_markers	exploratory cell type specific genes	
+PDGFRL	fibroblast_markers	exploratory cell type specific genes	
+PDGFRB	fibroblast_markers	exploratory cell type specific genes	
+COL14A1	fibroblast_markers	exploratory cell type specific genes	
+TAGLN	fibroblast_markers	exploratory cell type specific genes	
+IGFBP6	fibroblast_markers	exploratory cell type specific genes	
+FBLN1	fibroblast_markers	exploratory cell type specific genes	
+SPOCK1	fibroblast_markers	exploratory cell type specific genes	
+ADAM33	fibroblast_markers	exploratory cell type specific genes	
+PDGFRA	fibroblast_markers	exploratory cell type specific genes	
+SERPINF1	fibroblast_markers	exploratory cell type specific genes	
+COL5A2	fibroblast_markers	exploratory cell type specific genes	
+IGFBP5	fibroblast_markers	exploratory cell type specific genes	
+ELN	fibroblast_markers	exploratory cell type specific genes	
+ACTA2	fibroblast_markers	exploratory cell type specific genes	
+PLIN2	fibroblast_markers	exploratory cell type specific genes	
+APOE	fibroblast_markers	exploratory cell type specific genes	
+LTA	Bcell_marker		
+LTB	Bcell_marker		
+CXCL13	Bcell_marker		
+IRF8	Macro_marker		
+TOX	Tcell_marker		
+ACY3	defining_marker		
+ANPEP	defining_marker		
+AZU1	defining_marker		
+CD14	defining_marker		
+CD177	defining_marker		
+CD33	defining_marker		
+CD74	defining_marker		
+CD79A	defining_marker		
+CD9	defining_marker		
+CEBPE	defining_marker		
+CLC	defining_marker		
+CLEC14A	defining_marker		
+CSF1R	defining_marker		
+CSF3R	defining_marker		
+CST7	defining_marker		
+CXCL12	defining_marker		
+DNTT	defining_marker		
+ELANE	defining_marker		
+FCER1A	defining_marker		
+FCN1	defining_marker		
+GATA1	defining_marker		
+GATA2	defining_marker		
+GYPA	defining_marker		
+HBB	defining_marker		
+HBD	defining_marker		
+HDC	defining_marker		
+HEMGN	defining_marker		
+HLA-DQB2	defining_marker		
+HLF	defining_marker		
+ID2	defining_marker		
+IRF8	defining_marker		
+ITGA2B	defining_marker		
+KLF1	defining_marker		
+LEPR	defining_marker		
+LMO4	defining_marker		
+LTF	defining_marker		
+LYZ	defining_marker		
+MLXIP	defining_marker		
+MNDA	defining_marker		
+MPO	defining_marker		
+MS4A2	defining_marker		
+MS4A7	defining_marker		
+NKG7	defining_marker		
+PF4	defining_marker		
+PLEK	defining_marker		
+PPBP	defining_marker		
+RNASE2	defining_marker		
+RNASE3	defining_marker		
+RNF130	defining_marker		
+SMAHD1	defining_marker		
+SPIB	defining_marker		
+SPINK2	defining_marker		
+STAT1	defining_marker		
+TFRC	defining_marker		
+TPSB2	defining_marker		
+VCAN	defining_marker		
+VPREB1	defining_marker		
+VPREB2	defining_marker		
+VWF	defining_marker		
+CD14	lineage_marker		
+CD19	lineage_marker		
+CD3D	lineage_marker		
+CD3E	lineage_marker		
+CD4	lineage_marker		
+CD79A	lineage_marker		
+CD8A	lineage_marker		
+FCGR3A	lineage_marker		
+MS4A1	lineage_marker		
+NCAM1	lineage_marker		

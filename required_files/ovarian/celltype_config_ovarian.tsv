@@ -1,0 +1,7 @@
+Major	Subtype
+B.cells_ovca_find.markers.14.group.12.20	B.cells.naive_normal_Newman15,B.cells.memory_normal_Newman15,Plasma.cells_normal_Newman15
+HGSOC_ovca_find.markers.14.group.0.2.3.5.6.7	none
+Fibroblasts_ovca_find.markers.14.group.14	none
+Endothelial.progenitor_ovca_find.markers.14.group.16	none
+T.cells_ovca_find.markers.14.group.4.8.11.15.17	T.cells.CD8_normal_Newman15,T.cells.CD4.naive_normal_Newman15,T.cells.memory.resting_normal_Newman15,T.cells.memory.activated_normal_Newman15,T.cells.regulatory_normal_Newman15,T.cells.gamma.delta_normal_Newman15,NK.cells.resting_normal_Newman15,NK.cells.activated_normal_Newman15,Tcell.CD8.early.activated_melanoma_Feldman18,T.cell.memory.effector_melanoma_Feldman18,T.cell.CD8.exhausted_melanoma_Feldman18
+Macrophages_ovca_find.markers.14.group.1.10.13.19	M1.Macrophages_normal_literature,M2.Macrophages_normal_literature,TAM.Macrophages_normal_literature,TCRpos.Macrophages_normal_literature,CD169pos.Macrophages_normal_literature

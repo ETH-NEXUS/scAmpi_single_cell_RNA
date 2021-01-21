@@ -1,0 +1,17 @@
+cell_type	colour	class	indications
+T.cells_find.markers.1.union.group.2.5.6.10.13_classifier	blue2	Major	Mel
+T.cells.CD8_normal_Newman15	cyan2	Subtype	Mel,OvCa
+T.cells.CD4.naive_normal_Newman15	steelblue1	Subtype	Mel,OvCa
+NK.cells.resting_normal_Newman15	mediumpurple1	Subtype	Mel,OvCa
+NK.cells.activated_normal_Newman15	deeppink4	Subtype	Mel,OvCa
+B.cells_find.markers.1.union.group.14_classifier	green4	Major	Mel
+Plasma.cells_find.markers.1.group.19_classifier	darkcyan	Subtype	Mel,OvCa
+Plasmacytoid.dendritic.cell_melanoma_classifier	darkolivegreen1	Subtype	Mel,OvCa
+AML_find.markers.1.union.group.0.1.3.4.7.8.9.11.17.18_classifier	red2	Major	Mel
+AML.GMP.like_aml_VanGalen19	indianred3	Major	Mel
+Myeloid.putativeAML_bone.marrow_VanGalen19	gold	Major	Mel
+GMP.putativeAML_bone.marrow_VanGalen19	goldenrod3	Subtype	Mel,OvCa
+HSC.Prog.putativeAML_bone.marrow_VanGalen19	tan	Subtype	Mel,OvCa
+AML.HSC.Prog.like_aml_VanGalen19	chocolate1		AML
+AML.Myeloid.like_aml_VanGalen19	violetred1		AML
+Erythroid.cells_find.markers.1.group.12.15_classifier	saddlebrown		AML

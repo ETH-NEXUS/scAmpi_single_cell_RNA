@@ -1,0 +1,46 @@
+orig-name	rank (comment)	approved for melanoma (CH)?
+Trametinib	1 (MEKi, any MAPK driven melanoma)	approved
+Dabrafenib	2 (BRAFi, any BRAF mutated melanoma)	approved
+Palbociclib	3 (CDK4/6i, CDKN2A loss melanomas)	off label
+Crizotinib	4 (METi)	off label
+Imatinib	5 (KITi, PDGFRi, ABLi, ckit driven melanomas)	off label
+Sorafenib	6 (RAFi, VEGFRi, any MAPK driven melanoma incl. GNA/GNAQ mut.)	off label
+Erlotinib	7 (EGFRi, BRAFi resistant melanomas)	off label
+Everolimus	8 (mTORi, PTEN loss or PI3K mut. Melanomas)	off label
+Temozolomide	9 (chemo, alkylating agent)	off label
+Cisplatin	10 (chemo, alkylating)	approved
+Paclitaxel	11 (chemo,microtubule disassembly)	off label
+Dacarbazine	12 (chemo, antimetabolite, alkylating) 	approved
+Vindesine	13 (chemo, vinca-alkaloid, prevents microtubule formation)	approved
+STO	14 (Cu chelator, preclinical successful in melanoma)	preclinical
+Ulixertinib	15 (ERKi, similar inhibitor trial at USZ)	clinical trials
+MLN2480	16 (panRAFi, similar inhibitor trial at USZ)	clinical trials
+Ixazomib	17 (proteasome inhibitor, successful in melanoma pharmacoscopy)	off label
+Lenalidomide	18 (immune modulatory)	off label
+Dexamethasone	19 (corticosteroid, successful in melanoma pharmacoscopy in combi with proteasome inhibitors)	UNKNOWN
+Olaparib	20 (PARPi, melanomas with DNA repair defects)	off label
+Regorafenib	21 (multi kinase inh, VEGFR, PDGFR, RAF)	off label
+Midostaurin	22 (pan kinase inhibitor incl. PKCi)	off label
+Dasatinib	23 (SRCi, ABLi) 	off label
+Panobinostat	24 (HDACi) 	off label
+Decitabine	25 (DNA methylation inhibitor)	off label
+Hydroxyurea	26 (chemo, antimetabolite)	off label
+Melphalan	27 (chemo, alkylating agent, nitrogen mustard derived)	off label
+Cobimetinib	28 (MEKi)	approved
+Vemurafenib	29 (BRAFi)	in trials
+Ribociclib	30 (CDK4/6i)	off label 
+Cabozantinib	31 (METi, VEGFR2i)	off label 
+Gefitinib	32 (EGFRi)	off label 
+Temsirolimus	33 (mTORi)	off label 
+Carboplatin	34 (chemo, alkylating)	off label 
+Docetaxel	35 (chemo,microtubule disassembly)	off label
+Elesclomol	36 (Cu chelator)	in trials
+Vincristine	37 (chemo, vinca alkaloid, microtubule formation inhibitor)	approved
+Carfilzomib	38 (proteasome inhibitor) 	off label
+Pomalidomide	39 (immune modulatory)	off label
+Rucaparib	40 (PARPi, melanomas with DNA repair defects)	FDA approved only
+Belinostat	41 (HDACi)	FDA approved only
+Binimetinib	42 (MEKi, MEK162)	in trials
+Pazopanib	43 FRFR	
+Ponatinib	44 FGFR	
+Lenvatinib	45	

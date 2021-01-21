@@ -1,0 +1,34 @@
+AC (Doxorubicin + cyclophosphamide)	Combination chemo
+AC-T (Doxorubicin + cyclophosphamide + paclitaxel)	Combination chemo
+AC-TX (AC-T + capecitabine)	Combination chemo
+CAF (Cyclophosphamide + doxorubicin + 5-FU)	Combination chemo
+CMF (Cyclophosphamide + methotrexate + 5-FU)	Combination chemo
+FEC (5-FU + epirubicin + cyclophosphamide)	Combination chemo
+Gemcitabine + paclitaxel	Combination chemo
+TAC (Docetaxel + doxorubicin + cyclophosphamide)	Combination chemo
+Pembrolizumab + olaparib	Anti-PD1 + PARP inhibitor
+Ribociclib + olaparib	CDK4/6 inhibitor + PARP inhibitor
+Olaparib + carboplatin	PARP inhibitor + platinum
+Bicalutamide + palbociclib	Androgen antagonist + CDK4/6 inhibitor
+Pembrolizumab + AC-T	Anti-PD1
+Ribociclib + pembrolizumab	CDK4/6 inhibitor + anti-PD1
+Ixabepilone + capecitabine	Combination chemo
+Abiraterone + prednisone	CYP17A1 inhibitor
+Afatinib + paclitaxel	EGFR inhibitor
+Cetuximab + ixabepilone	EGFR inhibitor
+Erlotinib + FEC	EGFR inhibitor
+Mifepristone + carboplatin + gemcitabine	Glucocorticoid Receptor Antagonist + platinum + pyrimidine analogue
+Mifepristone + nab-paclitaxel	Glucocorticoid Receptor Antagonist + taxane
+Cobimetinib + paclitaxel	MEK inhibitor
+Everolimus + carboplatin	mTOR inhibitor
+Everolimus + FEC	mTOR inhibitor
+Everolimus + paclitaxel + cisplatin	mTOR inhibitor + platinum
+Everolimus + paclitaxel + bevacizumab	mTOR inhibitor + VEGF inhibitor
+Olaparib + paclitaxel	PARP inhibitor
+Olaparib + paclitaxel + carboplatin	PARP inhibitor + platinum
+Talazoparib + carboplatin + paclitaxel	PARP inhibitor + platinum
+Veliparib + paclitaxel + carboplatin	PARP inhibitor + platinum
+Carboplatin + AC-T	Platinum
+Carboplatin + Paclitaxel	Platinum
+Bevacizumab + AC-T	VEGF inhibitor
+Bevacizumab + AC-T + carboplatin	VEGF inhibitor

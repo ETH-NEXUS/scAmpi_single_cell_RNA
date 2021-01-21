@@ -1,0 +1,733 @@
+SYMBOL	group	notes	known_mutations
+A4GALT	glyco		
+ABO	glyco		
+ADH1B	tumor_marker		
+ALDH1A1	tumor_marker		
+ALDH1A2	tumor_marker		
+ALDH1A3	tumor_marker		
+ALG8	relevant_pathways		
+ANGPT1	drug_target		
+ANGPT2	drug_target		
+AR	tumor_marker		
+ARID1A	drug_target		
+B3GALNT1	glyco		
+B3GALT5	glyco		
+B3GNT3	glyco		
+B3GNT5	glyco		
+NANOG	cell_status	stem cell marker	
+SOX2	cell_status	stem cell marker	
+SOX3	cell_status	stem cell marker	
+SOX15	cell_status	stem cell marker	
+PAX2	cell_status	stem cell marker	
+PAX6	cell_status	stem cell marker	
+POU5F1	cell_status	stem cell marker;ALIAS:OCT4;	
+NOG	cell_status	stem cell marker	
+GBX2	cell_status	stem cell marker	
+TEKT1	cell_status	stem cell marker	
+BARD1	cell_status		
+BCL2	drug_target		
+BRAF	drug_target		
+BRCA1	drug_target		
+BRCA2	drug_target		
+CDKN2A	drug_target		
+CCND1	drug_target		
+PARP1	cell_status		
+CAV1	microenvironment		
+CAV2	em_transition		
+FGFBP1	em_transition		
+CCNE1	drug_target		
+PROM1	tumor_marker		
+CD24	tumor_marker		
+ITGB1	immunoregulatory		
+PECAM1	microenvironment		
+CD44	tumor_marker		
+PTPRC	immunoregulatory	;ALIAS:CD45;	
+CD47	immunoregulatory		
+CDH1	em_transition		E-Cadherin
+CDH2	em_transition	N-Cadherin	
+CDH3	em_transition		P-Cadherin
+SPP1	em_transition		
+CXXC1	em_transition		also an alias of SPP1
+CDK12	drug_target		
+CDK4	drug_target		
+CDK6	drug_target		
+KRT14	tumor_marker		
+KRT5	tumor_marker		
+KRT6A	tumor_marker		
+KRT6B	tumor_marker		
+KRT8	tumor_marker		
+KRT18	tumor_marker		
+CLDN1	em_transition		
+CLDN2	em_transition		
+CLDN3	em_transition		
+CLDN4	em_transition		
+CLDN5	em_transition		
+C1GALT1C1	glyco		
+CSMD3	relevant_pathways		
+CTCF	relevant_pathways		
+DDR1	drug_target		
+DNMT1	drug_target		
+ALDH1A1	drug_target	IS or growth	aldehyde dehydrogenase - GABA synthesis
+PROM1	drug_target	upregulated by ALDH1A1	
+E2F3	relevant_pathways		
+EGFR	drug_target		
+EPCAM	em_transition		
+TJP1	em_transition		ZO-1
+ESR1	drug_target		
+ESR2	drug_target		
+ERBB2	drug_target	;ALIAS:HER2;	
+EMSY	drug_target	C11orf30	
+EZH2	relevant_pathways		
+FABP4	tumor_marker		
+FAP	microenvironment		
+FGFR1	drug_target		
+FOXP3	immunoregulatory		
+S100A4	microenvironment		
+FUT1	glyco		
+FUT2	glyco		
+FUT8	glyco		
+GAS6	relevant_pathways		
+NR3C1	cell_status		
+WFDC2	tumor_marker	;ALIAS:HE4;	
+ERBB3	drug_target	;ALIAS:HER3;	
+ITGA2	relevant_pathways		
+ITGA4	relevant_pathways		
+ITGA5	relevant_pathways		
+ITGB1	relevant_pathways		
+KDM6A	relevant_pathways		
+MKI67	cell_status		
+KRAS	drug_target		
+KRT19	tumor_marker		
+KRT7	tumor_marker		
+L1CAM	tumor_marker		
+LATS1	relevant_pathways		
+LATS2	relevant_pathways		
+ABCB1	relevant_pathways		
+ABCC1	relevant_pathways		
+ABCC2	relevant_pathways		
+ABCG2	relevant_pathways		
+MECOM	tumor_marker		
+MAP2K1	drug_target		
+MAP2K2	drug_target		
+MELK	drug_target		
+MGAT3	glyco		
+MGAT5	glyco		
+MSLN	tumor_marker		
+MUC1	tumor_marker		
+MUC16	tumor_marker		
+MYC	drug_target		
+NF1	drug_target		
+NRG1	relevant_pathways		
+PAX8	tumor_marker		
+PCNA	cell_status		
+PDCD1LG2	immunoregulatory		
+PDGFRB	drug_target		
+PIAS3	microenvironment		
+PIK3CA	drug_target		
+PTEN	drug_target		
+RB1	drug_target		
+ROR1	drug_target		
+ROR2	drug_target		
+SFRP4	relevant_pathways		
+SIGLEC10	immunoregulatory		
+SIGLEC7	immunoregulatory		
+SIGLEC8	immunoregulatory		
+SIGLEC9	immunoregulatory		
+SMN1	microenvironment		
+SOX17	relevant_pathways		
+ST3GAL1	glyco		
+ST3GAL2	glyco		
+ST6GAL1	glyco		
+ST8SIA1	glyco		
+TEK	tumor_marker		
+TOP2A	cell_status		
+TP53	tumor_marker		
+TUBB	microenvironment		
+TUBB1	microenvironment		
+TUBB3	microenvironment		
+UGCG	glyco		
+VCAM1	drug_target		
+VEGFA	drug_target		
+KDM5B	drug_target		
+ABCB5	drug_target		
+MSR1	drug_target		
+VEGFA	exploratory		
+VIM	em_transition		
+WNT5A	relevant_pathways		
+WNT8B	relevant_pathways		
+WT1	exploratory		
+MDK	exploratory		
+GRN	exploratory		
+YAP1	relevant_pathways		
+PDCD1	immunoregulatory	;ALIAS:PD-1;	
+CD274	immunoregulatory	;ALIAS:PD-L1;	
+CTLA4	immunoregulatory		
+LAG3	immunoregulatory		
+GZMB	immunoregulatory		
+HLA-DRA	immunoregulatory		
+HLA-DRB1	immunoregulatory		
+HLA-DRB3	immunoregulatory		
+HLA-DRB4	immunoregulatory		
+HLA-DRB5	immunoregulatory		
+HAVCR2	immunoregulatory	;ALIAS:TIM3;	
+TIGIT	immunoregulatory		
+IDO1	immunoregulatory		
+IDO2	immunoregulatory		
+ICOS	immunoregulatory		
+CD80	immunoregulatory		
+CD86	immunoregulatory		
+CD28	immunoregulatory		
+TNFRSF9	immunoregulatory		
+TNFRSF18	immunoregulatory		
+VSIR	immunoregulatory	;ALIAS:VISTA;	
+B2M	immunoregulatory		
+IL2	cytokines		
+IL3	cytokines		
+IL6	cytokines		
+IL4	cytokines		
+IL10	cytokines		
+IL13	cytokines		
+IL17A	cytokines		
+IL17B	cytokines		
+IL17C	cytokines		
+IL17D	cytokines		
+IL23A	cytokines		
+IL23R	cytokines		
+GDF15	cytokines		
+TNF	cytokines		
+TGFB1	cytokines		
+IRF1	drug_target		
+FSHR	exploratory		
+ACTN1	exploratory		
+AKAP13	exploratory		
+AKAP9	exploratory		
+ANKRD11	exploratory		
+ATAD3C	exploratory		
+RHEX	exploratory		
+CA12	exploratory		
+CALD1	exploratory		
+CCNL1	exploratory		
+CPSF1	exploratory		
+CSAD	exploratory		
+CYP4X1	exploratory		
+DLG5	exploratory		
+ECHDC2	exploratory		
+ERBB3	exploratory	;ALIAS:HER3;	
+GABRE	exploratory		
+KIAA1217	exploratory		
+KMT2E	exploratory		
+LAMA5	exploratory		
+LUC7L3	exploratory		
+MBD6	exploratory		
+MBNL1	exploratory		
+MEIS2	exploratory		
+MSL1	exploratory		
+MTRNR2L1	exploratory		
+MTRNR2L10	exploratory		
+MTRNR2L12	exploratory		
+MTRNR2L2	exploratory		
+MTRNR2L8	exploratory		
+NKTR	exploratory		
+PABPN1	exploratory		
+PHF20L1	exploratory		
+PILRB	exploratory		
+PLXNB1	exploratory		
+POLR2J3	exploratory		
+PRUNE2	exploratory		
+PTPRF	exploratory		
+RHPN1	exploratory		
+RNPC3	exploratory		
+SETD5	exploratory		
+SF1	exploratory		
+SLC25A29	exploratory		
+SLC25A36	exploratory		
+SLC25A37	exploratory		
+SLC26A2	exploratory		
+SNRNP70	exploratory		
+SON	exploratory		
+SORL1	exploratory		
+SRGAP3	exploratory		
+SYNE2	exploratory		
+THSD4	exploratory		
+TSHZ2	exploratory		
+USP53	exploratory		
+WDR60	exploratory		
+ZMYND8	exploratory		
+ZNF292	exploratory		
+ZNF83	exploratory		
+RAB25	cbioportal_oncogene		
+MECOM	cbioportal_oncogene		
+EIF5A2	cbioportal_oncogene		
+PRKCI	cbioportal_oncogene		
+PIK3CA	cbioportal_oncogene		
+KIT	cbioportal_oncogene		
+FGF1	cbioportal_oncogene		
+MYC	cbioportal_oncogene		
+EGFR	cbioportal_oncogene		
+NOTCH3	cbioportal_oncogene		
+KRAS	cbioportal_oncogene		
+AKT1	cbioportal_oncogene		
+ERBB2	cbioportal_oncogene	;ALIAS:HER2;	
+PIK3R1	cbioportal_oncogene		
+CCNE1	cbioportal_oncogene		
+AKT2	cbioportal_oncogene		
+AURKA	cbioportal_oncogene		
+DIRAS3	cbioportal_suppressor		
+RASSF1	cbioportal_suppressor		
+DLEC1	cbioportal_suppressor		
+SPARC	cbioportal_suppressor		
+DAB2	cbioportal_suppressor		
+PLAGL1	cbioportal_suppressor		
+RPS6KA2	cbioportal_suppressor		
+PTEN	cbioportal_suppressor		
+OPCML	cbioportal_suppressor		
+BRCA2	cbioportal_suppressor		
+ARL11	cbioportal_suppressor		
+WWOX	cbioportal_suppressor		
+TP53	cbioportal_suppressor		
+DPH1	cbioportal_suppressor		
+BRCA1	cbioportal_suppressor		
+PEG3	cbioportal_suppressor		
+ITGA1	integrin_ecm		
+ITGA2	integrin_ecm		
+ITGA3	integrin_ecm		
+ITGA4	integrin_ecm		
+ITGA5	integrin_ecm		
+ITGA6	integrin_ecm		
+ITGA7	integrin_ecm		
+ITGA8	integrin_ecm		
+ITGA9	integrin_ecm		
+ITGA10	integrin_ecm		
+ITGA11	integrin_ecm		
+ITGAD	integrin_ecm		
+ITGAE	integrin_ecm		
+ITGAL	integrin_ecm		
+ITGAM	integrin_ecm		
+ITGAV	integrin_ecm		
+ITGA2B	integrin_ecm		
+ITGAX	integrin_ecm		
+ITGB1	integrin_ecm		
+ITGB2	integrin_ecm		
+ITGB3	integrin_ecm		
+ITGB4	integrin_ecm		
+ITGB5	integrin_ecm		
+ITGB6	integrin_ecm		
+ITGB7	integrin_ecm		
+ITGB8	integrin_ecm		
+TLN1	integrin_ecm		TALIN
+COL1A1	integrin_ecm		
+COL1A2	integrin_ecm		
+COL2A1	integrin_ecm		
+COL3A1	integrin_ecm		
+COL4A1	integrin_ecm		
+COL4A2	integrin_ecm		
+COL5A1	integrin_ecm		
+COL5A2	integrin_ecm		
+COL6A1	integrin_ecm		
+COL6A2	integrin_ecm		
+COL6A3	integrin_ecm		
+COL8A1	integrin_ecm		
+COL10A1	integrin_ecm		
+COL12A1	integrin_ecm		
+COL14A1	integrin_ecm		
+COL18A1	integrin_ecm		
+FN1	em_transition		
+TWIST1	em_transition		
+SERPINE1	em_transition		
+LAMA1	integrin_ecm		
+LAMA2	integrin_ecm		
+LAMA3	integrin_ecm		
+LAMA4	integrin_ecm		
+ALCAM	integrin_ecm		
+ENG	integrin_ecm		
+PDGFRA	integrin_ecm		
+FAP	integrin_ecm		
+FABP4	integrin_ecm		
+FGFR1	exploratory		check isoforms for CyTOF
+FGFR2	exploratory		check isoforms for CyTOF
+FGFR3	exploratory		check isoforms for CyTOF
+FGFR4	exploratory		check isoforms for CyTOF
+FGFR5	exploratory		check isoforms for CyTOF
+CD14	Macro_marker	general Macro marker	coreceptor for bacterial LPS
+FCGR3A	Macro_marker	general Macro marker	CD16 (Fc-gamma receptor IIIB), recognition of antibody bound antigen
+FCGR1A	Macro_marker	general Macro marker	CD64 (Fc-gamma receptor I A1), recognition of antibody bound antigen
+CD68	Macro_marker	general Macro marker	Binds to tissue- and organ-specific lectins or selectins,  member of the scavenger receptor family clearing cell debris
+TFRC	Macro_marker	general Macro marker	CD71 (transferrin receptor), cellular iron uptake
+ITGAM	Macro_marker	general Macro marker	CD11b, implicated in various adhesive interactions of monocytes, macrophages and granulocytes, mediates uptake of complement-coated particles and pathogens
+HLA-DR	Macro_marker	general Macro marker	class II antigen presentation
+NOS2	Macro_marker	general Macro marker	production of nitric oxide (NO), enhances pro-inflammatory mediators such as IL6/CXCL8, in macros, NO mediates tumoricidal/bactericidal actions
+CXCL9	Macro_marker	M1 Macrophage	chemoattractant for lymphocytes but not neutrophils, chemotactic for activated T-cells, binds to CXCR3
+CXCL10	Macro_marker	M1 Macrophage	pro-inflammatory cytokine, binds CXCR3, recruitment of immune cells to site of infection
+CXCL11	Macro_marker	M1 Macrophage	pro-inflammatory cytokine, binds CXCR3, chemotactic for interleukin-activated T-cells but not unstimulated T-cells, neutrophils or monocytes.
+CD80	Macro_marker	M1 Macrophage	costimulatory signal for T-lymphocyte activation, ligand to CD28/CTLA-4, activates T cells when bound to CD28, inhibits T cells when bound to CTLA4
+CD86	Macro_marker	M1 Macrophage	paralog of CD80, costimulatory signal to T cells, CD28/CTLA-4 ligand -> induces/inhibits T cell activation
+STAT2	Macro_marker	M1 Macrophage	mediates singling by type I interferon (IFNA, IFNB), becomes phosphorylated, binds with STAT1, activates IFN-regulated genes -> antiviral cell state
+TLR2	Macro_marker	M1 Macrophage	pathogen recognition (PAMPs), mediates innate immune response to bacterial lipoproteins and lipopeptides
+IL18	Macro_marker	M1 Macrophage	pro-inflammatory cytokine that augments natural killer cell activity and stimulates interferon gamma production in T-helper type I cells
+IL6	Macro_marker	M1 Macrophage	pro-inflammatory cytokine (acute phase response), induces B cell maturation, pyrogen (fever-inducing)
+CIITA	Macro_marker	M1 Macrophage	controls MHC class II gene transcription
+SOCS3	Macro_marker	M1 Macrophage	negative regulators of cytokine signaling, regulates IL-6 signalling
+CCL17	Macro_marker	M2 Macrophage	Chemotactic factor for T-lymphocytes but not monocytes or granulocytes. May play a role in trafficking and activation of mature T-cells. Binds to CCR4.
+CCL18	Macro_marker	M2 Macrophage	Chemotactic, attracts lymphocytes but not monocytes/granulocytes. 
+CCL22	Macro_marker	M2 Macrophage	Cytokine: Chemotactic for monocytes, dendritic cells, natural killer cells and for chronically activated T lymphocytes. Binds CCR4.
+CD209	Macro_marker	M2 Macrophage	Pathogen-recognition receptor (many viruses, ICAM2/3) expressed on immature dendritic cells and involved in initiation of primary immune response. 
+CD163	Macro_marker	M2/TAM	Acute phase-regulated receptor involved in clearance and endocytosis of hemoglobin complexes. May thereby protect tissues from free oxidative damage. Soluble has anti-inflammatory activity.
+STAT3	Macro_marker	M2 Macrophage	mediates cellular responses to interleukins, KITLG/SCF, LEP and other growth factors. Acts as a regulator of inflammatory response by regulating differentiation of naive CD4(+) T-cells into T-helper Th17 or regulatory T-cells (Treg).
+STAT6	Macro_marker	M2 Macrophage	Involved in IL4/interleukin-4- and IL3/interleukin-3-mediated signaling. Humoral activity: differentiation of T helper 2 (Th2) cells
+IL10	Macro_marker	M2/TAM	Major immuneregulatory cytokine that acts on many cells of the immune system, it has profound anti-inflammatory functions limiting excessive tissue disruption caused by inflammation. Downregulates Th1 cytokine expression, MHCII expression and costimulatory receptors on macrophages, inhibits release of proinfl cytokines, enhances B cell activity
+MRC1	Macro_marker	M2/TAM/CD169+	CD206, Mannose Receptor, acts as phagocytic receptor for bacteria, fungi and other pathogens, mediates the endocytosis of glycoproteins by macrophages
+CD200R1	Macro_marker	M2 Macrophage	Limits inflammation by inhibiting expression of pro-inflammatory molecules (TNF-alpha, interferons, iNOS) in response to selected stimuli.
+TGFB1	Macro_marker	M2/TAM	Transforming growth factor beta, regulates cell proliferation, differentiation and growth, frequently upregulated in tumor cells
+KDR	Macro_marker	M2 Macrophage	key element of the urea cycle, metabolites proline and polyamides drive collagen synthesis and cell proliferation, critical regulator of innate and adaptive immune responses
+VEGFA	Macro_marker	TAM	Growth factor active in angiogenesis, vasculogenesis and endothelial cell growth. Induces endothelial cell proliferation, promotes cell migration, inhibits apoptosis and induces permeabilization of blood vessels
+VEGFB	Macro_marker	TAM	regulates the formation of blood vessels and are involved in endothelial cell physiology
+VEGFC	Macro_marker	TAM	Growth factor active in angiogenesis, and endothelial cell growth, stimulating their proliferation and migration and also has effects on the permeability of blood vessels
+VEGFD	Macro_marker	TAM	Growth factor active in angiogenesis, lymphangiogenesis and endothelial cell growth, stimulating their proliferation and migration and also has effects on the permeability of blood vessels. 
+CD3G	Macro_marker	TAM/TCR+	CD3, universal T cell marker
+CD3E	Macro_marker	TAM/TCR+	CD3, universal T cell marker
+CD3D	Macro_marker	TAM/TCR+	CD3, universal T cell marker
+CCL2	Macro_marker	TAM/TCR+	cytokine, chemotactic activity for monocytes and basophils but not for neutrophils or eosinophils, binds CCR2/4
+STAT1	Macro_marker	TAM	Signal transducer and transcription activator that mediates cellular responses to interferons (IFNs)
+TRAC	Macro_marker	TCR+	Constant region of T cell receptor (TR) alpha chain
+TRGC2	Macro_marker	TCR+	Constant region of T cell receptor (TR) gamma chain that participates in the antigen recognition
+ZAP70	Macro_marker	TCR+	functions in the initial step of TCR-mediated signal transduction in combination with the Src family kinases, Lck and Fyn
+FYN	Macro_marker	TCR+	participates in negative feedback regulation of TCR signaling
+LCK	Macro_marker	TCR+	plays a key role in T-cell antigen receptor (TCR)-linked signal transduction pathways
+SIGLEC1	Macro_marker	CD169+	CD169, lectin-like adhesion molecule that binds glycoconjugate ligands, expressed by subpopulation of macrophages
+ITGAX	Macro_marker	CD169+ 	CD11c, mediates cell-cell interaction during inflammatory responses. It is especially important in monocyte adhesion and chemotaxis
+MARCO	Macro_marker	MARCO+	Pattern recognition receptor (PRR) which binds Gram-positive and Gram-negative bacteria
+IFNG	Macro_marker	IFNG+	pro-inflammatory cytokine, activates macrophages and inhibits Th2 proliferation, stimulates B cells secrete antibodies
+GATA6	Macro_marker		regulates tissue resident macrophages
+CD19	Bcell_marker	general B cell marker	
+MS4A1	Bcell_marker	general B cell marker	
+CD79A	Bcell_marker	general B cell marker	
+CXCR5	Bcell_marker	pos for memory B cell	
+CR2	Bcell_marker	CD21, high for marginal zone B cells, pos for follicular B cells	
+FCER2	Bcell_marker	CD23, high for follicular B cells, pos for marginal zone B cells	
+CD24	Bcell_marker	high on regulatory B cells	
+CD1D	Bcell_marker	high on regulatory B cells	
+CD1	Bcell_marker	pos for marginal zone B cells	
+CD38	Bcell_marker	activated B cell marker	
+CD5	Bcell_marker	pos for regulatory B cells	
+PRDM1	Bcell_marker	BLIMP1, plasma cell transcription factor	
+CD27	Bcell_marker	pos for activated B cells including plasmablasts/cells	
+BCL6	Bcell_marker	germinal centre B cell specific transcription factor	
+AICDA	Bcell_marker	key germinal centre marker gene (dark zone), DNA editing	
+CD69	Bcell_marker	activated B cells	
+IL2RA	Bcell_marker	activated B cells	
+TNFRSF8	Bcell_marker	activated B cells	
+MME	Bcell_marker	CD10, pos for germinal centre B cells	
+SDC1	Bcell_marker	CD138, plasma cell marker	
+IRF4	Bcell_marker	plasma cell transcription marker	
+XBP1	Bcell_marker	plasma cell transcription factor	
+CD40	Bcell_marker	pos for memory B cells	
+CD83	Bcell_marker	high on germinal centre light zone cells	
+BCL2A1	Bcell_marker	apoptosis, high on GC light zone cells	
+IL10	Bcell_marker	cytokine of regulatory B cells	
+TGFB1	Bcell_marker	cytokine of regulatory B cells	
+IL12A	Bcell_marker	cytokine of regulatory B cells	
+IGHM	Bcell_marker	on naive B cells	
+IGHD	Bcell_marker	on naive B cells	
+IGHE	Bcell_marker	isotype switched B cell, allergy response	
+IGHA1	Bcell_marker	isotype switched B cell, secreted: mucosal surface and gut	
+IGHA2	Bcell_marker	isotype switched B cell, secreted: mucosal surface and gut	
+IGHG1	Bcell_marker	isotype switched B cell, IgG1, plasma antibody	
+IGHG2	Bcell_marker	isotype switched B cell, IgG2, plasma antibody	
+IGHG3	Bcell_marker	isotype switched B cell, IgG3, plasma antibody	
+IGKC	Bcell_marker	light chain constant kappa, high in plasma cells	
+IGLC1	Bcell_marker	light chain constant lambda 1, high in plasma cells	
+IGLC2	Bcell_marker	light chain constant lambda 2, high in plasma cells	
+JCHAIN	Bcell_marker		IGJ, on plasma cells secreting antibodies of either IgM or IgA isotype
+CD4	Tcell_marker	CD4 pos, Treg	
+CD8A	Tcell_marker	CD8 pos	
+CD8B	Tcell_marker	CD8 pos	
+FOXP3	Tcell_marker	Treg	
+CTLA4	Tcell_marker	Treg	
+IL2RA	Tcell_marker	Treg	
+LAG3	Tcell_marker	CD8 pos	
+FASLG	Tcell_marker	CD8 pos	
+HAVCR2	Tcell_marker	CD8 pos;ALIAS:TIM3;	
+PDCD1	Tcell_marker	CD8 pos	
+CD38	Tcell_marker	CD8 pos	
+ENTPD1	Tcell_marker	CD8 pos	
+BATF	Tcell_marker	CD8 pos	
+PTPN6	Tcell_marker	CD8 pos	
+CD3E	Tcell_marker	general	
+CD3G	Tcell_marker	general	
+CD3D	Tcell_marker	general	
+TRAC	Tcell_marker	gamma delta	
+TRGC2	Tcell_marker	gamma delta	
+IL17A	Tcell_marker	activated, TH 17	
+IL17F	Tcell_marker	activated, TH17	
+IFNG	Tcell_marker	activates macrophages	
+TBX21	Tcell_marker	TH1 cells	
+IL4	Tcell_marker	activated, TH 2	
+IL13	Tcell_marker	activated TH2 cells	
+GATA3	Tcell_marker	TH2 cells	
+EBI3	Tcell_marker	Cd4 differentiation	
+IL21	Tcell_marker	potentially NK cell differentiation	
+TNF	Tcell_marker	activator and regulator of immune function	
+KLRD1	Tcell_marker	NK cells	
+NCAM1	Tcell_marker	NK cells	
+CCL4	Tcell_marker	NK cells	
+FCGR3A	Tcell_marker	NK cells	
+CD7	Tcell_marker	NK cells	
+PRF1	Tcell_marker	Perforin, cytotoxicity marker	
+CXCL1	pro_inflammatory		
+CXCL2	pro_inflammatory		
+CXCL8	pro_inflammatory		
+CXCL9	pro_inflammatory		
+CXCL10	pro_inflammatory		
+CXCL11	pro_inflammatory		
+CCL2	pro_inflammatory		
+CCL3	pro_inflammatory		
+CCL4	pro_inflammatory		
+CCL5	pro_inflammatory		
+CCL11	pro_inflammatory		
+IL6	pro_inflammatory		
+IFNG	pro_inflammatory		
+TNF	pro_inflammatory		
+IL1A	pro_inflammatory		
+IL1B	pro_inflammatory		
+IL1RN	pro_inflammatory		
+IL12A	pro_inflammatory		
+IL18	pro_inflammatory		
+CSF2	pro_inflammatory		
+IL17A	pro_inflammatory		
+IL23	pro_inflammatory		
+IL27	pro_inflammatory		
+IL4	anti_inflammatory		
+IL10	anti_inflammatory		
+IL13	anti_inflammatory		
+IFNA1	anti_inflammatory		
+TGFB1	anti_inflammatory		
+IL6	anti_inflammatory		
+CCL22	anti_inflammatory		
+CXCL10	anti_inflammatory		
+CCL1	anti_inflammatory		
+CCL17	anti_inflammatory		
+CCL18	anti_inflammatory		
+CCL24	anti_inflammatory		
+IL2	Th1_profile		
+IL12	Th1_profile		
+IL18	Th1_profile		
+IL27	Th1_profile		
+IL10	Th1_profile		
+IFNG	Th1_profile		
+TNF	Th1_profile		
+STAT4	Th1_profile		
+TBX21	Th1_profile		
+IL12RB1	Th1_profile		
+IFNGR1	Th1_profile		
+IL4	Th2_profile		
+IL5	Th2_profile		
+IL6	Th2_profile		
+IL10	Th2_profile		
+IL13	Th2_profile		
+STAT6	Th2_profile		
+GATA3	Th2_profile		
+IL4R	Th2_profile		
+IL17A	Th17_profile		
+IL17F	Th17_profile		
+IL21	Th17_profile		
+IL22	Th17_profile		
+TGFB1	Th17_profile		
+IL6	Th17_profile		
+STAT3	Th17_profile		
+TGFBR1	Th17_profile		
+TGFB1	Treg_profile		
+IL10	Treg_profile		
+IL12A	Treg_profile		
+EBI3	Treg_profile		
+TGFBR1	Treg_profile		
+IL2RA	Treg_profile		
+FOXP3	Treg_profile		
+CHAT	exploratory_tumorImmune	Immunesuppression	choline o-acetyltransferase
+CHRNA1	exploratory_tumorImmune	Immunesuppression	nicotinic acetylcholine receptor alpha subunit
+CHRNA7	exploratory_tumorImmune	Immunesuppression	alpha 7 nACh receptor
+SLC5A7	exploratory_tumorImmune	Immunesuppression	Choline transporter
+ACHE	exploratory_tumorImmune	Immunesuppression	Acetylcholine esterase
+IL10	exploratory_tumorImmune	Immunesuppression	
+IL4	exploratory_tumorImmune	Immunesuppression	
+IL1B	exploratory_tumorImmune	Immunesuppression	Interleukin 1-beta
+TNF	exploratory_tumorImmune	Immunesuppression	
+CHRM1	exploratory_tumorImmune	Immunesuppression	muscarinic ACh receptor subunit 1
+CHRM2	exploratory_tumorImmune	Immunesuppression	muscarinic ACh receptor subunit 2
+CHRM3	exploratory_tumorImmune	Immunesuppression	muscarinic ACh receptor subunit 3
+CHRM4	exploratory_tumorImmune	Immunesuppression	muscarinic ACh receptor subunit 4
+CHRM5	exploratory_tumorImmune	Immunesuppression	muscarinic ACh receptor subunit 5
+RIMKLA	exploratory_tumorImmune	Immunesuppression	NAAG (NT) synthase
+FOLH1	exploratory_tumorImmune	Immunesuppression	glutamate carboxypeptidase II
+GABRA1	exploratory_tumorImmune	IS or growth	GABA receptor
+GABRA2	exploratory_tumorImmune	IS or growth	GABA receptor
+GABRA3	exploratory_tumorImmune	IS or growth	GABA receptor
+GABRA4	exploratory_tumorImmune	IS or growth	GABA receptor
+GABRA5	exploratory_tumorImmune	IS or growth	GABA receptor
+GABRA6	exploratory_tumorImmune	IS or growth	GABA receptor
+GABRB1	exploratory_tumorImmune	IS or growth	GABA receptor
+GABRB2	exploratory_tumorImmune	IS or growth	GABA receptor
+GABRB3	exploratory_tumorImmune	IS or growth	GABA receptor
+GABRD	exploratory_tumorImmune	IS or growth	GABA receptor
+GABRE	exploratory_tumorImmune	IS or growth	GABA receptor
+GRIA1	exploratory_tumorImmune	IS or growth	glutamate receptor
+GAD1	exploratory_tumorImmune	IS or growth	glutamate decarboxylase 1 - GABA synthesis
+GAD2	exploratory_tumorImmune	IS or growth	glutamate decarboxylase 2 - GABA synthesis
+AOC1	exploratory_tumorImmune	IS or growth	Diamine oxidase -  GABA synthesis
+ALDH1A1	exploratory_tumorImmune	IS or growth	aldehyde dehydrogenase - GABA synthesis
+GRIN2A	exploratory_tumorImmune	IS or growth	NMDA receptor
+GRIN2B	exploratory_tumorImmune	IS or growth	NMDA receptor
+GRIN2C	exploratory_tumorImmune	IS or growth	NMDA receptor
+GRIC1	exploratory_tumorImmune	IS or growth	Kaianate receptor
+GRIC2	exploratory_tumorImmune	IS or growth	Kaianate receptor
+GRIC3	exploratory_tumorImmune	IS or growth	Kaianate receptor
+GRIC4	exploratory_tumorImmune	IS or growth	Kaianate receptor
+GRIC5	exploratory_tumorImmune	IS or growth	Kaianate receptor
+DDC	exploratory_tumorImmune	IS or growth	Aromatic L-amino acid decarboxylase: adrenaline/dopamine/serotonin synthesis
+TH	exploratory_tumorImmune	IS or growth	adrenaline biosynthesis
+DDC	exploratory_tumorImmune	IS or growth	adrenaline biosynthesis
+PNMT	exploratory_tumorImmune	IS or growth	adrenaline biosynthesis
+DBH	exploratory_tumorImmune	IS or growth	adrenaline biosynthesis
+DRD1	exploratory_tumorImmune	IS or growth	dopamine receptor
+DRD2	exploratory_tumorImmune	IS or growth	dopamine receptor
+DRD3	exploratory_tumorImmune	IS or growth	dopamine receptor
+DRD4	exploratory_tumorImmune	IS or growth	dopamine receptor
+DRD5	exploratory_tumorImmune	IS or growth	dopamine receptor
+ADRA1A	exploratory_tumorImmune	IS or growth	Adreno receptor (adrenaline)
+ADRA1B	exploratory_tumorImmune	IS or growth	Adreno receptor (adrenaline)
+ADRA1A	exploratory_tumorImmune	IS or growth	Adreno receptor (adrenaline)
+ADRA2A	exploratory_tumorImmune	IS or growth	Adreno receptor (adrenaline)
+ADRA2B	exploratory_tumorImmune	IS or growth	Adreno receptor (adrenaline)
+ADRA2C	exploratory_tumorImmune	IS or growth	Adreno receptor (adrenaline)
+ADRB1	exploratory_tumorImmune	IS or growth	Adreno receptor (adrenaline)
+ADRB2	exploratory_tumorImmune	IS or growth	Adreno receptor (adrenaline)
+ADRB3	exploratory_tumorImmune	IS or growth	Adreno receptor (adrenaline)
+HTR1A	exploratory_tumorImmune	IS or growth	Serotonin receptor
+HTR1B	exploratory_tumorImmune	IS or growth	Serotonin receptor
+HTR1D	exploratory_tumorImmune	IS or growth	Serotonin receptor
+HTR1E	exploratory_tumorImmune	IS or growth	Serotonin receptor
+HTR1F	exploratory_tumorImmune	IS or growth	Serotonin receptor
+HTR2A	exploratory_tumorImmune	IS or growth	Serotonin receptor
+HTR2B	exploratory_tumorImmune	IS or growth	Serotonin receptor
+HTR2C	exploratory_tumorImmune	IS or growth	Serotonin receptor
+HTR4	exploratory_tumorImmune	IS or growth	Serotonin receptor
+HTR6	exploratory_tumorImmune	IS or growth	Serotonin receptor
+HTR7	exploratory_tumorImmune	IS or growth	Serotonin receptor
+HTR5A	exploratory_tumorImmune	IS or growth	Serotonin receptor
+HTR5BP	exploratory_tumorImmune	IS or growth	Serotonin receptor
+HTR3A-E	exploratory_tumorImmune	IS or growth	Serotonin receptor
+TAC1	exploratory_tumorImmune	IS or growth	Tachykinin Precursor 1 / Neurokinin 1
+TAC3	exploratory_tumorImmune	IS or growth	Tachykinin 3
+NPY	exploratory_tumorImmune	IS or growth	Neuropeptide Y
+CXCL12	stem_cell_markers	Stromal cell derived factor SDF-1alpha	Adult (tissue) stem cells
+CXCR4	stem_cell_markers		Adult (tissue) stem cells
+WT1	stem_cell_markers	Wilms Tumor Protein	Adult (tissue) stem cells
+NANOG	stem_cell_markers		Pluripotent stem cells
+POU5F1	stem_cell_markers	Oct-4, also listed as "mesenchymal" stem cell marker	Pluripotent stem cells
+FUT4	stem_cell_markers	Fucosyltransferase, SSEA-1	Pluripotent stem cells
+DPPA3	stem_cell_markers	Stella	Pluripotent stem cells
+GREM1	stem_cell_markers	Gremlin1, PIG2 (cytokine)	Pluripotent stem cells
+IRF6	stem_cell_markers		Pluripotent stem cells
+TDGF1	stem_cell_markers	Cripto, embryo and epithelial cancers (secretory)	Pluripotent stem cells
+FGF10	stem_cell_markers	FGF family, wound healing, cell survival (secretory)	Pluripotent stem cells
+GDF3	stem_cell_markers	secretory	Pluripotent stem cells
+CD9	stem_cell_markers	surface	Pluripotent stem cells
+DLL1	stem_cell_markers	Delta1, surface	Pluripotent stem cells
+ITGA6	stem_cell_markers	surface,CD49f, also listed as "other" marker	Pluripotent stem cells
+ITGB1	stem_cell_markers	CD29, surface, also listed as "mesenchymal" stem cell marker	Pluripotent stem cells
+SHH	stem_cell_markers	sonic hedgehog (surface)	Pluripotent stem cells
+CD24	stem_cell_markers		Other stem cell markers
+ROR1	stem_cell_markers		Other stem cell markers
+CD44	stem_cell_markers		Mesenchymal stem cells
+THY1	stem_cell_markers	CD90, also as "other" marker	Mesenchymal stem cells
+ENG	stem_cell_markers	Endoglin, CD105, also as "other" marker	Mesenchymal stem cells
+VCAM1	stem_cell_markers	CD106, vascular cell adhesion molecule	Mesenchymal stem cells
+ALCAM	stem_cell_markers	CD166, activated leukocyte cell adhesion molecule	Mesenchymal stem cells
+ITGAV	stem_cell_markers	CD51	Mesenchymal stem cells
+NT5E	stem_cell_markers	CD73, also as "other" marker	Mesenchymal stem cells
+ICAM1	stem_cell_markers	CD54	Mesenchymal stem cells
+CD58	stem_cell_markers	LFA3	Mesenchymal stem cells
+ITGB3	stem_cell_markers	Integrin beta 3, CD61,also as "other" marker	Mesenchymal stem cells
+SELL	stem_cell_markers	CD62L	Mesenchymal stem cells
+ITGA5	stem_cell_markers	CD49e	Mesenchymal stem cells
+ITGA4	stem_cell_markers	CD49d	Mesenchymal stem cells
+ITGA3	stem_cell_markers	CD49c	Mesenchymal stem cells
+ITGA2	stem_cell_markers	CD49b	Mesenchymal stem cells
+ITGA1	stem_cell_markers	CD49a	Mesenchymal stem cells
+ICAM2	stem_cell_markers	CD102	Mesenchymal stem cells
+ITGB4	stem_cell_markers	CD104	Mesenchymal stem cells
+IL3RA	stem_cell_markers	CD123	Mesenchymal stem cells
+IL4R	stem_cell_markers	CD124	Mesenchymal stem cells
+IL6R	stem_cell_markers	CD126	Mesenchymal stem cells
+IL7R	stem_cell_markers	CD127	Mesenchymal stem cells
+PDGFRA	stem_cell_markers	CD140a	Mesenchymal stem cells
+MME	stem_cell_markers	CD10	Mesenchymal stem cells
+ANPEP	stem_cell_markers	CD13	Mesenchymal stem cells
+NGFR	stem_cell_markers	CD271, nerve growth factor receptor	Mesenchymal stem cells
+PDGFRB	stem_cell_markers	CD140b	Mesenchymal stem cells
+ERBB2	stem_cell_markers	CD340;ALIAS:HER2;	Mesenchymal stem cells
+MCAM	stem_cell_markers	CD146, melanoma cell adhesion molecule	Mesenchymal stem cells
+LGR5	stem_cell_markers	Intestine and colon, surface marker	Adult/Cancer stem cells
+TNFRSF19	stem_cell_markers	Troy	Adult/Cancer stem cells
+GATA6	stem_cell_markers		Adult/Cancer stem cells
+LGR6	stem_cell_markers		Adult/Cancer stem cells
+LRIG1	stem_cell_markers		Adult/Cancer stem cells
+POU3F2	stem_cell_markers		Adult/Cancer stem cells
+SOX2	stem_cell_markers		Adult/Cancer stem cells
+SALL2	stem_cell_markers		Adult/Cancer stem cells
+OLIG2	stem_cell_markers		Adult/Cancer stem cells
+PROM1	stem_cell_markers	CD133,also as "other" marker	Adult/Cancer stem cells
+CD33	stem_cell_markers		Adult/Cancer stem cells
+DLL3	stem_cell_markers		Adult/Cancer stem cells
+KDM1A	stem_cell_markers		Adult/Cancer stem cells
+HDAC1	stem_cell_markers		Adult/Cancer stem cells
+HDAC1-11	stem_cell_markers		Adult/Cancer stem cells
+DOT1L	stem_cell_markers		Adult/Cancer stem cells
+BRD2	stem_cell_markers		Adult/Cancer stem cells
+BRD3	stem_cell_markers		Adult/Cancer stem cells
+BRD4	stem_cell_markers		Adult/Cancer stem cells
+BRDT	stem_cell_markers		Adult/Cancer stem cells
+IDH1	stem_cell_markers		Adult/Cancer stem cells
+IDH2	stem_cell_markers		Adult/Cancer stem cells
+RNF43	stem_cell_markers		Adult/Cancer stem cells
+PORCN	stem_cell_markers		Adult/Cancer stem cells
+RSPO2	stem_cell_markers		Adult/Cancer stem cells
+RSPO3	stem_cell_markers		Adult/Cancer stem cells
+TNC	stem_cell_markers		Adult/Cancer stem cells
+POSTN	stem_cell_markers		Adult/Cancer stem cells
+YBX1	stem_cell_markers		
+SPP1	stem_cell_markers		
+G3BP1	stem_cell_markers		
+ABCB1	stem_cell_markers		
+MUC16	priority_genes	tumor marker	
+WFDC2	priority_genes	tumor marker;ALIAS:HE4;	
+KRT18	priority_genes	tumor marker	
+KRT19	priority_genes	tumor marker	
+MUC1	priority_genes	tumor marker	
+PAX8	priority_genes	tumor marker	
+MSLN	priority_genes	tumor marker	
+NF1	priority_genes	tumor marker	
+RB1	priority_genes	tumor marker	
+MYC	priority_genes	tumor marker	
+MECOM	priority_genes	tumor marker	
+CD47	priority_genes	immuno relevant	don’t eat me
+CTLA4	priority_genes	immuno relevant	therapy
+PDCD1	priority_genes	immuno relevant	therapy
+HLA-A	priority_genes	immuno relevant	if low, less immune evasion
+HLA-B	priority_genes	immuno relevant	if low, less immune evasion
+HLA-C	priority_genes	immuno relevant	if low, less immune evasion
+ERBB2	priority_genes	drug target;ALIAS:HER2;	
+ERBB3	priority_genes	drug target;ALIAS:HER3;	
+TP53	priority_genes	drug target	
+MET	priority_genes	drug target	
+ALDH1A1	priority_genes	drug target	
+CDK4	priority_genes	drug target	
+ESR1	priority_genes	drug target	
+BRCA1	priority_genes	drug target	
+BRCA2	priority_genes	drug target	
+CDH1	priority_genes	EMT	E-cadherin
+VIM	priority_genes	EMT	
+LTA	Bcell_marker		
+LTB	Bcell_marker		
+CXCL13	Bcell_marker		
+IRF8	Macro_marker		
+TOX	Tcell_marker		

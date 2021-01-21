@@ -1,0 +1,17 @@
+Venetoclax + Azacitidin	Combination target
+Venetoclax + Decitabin	Combination target
+Glasdegib + Azacitidin	Combination target
+Glasdegib + Decitabin	Combination target
+Venetoclax + Ivosidenib	Combination target
+Venetoclax + Enasidenib	Combination target
+Cytarabine + Daunorubicin + Midostaurin	Combination chemo
+Cytarabine + Idarubicin + Midostaurin	Combination chemo
+Cytarabine + Daunorubicin + Venetoclax	Combination chemo
+Cytarabine + Idarubicin + Venetoclax	Combination chemo
+Cytarabine + Daunorubicin + AG-120	Combination chemo
+Cytarabine + Daunorubicin + AG-120	Combination chemo
+Cytarabine + Idarubicin + AG-221	Combination chemo
+Cytarabine + Idarubicin + AG-221	Combination chemo
+Cladribine + Cytarabine + Idarubicin	Combination chemo
+CPX-351 (Cytarabine + Daunorubicin)	Combination chemo
+Mitoxantron + Etoposide	Combination chemo

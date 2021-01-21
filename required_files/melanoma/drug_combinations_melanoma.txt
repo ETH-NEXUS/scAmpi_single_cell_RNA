@@ -1,0 +1,12 @@
+STO + Binimetinib
+Vemurafenib + Cobimetinib
+Trametinib + Dabrafenib
+Ixazantomib + Lenalidomide + dexamethasone
+pomalidomide + carfilzomib + dexamethasone
+Olaparib + Cisplatin
+erlotinib + trametinib
+midostaurin + trametinib
+panobinostat  + trametinib
+decitabine + trametinib
+palbociclib + trametinib
+Cisplatin + Vindesine
