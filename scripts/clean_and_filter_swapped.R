@@ -316,7 +316,6 @@ if (sum(samples_5pr) < 1 | sum(samples_3pr) < 1){
     ### Which swapped molecules correspond to 3pr-only swapping (3->3, internal), 5pr-only swapping (5->5, internal) or mixed swapping (3->5 or 5->3 or mixed, external)?
     ## Subset diagnostics matrix to only contain swapped molecules
     subDiagn <- cleaned_nova$diagnostics[swapped_tuples,]
-    # write.table(as.matrix(head(subDiagn, 1000)), file="/cluster/project/nexus/phrt/heinzelmann_omentum_2018/tests/index_hopping/test_diagnostics.txt",sep="\t", row.names=F)
 
     ## Which swapped molecules are present in which samples?
     which_samples <- subDiagn>0

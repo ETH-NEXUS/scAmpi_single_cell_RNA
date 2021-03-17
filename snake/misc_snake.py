@@ -218,11 +218,11 @@ def getSampleRootPaths():
             rootdir = sampleMap[sample][crsample]
             # NOTE: it is assumed that the provided root path already ends with "/"
             output.append(rootdir + crsample + '/singlecell_rna/analysis/cellranger_run/' + sample)
-            # eg. /cluster/work/bewi/ngs/projects/tumorProfiler/analysis/trial_melanoma/MADIBUG-T/singlecell_rna/analysis/cellranger_run/MADIBUG-T_scR_Ar1v7.6
-            # where:    rootdir = /cluster/work/bewi/ngs/projects/tumorProfiler/analysis/trial_melanoma/ (depends on the sample type)
-            #           crsample = MADIBUG-T (short version of sample name)
+            # eg. Mysample-L_scR_v1.6
+            # where:    rootdir = sample_dir/ (depends on the sample type)
+            #           crsample = Mysample-L (short version of sample name)
             #           /singlecell_rna/analysis/cellranger_run/ (fixed)
-            #           add actual sample name at the end (to be used as a filename tag) = MADIBUG-T_scR_Ar1v7.6
+            #           add actual sample name at the end (to be used as a filename tag) = Mysample-L_scR_v1.6
     return output
 
 

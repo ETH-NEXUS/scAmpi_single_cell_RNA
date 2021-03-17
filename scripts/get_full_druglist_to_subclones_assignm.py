@@ -4,7 +4,7 @@
 
 This gets two inputs:
     - {sample}.coding_region_only.cell_cycle_removed.drugToCluster.allDrugs.txt, which has three tab separated columns: drug,clusters,weight and one line for each drug from the list where a drug-gene interaction was found to a differentially expressed gene in one of the malignant cell clusters
-    - the list of drugs that are especially relevant for the given cancer indication, given by clinicians (e.g. /cluster/work/bewi/ngs/projects/tumorProfiler/code/all/scTumorProfiler/required_files/melanoma/melanoma_drug_list_converted_corrected.txt)
+    - the list of drugs that are especially relevant for the given cancer indication (e.g. melanoma_drug_list_converted_corrected.txt)
 
 The output is a full list of the clinically relevant drugs (rows) with one column for each malignant cluster. With "1" or "0" it is indicated if a drug-gene interaction was found between the drug and any differentially expressed gene of the respective malignant cluster.
 

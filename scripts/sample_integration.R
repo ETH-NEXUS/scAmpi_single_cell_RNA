@@ -37,8 +37,8 @@ opt = parse_args(opt_parser)
 
 # specify the python version to use
 # This is the python version used in the TP pipeline
-use_python("/cluster/work/bewi/ngs/projects/tumorProfiler/code/installations/snakemake_v5.1.4/bin/python")
-print("Using python version: /cluster/work/bewi/ngs/projects/tumorProfiler/code/installations/snakemake_v5.1.4/bin/python when calling from R.")
+#use_python("bin/python")
+#print("Using python version: bin/python when calling from R.")
 
 # convenience function for string concatenation
 '%&%' = function(a,b) paste(a,b,sep="")
