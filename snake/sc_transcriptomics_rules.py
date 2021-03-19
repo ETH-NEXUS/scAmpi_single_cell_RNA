@@ -105,6 +105,7 @@ rule filter_genes_and_cells:
         nmads_NODG = config['tools']['filter_genes_and_cells']['nmads_NODG'],
         threshold_fractionMT = config['tools']['filter_genes_and_cells']['threshold_fractionMT'],
         threshold_NODG = config['tools']['filter_genes_and_cells']['threshold_NODG'],
+        remove_doublets = config['tools']['filter_genes_and_cells']['remove_doublets'],
         outDir = FILTER_GENES_CELLS_OUT,
         lsfoutfile = FILTER_GENES_CELLS_OUT + '{sample}.filter_genes_and_cells.lsfout.log',
         lsferrfile = FILTER_GENES_CELLS_OUT + '{sample}.filter_genes_and_cells.lsferr.log',
@@ -126,6 +127,7 @@ rule filter_genes_and_cells:
             '--threshold_fractionMT {params.threshold_fractionMT} ' +
             '--genomeVersion {params.genomeVersion} ' +
             '--doublet_barcodes {input.doublets} ' +
+            '--remove_doublets {params.remove_doublets} ' +
             '--sample {params.sample} ' +
             '--outDir {params.outDir}'
 
