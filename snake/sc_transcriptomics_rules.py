@@ -188,7 +188,15 @@ rule phenograph:
     benchmark:
         PHENOGRAPH_OUT + '{sample}.phenograph.benchmark'
     shell:
-        "{config[tools][clustering][phenograph][call]} {input.infile} {output.outfile} {output.distance_matrix} {output.modularity_score}  {params.n_neighbours}  {params.min_cluster_size}  -l {params.log_normalize} --n_threads {threads}"
+        '{config[tools][clustering][phenograph][call]} ' +
+        '--input_file {input.infile} ' +
+        '--output_file {output.outfile} ' +
+        '--distance_matrix {output.distance_matrix} ' +
+        '--modularity_score {output.modularity_score} ' +
+        '--n_neighbours {params.n_neighbours} ' +
+        '--min_size {params.min_cluster_size} ' +
+        '--log_normalize {params.log_normalize} ' +
+        '--n_threads {threads}'
 
 
 if not 'PREPARE_CELLTYPING_IN' in globals():
