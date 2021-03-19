@@ -71,7 +71,7 @@ options(stringsAsFactors = FALSE)
 # calculate wilcox p-value or return preset values
 f.my.wilcox.test <- function(x, y, min_genes = 5) {
   if (length(x) >= min_genes & length(y) >= min_genes) {
-    return(wilcox.test(x, y)$p.value)
+    return(wilcox.test(x, y, alternative = "greater")$p.value)
   } else {
     return(1)
   }
@@ -303,7 +303,6 @@ idx <- match(all.ct.genes, rownames(tmp))
 idx <- idx[!is.na(idx)]
 tmp <- tmp[idx, ]
 r.umap <- umap(t(tmp), n_neighbors = n_nn, spread = 1, min_dist = 0.01,
-  y = sce_data$celltype.major,
   ret_nn = T)
 reducedDim(sce_data, "umap_ct") <- r.umap$embedding
 if (hasName(metadata(sce_data), "umap_ct")) {
@@ -517,4 +516,3 @@ print(dom_types)
 saveRDS(sce_data, path %&% ".RDS")
 # also save sce_data object that including the cells that are in cluster 0
 saveRDS(sce_data_incl_cluster0, path %&% ".all_cells.RDS")
-

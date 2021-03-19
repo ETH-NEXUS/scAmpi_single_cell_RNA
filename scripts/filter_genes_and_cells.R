@@ -52,6 +52,7 @@ option_list <- list(
   make_option("--hdf5File", type = "character", help = "Path to hdf5 input file. It includes raw expression matrix, gene & cell attributes."),
   make_option("--sample", type = "character", help = "Sample name, prefix of all output files"),
   make_option("--doublet_barcodes", type = "character", help = "Path to text file with doublet barcodes"),
+  make_option("--remove_doublets", type = "logical", help = "Set TRUE or FALSE if doublets should be removed"),
   make_option("--nmads_NODG", type = "character", help = "Number of median-absolute-deviations away from median required for a value to be called an outlier, e.g. 5"),
   make_option("--nmads_fractionMT", type = "character", help = "Number of median-absolute-deviations away from median required for a value to be called an outlier, e.g. 5"),
   make_option("--outDir", type = "character", help = "Full path to output directory"),
@@ -105,12 +106,20 @@ cat("#####          CELL FILTERING          #####\n")
 cat("#####                                  #####\n")
 
 ### Filter doublets
-cat("\n\n\n###   Filtering doublets   ###\n")
-doublet_barcodes <- read.csv(opt$doublet_barcodes, header = FALSE, stringsAsFactors = FALSE)
-doublet_barcodes <- doublet_barcodes$V1
-cat("\n\n\nDoublet barcodes object:\n")
-print(str(doublet_barcodes))
-doublets_mask <- colnames(umi_counts) %in% doublet_barcodes
+
+# check if doublets should be removed or not (parameter)
+if (opt$remove_doublets) {
+  cat("\n\n\n###   Filtering doublets   ###\n")
+  doublet_barcodes <- read.csv(opt$doublet_barcodes, header = FALSE, stringsAsFactors = FALSE)
+  doublet_barcodes <- doublet_barcodes$V1
+  cat("\n\n\nDoublet barcodes object:\n")
+  print(str(doublet_barcodes))
+  doublets_mask <- colnames(umi_counts) %in% doublet_barcodes
+} else if (!opt$remove_doublets) {
+  cat("\n\n\n###   No doublet filtering performed   ###\n")
+  doublet_barcodes <- character()
+  doublets_mask <- logical(length = length(colnames(umi_counts)))
+}
 indices_doublets <- which(doublets_mask)
 perc_doublets <- signif((length(indices_doublets) / length(input_cell_names)) * 100, digits = 2)
 # print out numbers of filtered cells:
