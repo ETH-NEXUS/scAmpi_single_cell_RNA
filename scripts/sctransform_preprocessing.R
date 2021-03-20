@@ -83,7 +83,7 @@ print("Start performing sctransform::vst: ")
 vst_out = sctransform::vst(dat, cell_attr = cell_desc, method="nb_fast",
                            latent_var = c('log_umi'),
                            latent_var_nonreg = c("g2m_score", "s_score"),
-                           return_gene_attr = T, return_cell_attr = T, show_progress = T)
+                           return_gene_attr = T, return_cell_attr = T)
 print("Start performing sctransform::smooth_via_pca: ")
 y_smooth = sctransform::smooth_via_pca(vst_out$y, do_plot = TRUE)
 print("Start performing sctransform::correct: ")
