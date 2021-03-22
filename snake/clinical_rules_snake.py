@@ -23,7 +23,6 @@ rule parseAndFilter_DEgenes:
         PROCESSDE_OUT + '{sample}.{clusterid}.parse.benchmark'
     shell:
         '{config[tools][parseAndFilter_DEgenes][call]} {input.tsv} {output.out} {params.variousParams}'
-		
 
 if not 'DGIDB_IN' in globals():
     DGIDB_IN = OUTDIR + 'databaseQuery/'
@@ -55,16 +54,16 @@ rule dgidbQuery:
 
 
 if not 'CLINICALTRIALS_IN' in globals():
-    CLINICALTRIALS_IN = DGIDB_OUT		
+    CLINICALTRIALS_IN = DGIDB_OUT
 if not 'CLINICALTRIALS_OUT' in globals():
-    CLINICALTRIALS_OUT = OUTDIR + 'clinicalTrials/'		
+    CLINICALTRIALS_OUT = OUTDIR + 'clinicalTrials/'
 
 # clnical trials query
 rule clinicalTrialsQuery:
     input:
         infile = CLINICALTRIALS_IN + '{sample}.{clusterid}.dgidb.txt.CompleteTable.txt',
         downloadSuccess = CLINICALTRIALS_OUT + 'downloadSuccess.txt',
-	#clinicalTrialsFolder = {config['resources']['general']['clinicalTrialsFolder']}
+        #clinicalTrialsFolder = {config['resources']['general']['clinicalTrialsFolder']}
     output:
         outfile = CLINICALTRIALS_OUT + '{sample}.{clusterid}.dgidb.txt.CompleteTable.ClinicalTrials.allDrugs.txt'
     params:
@@ -104,15 +103,15 @@ rule downloadClinicalTrials:
         CLINICALTRIALS_OUT + 'downloadClinicalTrials.benchmark'
     shell:
         ('wget "https://clinicaltrials.gov/search?term={params.cancerType}&studyxml=true" ' + 
-	'-O {params.outDirec}/{params.cancerType}_clinicalTrials.zip ; ' + 
-	'unzip {params.outDirec}/{params.cancerType}_clinicalTrials.zip -d {params.outDirec}/{params.cancerType}_clinicalTrials ; ' +
-	'touch {params.outDirec}/downloadSuccess.txt')
-	
+        '-O {params.outDirec}/{params.cancerType}_clinicalTrials.zip ; ' + 
+        'unzip {params.outDirec}/{params.cancerType}_clinicalTrials.zip -d {params.outDirec}/{params.cancerType}_clinicalTrials ; ' +
+        'touch {params.outDirec}/downloadSuccess.txt')
+
 
 if not 'ANNOTATECLINICAL_IN' in globals():
-    ANNOTATECLINICAL_IN = PROCESSDE_OUT		
+    ANNOTATECLINICAL_IN = PROCESSDE_OUT
 if not 'ANNOTATECLINICAL_OUT' in globals():
-    ANNOTATECLINICAL_OUT = OUTDIR + 'clinicalAnnotation/'		
+    ANNOTATECLINICAL_OUT = OUTDIR + 'clinicalAnnotation/'
 
 # Combine different database queries, annotate input table with clinical information
 rule annotate_DE_clinicalInformation:
@@ -161,21 +160,20 @@ rule queryCIVIC:
         highLevel = config['tools']['queryCIVIC']['highLevel'],
         colName_gene = config['tools']['queryCIVIC']['colName_gene'],
         colName_logFC = config['tools']['queryCIVIC']['colName_logFC'],
-        strictExpression = config['tools']['queryCIVIC']['strictExpression']
+        strictExpression = config['tools']['queryCIVIC']['strictExpression'],
+        envmodules = config['tools']['queryCIVIC']['envmodules']
     threads:
         config['tools']['queryCIVIC']['threads']
     benchmark:
         CIVIC_OUT + '{sample}.{clusterid}.queryCIVIC.benchmark'
-    conda:
-        "../envs/queryCIVIC_conda_env.yml"
     shell:
-        '{config[tools][queryCIVIC][call]} --inputTable {input.infile} --outFile {output.outfile} --cancerTypeList "{params.cancerType}" --blackList "{params.blackList}" --highLevelList "{params.highLevel}" --colName_gene {params.colName_gene} --colName_logFC {params.colName_logFC} --strictExpression {params.strictExpression}'
+        '{params.envmodules} ; {config[tools][queryCIVIC][call]} --inputTable {input.infile} --outFile {output.outfile} --cancerTypeList "{params.cancerType}" --blackList "{params.blackList}" --highLevelList "{params.highLevel}" --colName_gene {params.colName_gene} --colName_logFC {params.colName_logFC} --strictExpression {params.strictExpression}'
 
 
 if not 'GENESETANALYSIS_IN' in globals():
-    GENESETANALYSIS_IN = DIFF_EXP_OUT		
+    GENESETANALYSIS_IN = DIFF_EXP_OUT
 if not 'GENESETANALYSIS_OUT' in globals():
-    GENESETANALYSIS_OUT = OUTDIR + 'geneSetAnalysis/'		
+    GENESETANALYSIS_OUT = OUTDIR + 'geneSetAnalysis/'
 
 # clnical trials query
 rule geneSetEnrichment:
@@ -199,11 +197,11 @@ rule geneSetEnrichment:
         '{config[tools][geneSetEnrichment][call]} {input.infile} {output.outfile} {params.geneSetDB} {params.variousParams}'
 
 def getGeneSetHeatmapFiles(wildcards):
-	if "DEmalignant" in wildcards.sample:
-		if len(CLUSTER_IDS_MALIGNANT) == 0:
-			return [GENESETANALYSIS_OUT]
-		return expand(GENESETANALYSIS_OUT + wildcards.sample + '.{clusterid}.enrichedGeneSets.txt', clusterid = CLUSTER_IDS_MALIGNANT)
-	return expand(GENESETANALYSIS_OUT + wildcards.sample + '.{clusterid}.enrichedGeneSets.txt', clusterid = CLUSTER_IDS)
+    if "DEmalignant" in wildcards.sample:
+        if len(CLUSTER_IDS_MALIGNANT) == 0:
+            return [GENESETANALYSIS_OUT]
+        return expand(GENESETANALYSIS_OUT + wildcards.sample + '.{clusterid}.enrichedGeneSets.txt', clusterid = CLUSTER_IDS_MALIGNANT)
+    return expand(GENESETANALYSIS_OUT + wildcards.sample + '.{clusterid}.enrichedGeneSets.txt', clusterid = CLUSTER_IDS)
 
 
 # plot heat map for gene set enrichment
@@ -221,13 +219,13 @@ rule plot_gene_set_enrichment:
         mem = config['tools']['plotGeneSetEnrichment']['mem'],
         time = config['tools']['plotGeneSetEnrichment']['time'],
         variousParams = config['tools']['plotGeneSetEnrichment']['variousParams'],
-	comparison_direc = GENESETANALYSIS_OUT
+        comparison_direc = GENESETANALYSIS_OUT
     threads:
         config['tools']['plotGeneSetEnrichment']['threads']
     benchmark:
         GENESETANALYSIS_OUT + '{sample}.heatmap_enrichment.benchmark'
     shell:
-	    'if [ "{input.inDir}" != "{params.comparison_direc}" ] ; then echo "test1" ; {config[tools][plotGeneSetEnrichment][call]} {output.outfile} {input.inDir} ; else touch {output.outfile} ; fi'
+        'if [ "{input.inDir}" != "{params.comparison_direc}" ] ; then echo "test1" ; {config[tools][plotGeneSetEnrichment][call]} {output.outfile} {input.inDir} ; else touch {output.outfile} ; fi'
 
 
 if not 'DRUGCOMBINATION' in globals():
@@ -406,28 +404,28 @@ if not 'PLOT_DRUGS_OUT' in globals():
 
 # check whether all civic queries are finished
 def getCivicQueryResults(wildcards):
-	return expand(PLOT_DRUGS_IN + wildcards.sample + '.{clusterid}.clinicalAnnotation.civic.txt', clusterid = CLUSTER_IDS)
+    return expand(PLOT_DRUGS_IN + wildcards.sample + '.{clusterid}.clinicalAnnotation.civic.txt', clusterid = CLUSTER_IDS)
 
 # this rule generates a UMAP plot that shows drug prediction on the tumor clones
 rule plot_drug_prediction:
     input:
-	    rdsFile = REMOVE_ATYPICAL_OUT + '{sample}.RDS',
-	    inFiles = getCivicQueryResults,
-	    drugList = config['resources']['drugList'],
-	    drugCombis = config['resources']['drugCombinations'],
-	    civicDict = config['resources']['civicDict']
+        rdsFile = REMOVE_ATYPICAL_OUT + '{sample}.RDS',
+        inFiles = getCivicQueryResults,
+        drugList = config['resources']['drugList'],
+        drugCombis = config['resources']['drugCombinations'],
+        civicDict = config['resources']['civicDict']
     output:
-	    out = PLOT_DRUGS_OUT + '{sample}.drug_prediction_umap.png'
+        out = PLOT_DRUGS_OUT + '{sample}.drug_prediction_umap.png'
     params:
-	    lsfoutfile = PLOT_DRUGS_OUT + '{sample}.drug_prediction_umap.lsfout.log',
-	    lsferrfile = PLOT_DRUGS_OUT + '{sample}.drug_prediction_umap.lsferr.log',
-	    scratch = config['tools']['show_drugPrediction_on_clones']['scratch'],
-	    sampleName = '{sample}',
-	    inputDir = PLOT_DRUGS_IN,
-	    outputDirec = PLOT_DRUGS_OUT,
-	    mem = config['tools']['show_drugPrediction_on_clones']['mem'],
-	    time = config['tools']['show_drugPrediction_on_clones']['time'],
-	    variousParams = config['tools']['show_drugPrediction_on_clones']['variousParams']
+        lsfoutfile = PLOT_DRUGS_OUT + '{sample}.drug_prediction_umap.lsfout.log',
+        lsferrfile = PLOT_DRUGS_OUT + '{sample}.drug_prediction_umap.lsferr.log',
+        scratch = config['tools']['show_drugPrediction_on_clones']['scratch'],
+        sampleName = '{sample}',
+        inputDir = PLOT_DRUGS_IN,
+        outputDirec = PLOT_DRUGS_OUT,
+        mem = config['tools']['show_drugPrediction_on_clones']['mem'],
+        time = config['tools']['show_drugPrediction_on_clones']['time'],
+        variousParams = config['tools']['show_drugPrediction_on_clones']['variousParams']
     threads:
         config['tools']['show_drugPrediction_on_clones']['threads']
     benchmark:
