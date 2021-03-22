@@ -6,7 +6,7 @@ if not 'CELLRANGER_OUT' in globals():
 # cellranger call to process the raw samples
 rule cellranger_count: 
     input:
-        fastqs_dir = CELLRANGER_IN, #+ '{sample}',
+        fastqs_dir = CELLRANGER_IN,
         reference = config['resources']['reference_transcriptome']
     output:
         features_file = CELLRANGER_OUT + '{sample}.features.tsv',
@@ -21,9 +21,9 @@ rule cellranger_count:
         mem = config['tools']['cellranger_count']['mem'],
         time = config['tools']['cellranger_count']['time'],
         variousParams = config['tools']['cellranger_count']['variousParams'],
-        cellranger_sampleName = config['tools']['cellranger_count']['cellranger_sampleName'],
         metrics_summary = CELLRANGER_OUT + '{sample}.metrics_summary.csv',
-        web_summary = CELLRANGER_OUT + '{sample}.web_summary.html'
+        web_summary = CELLRANGER_OUT + '{sample}.web_summary.html',
+	mySample = '{sample}' # needs to be the prefix of all fastq files that belong to this sample. NOTE: no dots are allowed in sample names!
     threads:
         config['tools']['cellranger_count']['threads']
     benchmark:
@@ -31,8 +31,7 @@ rule cellranger_count:
     # NOTE: cellranger count function cannot specify the output directory, the output it the path you call it from.
     # Therefore, a subshell is used here.
     shell:
-        '(cd {params.cr_out}; {config[tools][cellranger_count][call]} count --id={params.cellranger_sampleName} --transcriptome={input.reference} --localcores={params.local_cores} --fastqs={input.fastqs_dir} --nosecondary {params.variousParams}); gunzip {params.cr_out}{params.cellranger_sampleName}/outs/filtered_feature_bc_matrix/features.tsv.gz ; gunzip {params.cr_out}{params.cellranger_sampleName}/outs/filtered_feature_bc_matrix/barcodes.tsv.gz ; gunzip {params.cr_out}{params.cellranger_sampleName}/outs/filtered_feature_bc_matrix/matrix.mtx.gz ; ln -s "{params.cr_out}{params.cellranger_sampleName}/outs/filtered_feature_bc_matrix/features.tsv" "{output.features_file}"; ln -s "{params.cr_out}{params.cellranger_sampleName}/outs/filtered_feature_bc_matrix/matrix.mtx" "{output.matrix_file}"; ln -s "{params.cr_out}{params.cellranger_sampleName}/outs/filtered_feature_bc_matrix/barcodes.tsv" "{output.barcodes_file}" ; ln -s "{params.cr_out}{params.cellranger_sampleName}/outs/web_summary.html" "{params.web_summary}" ; ln -s "{params.cr_out}{params.cellranger_sampleName}/outs/metrics_summary.csv" "{params.metrics_summary}"'
-
+	    '(cd {params.cr_out}; {config[tools][cellranger_count][call]} count --id={params.mySample} --sample={params.mySample} --transcriptome={input.reference} --localcores={params.local_cores} --fastqs={input.fastqs_dir} --nosecondary {params.variousParams}); gunzip {params.cr_out}{params.mySample}/outs/filtered_feature_bc_matrix/features.tsv.gz ; gunzip {params.cr_out}{params.mySample}/outs/filtered_feature_bc_matrix/barcodes.tsv.gz ; gunzip {params.cr_out}{params.mySample}/outs/filtered_feature_bc_matrix/matrix.mtx.gz ; ln -s "{params.cr_out}{params.mySample}/outs/filtered_feature_bc_matrix/features.tsv" "{output.features_file}"; ln -s "{params.cr_out}{params.mySample}/outs/filtered_feature_bc_matrix/matrix.mtx" "{output.matrix_file}"; ln -s "{params.cr_out}{params.mySample}/outs/filtered_feature_bc_matrix/barcodes.tsv" "{output.barcodes_file}" ; ln -s "{params.cr_out}{params.mySample}/outs/web_summary.html" "{params.web_summary}" ; ln -s "{params.cr_out}{params.mySample}/outs/metrics_summary.csv" "{params.metrics_summary}"'
 
 if not 'CREATEHD5_IN' in globals():
     CREATEHD5_IN = CELLRANGER_OUT
