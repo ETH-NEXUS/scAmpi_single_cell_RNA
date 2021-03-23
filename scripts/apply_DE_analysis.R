@@ -179,8 +179,9 @@ if (length(malignant_clusters) > 0) {
       idy = apply(contrastmatrix, 1, function(x) names(which(x!=0)))
       #idy = sapply(idy, function(x) all(x %in% names(coef(fitobject))))
       tout = try(glht(fitobject, t.cm), silent=T)
-      tout = try(tidy(summary(tout)), silent=T)
+      tout = try(tidy(summary(tout, type="none")), silent=T)
       if(class(tout)[1] != "try-error") {
+        names(tout)[6] = "p.value"
         tout[, -2]
       } else {
         return("-1")
