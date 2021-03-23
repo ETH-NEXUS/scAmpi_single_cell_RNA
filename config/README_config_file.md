@@ -30,7 +30,7 @@ The scAmpi repository already includes resources for several tissue types, those
         "priority_genes":"../required_files/selected_genes_melanoma.txt"  # tab separated file that lists genes that shall be visualized on a UMAP. Genes are categorized into to user-defined gene-categories to allow better interpretation.
     },
 
-## Notes on disease-specific parameters for CIViC
+## Disease-specific parameters for CIViC
 
 The scAmpi workflow leverages expert curated clinical data from the [CIViC](https://civicdb.org) database ("Clinical Interpretation of Variants in Cancer"). Variant specific evidence data retrieved from CIVIC can be further filtered for cancer-type specificity using parameters `--cancerTypeList`, `--blackList` and `--highLevelList`. Search terms should be provided in a comma-separated list (no spaces) and multiple words per term are allowed, eg. `ovarian`, `solid tumor,melanoma` and `sex cord-stromal,granulosa cell,glandular pattern` are all valid inputs.
 

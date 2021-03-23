@@ -43,7 +43,6 @@ dependencies:
   - r-seurat
   - bioconductor-singlecellexperiment
   - r-reticulate
-  - bioconductor-rdgidb
   - r-remotes
   - r-broom
   - r-multcomp
@@ -56,4 +55,3 @@ dependencies:
   - pip
   - numpy
   - pandas
-  - aiohttp

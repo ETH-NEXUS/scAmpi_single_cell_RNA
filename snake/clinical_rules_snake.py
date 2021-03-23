@@ -160,14 +160,13 @@ rule queryCIVIC:
         highLevel = config['tools']['queryCIVIC']['highLevel'],
         colName_gene = config['tools']['queryCIVIC']['colName_gene'],
         colName_logFC = config['tools']['queryCIVIC']['colName_logFC'],
-        strictExpression = config['tools']['queryCIVIC']['strictExpression'],
-        envmodules = config['tools']['queryCIVIC']['envmodules']
+        strictExpression = config['tools']['queryCIVIC']['strictExpression']
     threads:
         config['tools']['queryCIVIC']['threads']
     benchmark:
         CIVIC_OUT + '{sample}.{clusterid}.queryCIVIC.benchmark'
     shell:
-        '{params.envmodules} ; {config[tools][queryCIVIC][call]} --inputTable {input.infile} --outFile {output.outfile} --cancerTypeList "{params.cancerType}" --blackList "{params.blackList}" --highLevelList "{params.highLevel}" --colName_gene {params.colName_gene} --colName_logFC {params.colName_logFC} --strictExpression {params.strictExpression}'
+        '{config[tools][queryCIVIC][call]} --inputTable {input.infile} --outFile {output.outfile} --cancerTypeList "{params.cancerType}" --blackList "{params.blackList}" --highLevelList "{params.highLevel}" --colName_gene {params.colName_gene} --colName_logFC {params.colName_logFC} --strictExpression {params.strictExpression}'
 
 
 if not 'GENESETANALYSIS_IN' in globals():

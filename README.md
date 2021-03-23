@@ -17,9 +17,19 @@ Example (this will install the conda environment in your home):
 ```
 
 Additionally required installations:
-- Cellranger: Follow the instructions on the 10xGenomics support page and include the cellranger binary to your path.
+- [Cellranger](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/what-is-cell-ranger): Follow the instructions on the 10xGenomics support page and include the cellranger binary to your path.
 Webpage: https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/installation
-- Phenograph: 1: activate the conda environment, 2: use `pip install PhenoGraph` to install the package
+- [Phenograph](https://github.com/dpeerlab/phenograph): 1: activate the conda environment, 2: use `pip install PhenoGraph` to install the package.
+- [CIViCpy](https://github.com/griffithlab/civicpy): 1: activate the conda environment, 2: use `pip install civicpy` to install the package, 3: download local cache of the [CIViC](https://civicdb.org) database using functionality from `civicpy` with
+
+    >> from civicpy import civic
+    >> civic.load_cache(on_stale='ignore')
+
+Note that updates to the cache file are not handled by scAmpi and is the user who should do this using
+
+    >> civic.update_cache()
+
+Webpage: https://docs.civicpy.org/en/latest/install.html
 
 
 *Temporary*
