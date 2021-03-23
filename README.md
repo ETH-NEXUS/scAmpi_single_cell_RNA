@@ -22,8 +22,8 @@ Webpage: https://support.10xgenomics.com/single-cell-gene-expression/software/pi
 - [Phenograph](https://github.com/dpeerlab/phenograph): 1: activate the conda environment, 2: use `pip install PhenoGraph` to install the package.
 - [CIViCpy](https://github.com/griffithlab/civicpy): 1: activate the conda environment, 2: use `pip install civicpy` to install the package, 3: download local cache of the [CIViC](https://civicdb.org) database using functionality from `civicpy` with
 
-    >> from civicpy import civic
 
+    >> from civicpy import civic
     >> civic.load_cache(on_stale='ignore')
 
 Note that updates to the cache file are not handled by scAmpi and is the user who should do this using
