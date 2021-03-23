@@ -3,11 +3,9 @@ from os import path
 
 # This function adapts the config object to include full path information
 include: "misc_snake.py"
-#configfile: 'config_scTranscriptomics.json'
 
 # input files and folders
 SAMPLEMAPPING = config['inputOutput']['sample_map']
-#INPUTDIR = config['inputOutput']['input_fastqs']
 OUTDIR = config['inputOutput']['analysis_output_dir']
 TMPDIR = config['inputOutput']['analysis_temp_dir']
 
@@ -85,33 +83,23 @@ PLOT_DRUGS_OUT = DRUGCOMBINATION
 GENESETANALYSIS_OUT = OUTDIR + 'geneSetAnalysis/'
 FILTERDRUGS_OUT = CLINICALTRIALS_OUT
 
-RESULTCOPY_OUT = OUTDIR + 'result_upload/'
 GENE_EXP_OUT = OUTDIR + 'gene_exp/'
 
 if not os.path.exists(GENESETANALYSIS_OUT):
 	os.mkdir(GENESETANALYSIS_OUT)
 
 # Include the rules
-#include: "clinical_rules_snake.py"
 
 # make sure that rules are only called when also input is there
 FINAL_FILE = []
-ONE_OR_MULTI_CLUSTER = ""
-NO_TUMOR_OR_MALIG_ONLY = ""
 if len(CLUSTER_IDS) > 0:
 	FINAL_FILE = OUTDIR + 'complete_clinical.txt'
-	if len(CLUSTER_IDS) > 1:
-		ONE_OR_MULTI_CLUSTER = "multi_cluster"
-	else:
-		ONE_OR_MULTI_CLUSTER = "one_cluster"
 	include: "clinical_rules_snake.py"
 elif len(CLUSTER_IDS_MALIGNANT) > 0:
 	FINAL_FILE = OUTDIR + 'complete_clinical_malignant_only.txt'
-	NO_TUMOR_OR_MALIG_ONLY = "malig_only"
 	include: "clinical_rules_snake.py"
 else:
 	FINAL_FILE = OUTDIR + 'complete_clinical_noTumor.txt'
-	NO_TUMOR_OR_MALIG_ONLY = "no_tumor"
 
 localrules: all_avoidEmptyInput
 rule all_avoidEmptyInput:
@@ -125,7 +113,6 @@ rule all_avoidEmptyInput:
 
 
 # This rule defines which files should be created
-# in addtion, results copy paste is handled (tumor profiler specific!)
 localrules: clinical_scTranscriptomics,clinical_scTranscriptomics_malignant_only,clinical_scTranscriptomics_noTumor
 rule clinical_scTranscriptomics:
 	input:
@@ -143,42 +130,16 @@ rule clinical_scTranscriptomics:
 		expand(PLOT_DRUGS_OUT + '{sample}.genes_cells_filtered.corrected.atypical_removed.drug_prediction_umap.png', sample = getSampleNames()),
 	output:
 		OUTDIR + 'complete_clinical.txt'
-		#OUTDIR + 'completed_results_copy.txt'
 	params:
-		outDir_copy = RESULTCOPY_OUT,
-		derivedList =  config['resources']['derived_suffixList'],
-		fastqDir = config['inputOutput']['input_fastqs'],
-		sampleName = expand('{sample}', sample = getSampleNames()),
-		cellrangerDir = CELLRANGER_OUT,
-		de_dir = DIFF_EXP_OUT,
-		clin_dir = ANNOTATECLINICAL_OUT,
-		fastqc_dir = config['inputOutput']['input_fastqc'],
-		enriched_dir = GENESETANALYSIS_OUT,
-		celltype_dir = CELLTYPECLASS_OUT,
-		rawH5_dir = CREATEHD5_OUT,
-		drugCombi_dir = DRUGCOMBINATION,
-		cluster_dir = PHENOGRAPH_OUT,
-		mean_dir = GENE_EXP_OUT,
-		filtered_dir = FILTER_GENES_CELLS_OUT,
-		atypical_dir = REMOVE_ATYPICAL_OUT,
-		plotting_dir = PLOTTING_OUT,
-		plotexpr_dir = PLOTTING_OUT + 'gene_expression/',
-		gsva_dir = GSVA_OUT,
-		sequencing_runName = config['inputOutput']['sequencing_runName'],
 		lsfoutfile = OUTDIR + 'complete_clinical.lsfout.log',
 		lsferrfile = OUTDIR + 'complete_clinical.lsferr.log',
 		mem = '1000',
 		scratch = '1000',
-		time = '500',
-		outdir_clinT = CLINICALTRIALS_OUT,
-		one_or_multi_cluster = ONE_OR_MULTI_CLUSTER,
+		time = '500'
 	benchmark:
 		OUTDIR + 'complete_clinical.txt.benchmark'
 	shell:
-		'if [ -d {params.outdir_clinT}cancer_clinicalTrials ] ;' +
-		'then rm -r {params.outdir_clinT}cancer_clinicalTrials ; echo "Deleted {params.outdir_clinT}cancer_clinicalTrials" ; ' +
-		'else echo "Directory {params.outdir_clinT}cancer_clinicalTrials does not exist." ; fi ; ' +
-		'{config[tools][organize_results_copy][call]} {params.outDir_copy} {params.derivedList} {params.fastqDir} {params.sampleName} {params.cellrangerDir} {params.de_dir} {params.clin_dir} {params.fastqc_dir} {params.enriched_dir} {params.celltype_dir} {params.atypical_dir} {params.rawH5_dir} {params.drugCombi_dir} {params.cluster_dir} {params.mean_dir} {params.filtered_dir} {params.plotting_dir} {params.plotexpr_dir} {params.gsva_dir} {params.sequencing_runName} {params.one_or_multi_cluster}; date > {output}'
+		'date > {output}'
 
 
 rule clinical_scTranscriptomics_malignant_only:
@@ -188,65 +149,27 @@ rule clinical_scTranscriptomics_malignant_only:
 	output:
 		OUTDIR + 'complete_clinical_malignant_only.txt'
 	params:
-		outDir_copy = RESULTCOPY_OUT,
-		derivedList =  config['resources']['derived_suffixList'],
-		fastqDir = config['inputOutput']['input_fastqs'],
-		sampleName = expand('{sample}', sample = getSampleNames()),
-		cellrangerDir = CELLRANGER_OUT,
-		de_dir = DIFF_EXP_OUT,
-		fastqc_dir = config['inputOutput']['input_fastqc'],
-		enriched_dir = GENESETANALYSIS_OUT,
-		celltype_dir = CELLTYPECLASS_OUT,
-		rawH5_dir = CREATEHD5_OUT,
-		cluster_dir = PHENOGRAPH_OUT,
-		mean_dir = GENE_EXP_OUT,
-		filtered_dir = FILTER_GENES_CELLS_OUT,
-		atypical_dir = REMOVE_ATYPICAL_OUT,
-		plotting_dir = PLOTTING_OUT,
-		plotexpr_dir = PLOTTING_OUT + 'gene_expression/',
-		gsva_dir = GSVA_OUT,
-		sequencing_runName = config['inputOutput']['sequencing_runName'],
 		lsfoutfile = OUTDIR + 'complete_clinical.lsfout.log',
 		lsferrfile = OUTDIR + 'complete_clinical.lsferr.log',
 		mem = '1000',
 		scratch = '1000',
-		time = '500',
-		no_tumor_or_malig_only = NO_TUMOR_OR_MALIG_ONLY,
+		time = '500'
 	benchmark:
 		OUTDIR + 'complete_clinical_malignant_only.txt.benchmark'
 	shell:
-		'{config[tools][organize_results_copy][call_noTumor]} {params.outDir_copy} {params.derivedList} {params.fastqDir} {params.sampleName} {params.cellrangerDir} {params.de_dir} {params.fastqc_dir} {params.enriched_dir} {params.celltype_dir} {params.atypical_dir} {params.rawH5_dir} {params.cluster_dir} {params.mean_dir} {params.filtered_dir} {params.plotting_dir} {params.plotexpr_dir} {params.gsva_dir} {params.sequencing_runName} {params.no_tumor_or_malig_only}; date > {output}'
+		'date > {output}'
 
 rule clinical_scTranscriptomics_noTumor:
 	output:
 		OUTDIR + 'complete_clinical_noTumor.txt'
 	params:
-		outDir_copy = RESULTCOPY_OUT,
-		derivedList =  config['resources']['derived_suffixList'],
-		fastqDir = config['inputOutput']['input_fastqs'],
-		sampleName = expand('{sample}', sample = getSampleNames()),
-		cellrangerDir = CELLRANGER_OUT,
-		de_dir = DIFF_EXP_OUT,
-		fastqc_dir = config['inputOutput']['input_fastqc'],
-		enriched_dir = GENESETANALYSIS_OUT,
-		celltype_dir = CELLTYPECLASS_OUT,
-		rawH5_dir = CREATEHD5_OUT,
-		cluster_dir = PHENOGRAPH_OUT,
-		mean_dir = GENE_EXP_OUT,
-		filtered_dir = FILTER_GENES_CELLS_OUT,
-		atypical_dir = REMOVE_ATYPICAL_OUT,
-		plotting_dir = PLOTTING_OUT,
-		plotexpr_dir = PLOTTING_OUT + 'gene_expression/',
-		gsva_dir = GSVA_OUT,
-		sequencing_runName = config['inputOutput']['sequencing_runName'],
 		lsfoutfile = OUTDIR + 'complete_clinical.lsfout.log',
 		lsferrfile = OUTDIR + 'complete_clinical.lsferr.log',
 		mem = '1000',
 		scratch = '1000',
-		time = '500',
-		no_tumor_or_malig_only = NO_TUMOR_OR_MALIG_ONLY,
+		time = '500'
 	benchmark:
 		OUTDIR + 'complete_clinical_noTumor.txt.benchmark'
 	shell:
-		'{config[tools][organize_results_copy][call_noTumor]} {params.outDir_copy} {params.derivedList} {params.fastqDir} {params.sampleName} {params.cellrangerDir} {params.de_dir} {params.fastqc_dir} {params.enriched_dir} {params.celltype_dir} {params.atypical_dir} {params.rawH5_dir} {params.cluster_dir} {params.mean_dir} {params.filtered_dir} {params.plotting_dir} {params.plotexpr_dir} {params.gsva_dir} {params.sequencing_runName} {params.no_tumor_or_malig_only}; date > {output}'
+		'date > {output}'
 

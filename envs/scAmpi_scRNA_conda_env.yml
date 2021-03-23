@@ -1,0 +1,59 @@
+name: scAmpi_scRNA
+channels:
+  - bioconda
+  - conda-forge
+  - r
+  - anaconda
+  - defaults
+dependencies:
+  - snakemake
+## R
+  - r>=4.0
+  - bioconductor-rdgidb
+  - r-optparse
+  - bioconductor-rhdf5
+  - r-plyr
+  - r-ggplot2
+  - r-rcolorbrewer
+  - bioconductor-biomart
+  - bioconductor-scdblfinder
+  - bioconductor-singlecellexperiment
+  - bioconductor-scran
+  - r-sctransform
+  - r-uwot
+  - r-igraph
+  - r-reshape2
+  - r-dplyr
+  - bioconductor-limma
+  - r-purrr
+  - r-hmisc
+  - r-egg
+  - r-ggridges
+  - bioconductor-scater
+  - r-rtsne
+  - r-pheatmap
+  - r-cowplot
+  - bioconductor-org.hs.eg.db
+  - bioconductor-aroma.light
+  - bioconductor-scdblfinder
+  - r-class
+  - r-ggrepel
+  - r-gridextra
+  - r-gtable
+  - r-seurat
+  - bioconductor-singlecellexperiment
+  - r-reticulate
+  - bioconductor-rdgidb
+  - r-remotes
+  - r-broom
+  - r-multcomp
+  - bioconductor-gsva
+  - r-upsetr
+## python
+  - scipy
+  - configargparse
+  - h5py
+  - pip
+  - numpy
+  - pandas
+  - aiohttp

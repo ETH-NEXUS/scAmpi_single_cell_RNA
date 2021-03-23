@@ -18,6 +18,14 @@ suppressPackageStartupMessages({
 #  library(viridis)
 })
 
+## packages
+lby = c("limma", "scater", "scran", "Rtsne", "rhdf5", "ggplot2", "pheatmap", "Hmisc",
+        "RColorBrewer", "cowplot", "reshape2", "igraph", "org.Hs.eg.db", "GSVA","aroma.light",
+        "class","ggrepel")
+resp = lapply(lby, require, character.only=T, warn.conflicts=F, quietly=T)
+if(!all(unlist(resp))) stop("Could not load one or more packages")
+rm(resp, lby)
+
 # give out session Info
 cat("\n\n\nPrint sessionInfo:\n\n")
 print(sessionInfo())
@@ -61,17 +69,7 @@ dir.create(dir_qc, showWarnings = FALSE)
 print(path)
 print(path_gene_expr)
 print(path_qc)
-#dir_single_plots <- opt$outDir %&% "gene_expression/single_plots/"
-#path_single_plots <- opt$outDir %&% "gene_expression/single_plots/" %&% opt$sampleName
-#dir.create(dir_single_plots, showWarnings = FALSE)
-#print(path_single_plots)
 
-## packages
-lby = c("limma", "scater", "scran", "Rtsne", "rhdf5", "ggplot2", "pheatmap", "Hmisc",
-        "RColorBrewer", "cowplot", "reshape2", "igraph", "org.Hs.eg.db", "GSVA","aroma.light","WGCNA","class","ggrepel")
-resp = lapply(lby, require, character.only=T, warn.conflicts=F, quietly=T)
-if(!all(unlist(resp))) stop("Could not load one or more packages")
-rm(resp, lby)
 
 # set general options/parameters
 options(stringsAsFactors = FALSE)

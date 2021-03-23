@@ -1,41 +1,68 @@
-# single-cell-tumor-profiler
+# scAmpi - Single Cell Analysis mRNA pipeline
 
-* System requirements:
+#### General overview
 
-   *  - all r packages have been tested with r 3.5.1
-   * Python packages:
-   `pip install -r python-requirements.txt`
-   * R packages:
-   `Rscript r-requirements.R`
-   * cellranger needs to be installed (tested with cellranger-3.1.0 and earlier versions)
+This scAmpi workflow is organized into two main parts: the `scAmpi_basic` part and the `scAmpi_clinical` part. The first comprises general scRNA preprocessing steps, filtering, normalisation, unsupervised clustering, cell type classification, and DE analysis.
 
-### Comment on sample integration
+The latter (`clinical`) part includes the search for disease relevant drug targets of differentially expressed genes when comparing the malignant cells to the non-malignant cells of a sample. Note that the clinical part is only applied if at least one cluster identified in your sample is indicated as a diseased ("malignant") cell type.
 
-The rule `sample_integration` performs an integration of the current sample and a cohort of previous samples using the Seurat 3 framework.
-This is done to visualise the cells of all samples together in one UMAP.
-Because it is error prone and would use a great amount of resources, the cohort of previous samples does not contain all previously processed samples of the respective indication.
-Instead, we selected samples that were of high quality from a technical point of  view and consist of tumour as well as immune cells. The first aspect makes sure that enough common features (genes) are found in the samples.
-The latter is necessary for the integration software to find 'similar' cells of the same cell type in different samples that are used as 'anchors'.
-Even though the cohort should not exceed a for the purpose reasonable number of samples it will be updated as we get more samples that meet the criteria mentioned above.
+#### Software
 
+The pipeline consists of R and python scripts. Most of the relevant R and python packages used in this workflow can be installed as a conda environment using the yaml file `scAmpi_scRNA_conda_env.yml` provided in the sub folder "envs".
 
-## Preprocessing with NovaSeq
-
-When several samples (not necessarily from the same indication) were sequenced together using HiSeq 4000 (ie. NovaSeq), a preprocessing pipeline needs to be applied before the actual analysis can be performed. This pipeline makes use of `snake_scTranscriptomics_novaSeq_master.snake` and `config_scTranscriptomics_novaSeq.json`, and it expects a different directory structure compared to the regular analysis run: a single "root" fastq directory is used which contains one subdirectory per sequenced sample.
-
-Furthermore, in this pipeline the sample map is used to specify sample-specific parameters: the cellranger sample name (ie. short version containing no dots) corresponding to each sample, and the root directory for each sample's corresponding indication (as results from the preprocessing steps will be directly copied into each sample-specific directory for the analysis). Hence, the sample map should have the following example structure:
+Example (this will install the conda environment in your home):
 ```
-1   melanomaSampleID1   sampleCellRangerName    N   1   /path/to/melanoma/samples/
-1   melanomaSampleID2   sampleCellRangerName    N   1   /path/to/melanoma/samples/
-1   ovarianSampleID1    sampleCellRangerName    N   1   /path/to/ovarian/samples/
-...
+> conda env create -f scAmpi_scRNA_conda_env.yml --name scAmpi_scRNA
+> conda activate scAmpi_scRNA
 ```
-Beware the mandatory '/' at the end of each root path. Also, the pipeline expects each sample's fasq subdirectory to use the cellranger sample name instead of the "full" sample name.
+
+Additionally required installations:
+- Cellranger: Follow the instructions on the 10xGenomics support page and include the cellranger binary to your path.
+Webpage: https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/installation
+- Phenograph: 1: activate the conda environment, 2: use `pip install PhenoGraph` to install the package
+
+
+*Temporary*
+For the normalisation step the R package `sctransform` is used. As there is a known bug in the latest release, at the moment either an older package version (e.g. 0.2) or the development version should be installed. The development version can be installed within R using `remotes::install_github("ChristophH/sctransform@develop")`.
+
+
+#### Example data
+
+For a test run the freely available 10X Genomics data from PBMC cells can be used. Please find an example config file and in the directory `testdata`
+
+
+#### Before running the pipeline
+
+Before running the pipeline the `config` file needs to be adapted to contain the input and output paths for the intended analysis. Those are provided in the first section (`inputOutput`) of the config file. In addition to input and output paths, further resource information must be provided in the section `resources`. This information is primarily specifying input required for the cell type classification and the genomic reference used for the cellranger mapping. An example config file ready for adaptation, as well as a brief description of the relevant config blocks, is provided in the directory `config`.
+
+Further, a "sample_map" must be provided, a tab delimited text file that lists all samples that should be analysed (one row per sample).
+The sample map contains four columns (refer to example below): column 1: experiment ID, column 2: sample name (this ID will be used to name files and identify the sample throughout the pipeline); column 3: sample_info (free-text), e.g. tumor/normal/tissue_type; column 4: time point.
+
+Example:
+```
+1	SAMPLE-1_scR	lung	1
+2	SAMPLE-2_scR	skin	1
+```
+
+
+#### scAmpi_basic part
 
 Example call:
-`snakemake --notemp --latency-wait 60 -s /path/to/git/snake/snake_scTranscriptomics_novaSeq_master.snake --configfile /path/to/preprocessing/folder/snake_analysis_files/config_scTranscriptomics.json --cluster 'bsub -M {params.mem} -n {threads} -W {params.time} -R "rusage[mem={params.mem},scratch={params.scratch}]" -eo {params.lsferrfile} -oo {params.lsfoutfile}' -j 100 -p -k -n`
+
+```
+snakemake --notemp --latency-wait 60 -s snake_scAmpi_basic_master.snake --configfile config_scAmpi.json --cluster 'bsub -M {params.mem} -n {threads} -W {params.time} -R "rusage[mem={params.mem},scratch={params.scratch}]" -eo {params.lsferrfile} -oo {params.lsfoutfile}' -j 100 -p -k
+```
+
+Note that the section that follows parameter `--cluster` denotes the cluster specific notation to indicate memory and timr ressources for a job. Please adapt according to the respective job scheduling system used.
 
 
+#### Clinical part
 
+Example call:
 
+```
+snakemake --notemp --latency-wait 60 -s snake_scAmpi_clinical_master.snake --configfile config_scTranscriptomics.json --cluster 'bsub -M {params.mem} -n {threads} -W {params.time} -R "rusage[mem={params.mem},scratch={params.scratch}]" -eo {params.lsferrfile} -oo {params.lsfoutfile}' -j 100 -p -k
+```
+
+Note that the section that follows parameter `--cluster` denotes the cluster specific notation to indicate memory and timr ressources for a job. Please adapt according to the respective job scheduling system used.
 

@@ -15,22 +15,20 @@ logging.debug("system version : " + str(sys.version))
 #logging.debug("phenograph version: " + str(phenograph_version))
 
 parser = argparse.ArgumentParser()
-parser.add_argument("input_file", help="input matrix hdf5 file")
-parser.add_argument("output_file", help="path to the output csv file")
-parser.add_argument("distance_matrix", help="the distance matrix (output file) used by the louvain clustering")
-parser.add_argument("modularity_score", help="text file containing the louvain modularity score")
-parser.add_argument("n_neighbours", help="the number of neighbours",
-        type=int)
-parser.add_argument("min_size", help="minimum cluster size", type=int)
-parser.add_argument("--n_threads", help="the number of threads", type=int,
-        default=1)
-parser.add_argument("-l", "--log_normalize", help="Boolean switch for the log normalization", type=str2bool)
+parser.add_argument("--input_file", dest="input_file", required=True, help="input matrix hdf5 file")
+parser.add_argument("--output_file", dest="output_file", required=True, help="path to the output csv file")
+parser.add_argument("--distance_matrix", dest="distance_matrix", required=True, help="the distance matrix (output file) used by the louvain clustering")
+parser.add_argument("--modularity_score", dest="modularity_score", required=True, help="text file containing the louvain modularity score")
+parser.add_argument("--n_neighbours", dest="n_neighbours", required=True, help="the number of neighbours", type=int)
+parser.add_argument("--min_size", dest="min_size", required=True, help="minimum cluster size", type=int)
+parser.add_argument("--n_threads", dest="n_threads", required=True, help="the number of threads", type=int, default=1)
+parser.add_argument("-l", "--log_normalize", dest="log_normalize", required=True, help="Boolean switch for the log normalization", type=str2bool)
 args = parser.parse_args()
 
 
 
 def apply_pheno(input_file, output_file, distance_matrix, modularity_score, n_neighbours, min_size, threads, log_normalize):
-    
+
     logging.debug('input file: ' + input_file)
     logging.debug('n_neighbours: ' +  str(n_neighbours))
     logging.debug('min_size:' + str(min_size))
@@ -46,7 +44,7 @@ def apply_pheno(input_file, output_file, distance_matrix, modularity_score, n_ne
         pass
     pheno.apply()
 
-    
+
     logging.debug(pheno.barcodes[1:5])
     logging.debug('distance matrix')
     logging.debug(pheno.distance_matrix)
@@ -54,7 +52,7 @@ def apply_pheno(input_file, output_file, distance_matrix, modularity_score, n_ne
     pheno.write_csv(output_file)
 
     np.savetxt(fname = distance_matrix, X=pheno.distance_matrix, delimiter='\t')
-    
+
     # write the score file
     f = open(modularity_score, 'w')
     f.write(str(pheno.modularity))

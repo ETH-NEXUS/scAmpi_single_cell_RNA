@@ -41,6 +41,7 @@ opt = parse_args(opt_parser)
 # convenience function for string concatenation
 '%&%' = function(a,b) paste(a,b,sep="")
 
+
 # Input parameters
 fdr_cut <- as.numeric(opt$fdr_cut)
 fc_cut <- as.numeric(opt$fc_cut)
@@ -77,6 +78,14 @@ cluster_ids <- unlist(cluster_ids)
 names(dominant_types) <- cluster_ids
 print("str(dominant_types):")
 print(str(dominant_types))
+
+# remove all clusters that are too small
+cluster_sizes <- table(as.numeric(as.character(my_sce$phenograph_clusters)))
+too_small_mask <- cluster_sizes < threshold_comparison
+clusters_too_small <- names(too_small_mask)[too_small_mask, drop = F]
+cat("\n\n\nWarning : cluster(s)", clusters_too_small, "is/are too small and will not be included in the DE analysis\n")
+cat("dominant celltype(s) of small cluster(s):", dominant_types[too_small_mask], "\n\n\n")
+dominant_types <- dominant_types[!names(dominant_types) %in% clusters_too_small, drop = FALSE]
 
 # Get all malignant clusters of the current sample.
 malignant_mask <- grepl(opt$malignant_tag, dominant_types,
@@ -115,10 +124,11 @@ if (length(malignant_clusters) > 0) {
   # use SCE object
   mresid = assay(my_sce, "pearson_resid", min.cells = 0, min.features = 0)
   mnorm = assay(my_sce, "normcounts", min.cells = 0, min.features = 0)
-  print("str(mnorm):")
-  print(str(mnorm))
-  print("str(mresid):")
-  print(str(mresid))
+  cat("\n\n\n Before excluding small clusters:\n")
+  print("dim(mnorm):")
+  print(dim(mnorm))
+  print("dim(mresid):")
+  print(dim(mresid))
   # get cluster ids
   clu = sprintf("c%02.0f", as.numeric(as.character(my_sce$phenograph_clusters)))
   names(clu) = my_sce$barcodes
@@ -134,19 +144,19 @@ if (length(malignant_clusters) > 0) {
   print("str(clu.exclude):")
   print(str(clu.exclude))
   if(length(clu.exclude)>0) {
-    idx = which(clu %in% clu.exclude)
+    idx = which(clu %in% names(clu.exclude))
     print("str(idx):")
     print(str(idx))
     clu = clu[-idx]
     mresid = mresid[, -idx]
     mnorm = mnorm[, -idx]
   }
-  print("str(clu):")
-  print(str(clu))
-  print("str(mresid):")
-  print(str(mresid))
-  print("str(mnorm):")
-  print(str(mnorm))
+  #print("str(clu):")
+  cat("\n\n\n After excluding small clusters:\n")
+  print("dim(mresid):")
+  print(dim(mresid))
+  print("dim(mnorm):")
+  print(dim(mnorm))
   fit.model = formula("y ~ clu")
   # Find DE genes with regular linear model.
   dea_fit = function(y, clu, fit.model){
@@ -169,8 +179,9 @@ if (length(malignant_clusters) > 0) {
       idy = apply(contrastmatrix, 1, function(x) names(which(x!=0)))
       #idy = sapply(idy, function(x) all(x %in% names(coef(fitobject))))
       tout = try(glht(fitobject, t.cm), silent=T)
-      tout = try(tidy(summary(tout)), silent=T)
+      tout = try(tidy(summary(tout, type="none")), silent=T)
       if(class(tout)[1] != "try-error") {
+        names(tout)[6] = "p.value"
         tout[, -2]
       } else {
         return("-1")

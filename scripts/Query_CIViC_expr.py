@@ -1,83 +1,274 @@
 #!/usr/bin/env python
 
 '''
-API call to CIViC DB for expression data
-Requires Conda environment: async_API
-
+Query CIViC DB for expression data
+Version queries offline cache provided in civicpy module
+(Cache needs to be updated by user to get latest data available)
 Lourdes Rosano, Jul 2019
 '''
 
-## Execute with environment 'async_API'
-
 import sys
 import argparse
-import asyncio
-import aiohttp
+from civicpy import civic
 import re
-import time
-# from itertools import permutations
 
 
 ### Define what combination of directions and clinical significances define 'POSITIVE' and 'NEGATIVE' support
 supportDict = {'SUPPORTS': {'SENSITIVITY/RESPONSE':'POSITIVE', 'RESISTANCE':'NEGATIVE', 'REDUCED SENSITIVITY':'NEGATIVE', 'ADVERSE RESPONSE':'NEGATIVE'}, 'DOES NOT SUPPORT': {'RESISTANCE':'UNKNOWN_DNS', 'SENSITIVITY/RESPONSE':'UNKNOWN_DNS', 'REDUCED SENSITIVITY':'UNKNOWN_DNS', 'ADVERSE RESPONSE':'UNKNOWN_DNS'}}
+
+### Define global variable to ensure cache file is only loaded once even if several queries are performed
+global isLoad
+isLoad = False
 
 
 '''
 Functions
 '''
 
-### Functions for asynchronous API calls
-### Adapted from 'https://pawelmhm.github.io/asyncio/python/aiohttp/2016/04/22/asyncio-aiohttp.html'
+### Functions to query CIVIC and process result into structured dictionary
 
-async def fetch(url, session):
-    async with session.get(url) as response:
-        # TODO: allow for more status codes (only 4XX and 5xx raise error)
-        if response.status != 200:
-            print("Error! Query {} failed (Status code: {})".format(url, response.status))
+# Check that a given identifier type is contained in the list of allowed values
+def sanity_check_identifier_type(identifier_type):
+    if identifier_type not in ["entrez_id", "entrez_symbol", "civic_id"]:
+        print("\nError! '%s' is not a valid identifier_type. Please provide one of 'entrez_id', 'entrez_symbol' or 'civic_id'!" %(identifier_type))
+        sys.exit(1)
+    return None
+
+
+# Given a list of CIVIC gene records, parse and reformat into an structured dictionary
+# Assume gene records already contain all information about associated variants and corresponding evidence items
+def reformat_results(results, identifier_type):
+
+    varMap = {}
+    retrieved_genes = []    # keep track of genes that could be retrieved from CIVIC
+    no_variants = []        # keep track of genes retrieved from CIVIC but with no variants available
+    all_variants = []       # keep track of all variants retrieved from CIVIC
+
+    # Check that id type corresponds to one of the allowed options
+    ignore = sanity_check_identifier_type(identifier_type)
+
+    # Iterate individual gene records to retrieve associated variants and evidence information
+    for gene_record in results:
+        # Retrieve all ids associated to this gene (CIVIC, entrez, symbol)
+        gene_civic_id = str(gene_record.id)
+        gene_id = str(gene_record.entrez_id)
+        # Use uppercase for consistency of the gene symbols
+        gene_symbol = gene_record.name.strip().upper()
+        # Retrieve variants associated to this gene (can be empty)
+        gene_variants = gene_record.variants
+
+        # Use the provided gene id (civic, entrez or symbol) to uniquely identify genes
+        if identifier_type == "civic_id":
+            gene_key = gene_civic_id
+        if identifier_type == "entrez_id":
+            gene_key = gene_id
+        if identifier_type == "entrez_symbol":
+            gene_key = gene_symbol
+
+        # Keep track of gene ids which could be retrieved from CIVIC
+        if gene_key not in retrieved_genes:
+            retrieved_genes.append(gene_key)
+
+        # NOTE: it seems that only genes having at least 1 variant record available are included in the offline cache (eg. gene ADORA1 has no variants and is found via API but not in the cache)
+        # Skip genes that do not have any variants available in CIVIC
+        if not gene_variants:
+            if gene_key not in no_variants:
+                no_variants.append(gene_key)
+            continue
+
+        # Iterate variant records associated to the current gene
+        # Retrieve all relevant info listed for each variant
+        for variant_record in gene_variants:
+            # Internal variant id in CIVIC
+            variant_id = str(variant_record.id)
+            # Keep track of all variants retrieved from CIVIC
+            if variant_id not in all_variants:
+                all_variants.append(variant_id)
+            # Variant name in CIVIC; use uppercase for consistency
+            variant_name = variant_record.name.strip().upper()
+            hgvs_expressions = variant_record.hgvs_expressions
+            # Score to assess the accumulation of evidence for each variant (quantity and quality)
+            civic_score = variant_record.civic_actionability_score
+            # Sanity check for empty scores
+            if civic_score is None:
+                civic_score = "NULL"
+
+            # List of evidence records available for the current variant (can be empty)
+            evidence_items = variant_record.evidence_items
+
+            # Iterate through the listed evidence items and store relevant information for this variant
+            # Variants which do not have any clinical data associated to them will be directly skipped
+            for evidence_record in evidence_items:
+
+                # TODO: add sanity check for all relevant elements being present and non-empty (entrez_name, variant name, evidence_type, disease name). For now, assume this should never happen.
+
+                # Use uppercase for consistency of the tags
+                evidence_status = evidence_record.status.strip().upper()
+                evidence_type = evidence_record.evidence_type.strip().upper()
+                disease = evidence_record.disease.name.strip().upper()
+
+                evidence_level = evidence_record.evidence_level                     # just in case, should never be None
+                variant_origin = evidence_record.variant_origin                     # can be None
+                evidence_direction = evidence_record.evidence_direction             # can be None
+                clinical_significance = evidence_record.clinical_significance       # can be None
+
+                # Skip records that are not accepted evidence
+                if (evidence_status != "ACCEPTED"):
+                    continue
+
+                # Sanity check for empty evidence direction, clinical significance or level
+                # 'NULL' is introduced to distinguish from 'N/A' tag
+                if evidence_direction is None:
+                    evidence_direction = "NULL"
+                else:
+                    evidence_direction = evidence_direction.strip().upper()
+                if clinical_significance is None:
+                    clinical_significance = "NULL"
+                else:
+                    clinical_significance = clinical_significance.strip().upper()
+                if evidence_level is None:
+                    evidence_level = "NULL"
+                else:
+                    evidence_level = evidence_level.strip().upper()
+
+                # Combine the direction and significance of the evidence in one term
+                evidence = evidence_direction + ':' + clinical_significance
+
+                # At this point, currently evaluate evidence item has passed all the checks/filters
+                # Keep track of the current evidence item under the corresponding variant and gene
+                if gene_key not in varMap.keys():
+                    varMap[gene_key] = {}
+
+                # Variant name should be unique within gene (found some duplicates but all were submitted, not accepted data)
+                if variant_name not in varMap[gene_key].keys():
+                    varMap[gene_key][variant_name] = {}
+                    varMap[gene_key][variant_name]['id'] = variant_id
+                    varMap[gene_key][variant_name]['civic_score'] = civic_score
+
+                    # Keep original HGVS annotations (empty list when nothing is available)
+                    # Use uppercase to avoid mismatches due to case
+                    varMap[gene_key][variant_name]['hgvs'] = [h.strip().upper() for h in hgvs_expressions]
+
+                # FIXME: there is no sanity check for detecting possible variant name duplicates. For now, assume this should never happen.
+                if evidence_type not in varMap[gene_key][variant_name].keys():
+                    varMap[gene_key][variant_name][evidence_type] = {}
+                if disease not in varMap[gene_key][variant_name][evidence_type].keys():
+                    varMap[gene_key][variant_name][evidence_type][disease] = {}
+
+                drugs = []
+                evidence_drugs = evidence_record.drugs
+                for evidence_drug in evidence_drugs:
+                    drug_name = evidence_drug.name.strip().upper()
+                    if drug_name not in drugs:
+                        drugs.append(drug_name)
+
+                # When more than 1 drug are listed for the same evidence item, 'drug_interaction_type' is not null and defines the nature of this multiple drug entry
+                drug_interaction = evidence_record.drug_interaction_type
+                if drug_interaction is not None:
+                    drug_interaction = drug_interaction.strip().upper()
+                    # 'Substitutes' indicates that drugs can be considered individually
+                    if drug_interaction != "SUBSTITUTES":
+                        # Remaining terms ('Sequential' and 'Combination') indicate that drugs should be considered together, so join their names into a single tag
+                        # Sort drugs alphabetically to ensure that their order in the combination treatment is always the same
+                        drugs.sort()
+                        drugs = ["+".join(drugs)]
+
+                if not drugs:
+                    # Only non-Predictive evidences and Predictive ones without drugs will have this dummy level
+                    # Introduced for consistency purposes within the varMap structure
+                    drugs = ["NULL"]
+
+                # Iterate through drugs to add evidences associated to them
+                #   For non-Predictive evidences or Predictive with empty drugs, drugs=['NULL']
+                #   For Predictive and interaction=None, len(drugs) = 1
+                #   For Predictive and interaction='Substitutes', len(drugs)>1
+                #   For Predictive and interaction!='Substitutes', len(drugs)=1 (combiantion of several using '+')
+                for drug in drugs:
+                    if drug not in varMap[gene_key][variant_name][evidence_type][disease].keys():
+                        varMap[gene_key][variant_name][evidence_type][disease][drug] = {}
+                    if evidence not in varMap[gene_key][variant_name][evidence_type][disease][drug].keys():
+                        varMap[gene_key][variant_name][evidence_type][disease][drug][evidence] = {}
+                    if evidence_level not in varMap[gene_key][variant_name][evidence_type][disease][drug][evidence].keys():
+                        varMap[gene_key][variant_name][evidence_type][disease][drug][evidence][evidence_level] = []
+                    # Group all publications associated to the same level. Do not check publication status
+                    ## On 25.01.2019, source structure was changed to introduce ASCO abstracts as a source type
+                    # FIXME: there is no sanity check for empty ID, however assume this should never happen
+                    # FIXME: check for type of source? currently, both PUBMED and ASCO would be considered
+                    varMap[gene_key][variant_name][evidence_type][disease][drug][evidence][evidence_level].append(evidence_record.source.citation_id.strip())
+
+    # TODO: assertions are currently not considered, as they mostly consist of free text summarizing the available evidence
+
+    return (varMap,retrieved_genes,no_variants,all_variants)
+
+
+# Given a list of gene identifiers, query CIVIC for known variants and return a structured dictionary with the relevant results
+# List of gene ids can be: CIVIC id, entrez id or gene symbol
+def query_civic_genes(genes, identifier_type="entrez_symbol"):
+
+    # Check that provided argument is a list (even if length = 1)
+    if (not isinstance(genes, list)) or (not genes):
+        print("\nError! Please provide a list of gene ids to query in CIVIC.")
+        sys.exit(1)
+
+    # Check that id type corresponds to one of the allowed options
+    ignore = sanity_check_identifier_type(identifier_type)
+
+    ## Load offline cache of CIVICdb
+    # Ensure only loaded once
+    # NOTE: it is important that on_stale='ignore' to avoid attempts to update the cache via internet access
+    global isLoad
+    if not isLoad:
+        print("Loading offline CIVIC cache...")
+        is_successful = civic.load_cache(on_stale='ignore')
+        if is_successful:
+            isLoad = True
+        else:
+            print("\nError! Local cache file could not be successfully loaded!")
             sys.exit(1)
-        return await response.json()
 
-async def bound_fetch(sem, url, session):
-    # Getter function with semaphore.
-    async with sem:
-        return await fetch(url, session)
+    # Querying functionality provided by module `civicpy` can only use internal CIVIC ids
+    # NOTE: when using `civic.get_genes_by_ids()` with CIVIC ids, if any of them is not contained in the cache file, then it will try to directly query the CIVICdb, causing this script to crash
 
+    # Workaround: retrieve all gene records available in the offline cache and parse them to match to input genes
+    # Avoid at all costs directly querying the CIVIC db: even for CIVIC ids, we will match to available records from the offline cache
+    all_results = civic.get_all_genes()
 
-## Query a list of elements (ids or id batches, ie. several ids per call allowed) using urlbase
-## isBatch indicates whether elements correspond to single ids or batches of ids
-async def run(elements, urlbase, isBatch=False):
-    tasks = []
+    # Iterate individual records and retrieve only those matching the provided gene ids
+    results = []
+    for gene_record in all_results:
+        toKeep = False
 
-    # Create instance of Semaphore to limit number of concurrent requests
-    sem = asyncio.Semaphore(32)
+        if (identifier_type == "civic_id"):
+            gene_id = str(gene_record.id)                    # expectation is a single number
+            if gene_id in genes:
+                toKeep = True
 
-    # Fetch all responses within one Client session, keep connection alive for all requests
-    async with aiohttp.ClientSession(headers={"Connection": "close"}) as session:
-        for e in elements:
-            if isBatch:
-                # Join all IDs from the same batch for the corresponding call
-                idString = ','.join(e)
-            else:
-                idString = e
-            task = asyncio.ensure_future(bound_fetch(sem, urlbase.format(idString), session))
-            tasks.append(task)
+        if (identifier_type == "entrez_id"):
+            gene_id = str(gene_record.entrez_id)             # expectation is a single number
+            if gene_id in genes:
+                toKeep = True
 
-        responses = await asyncio.gather(*tasks, return_exceptions=True)
-        return responses
+        if (identifier_type == "entrez_symbol"):
+            gene_id = gene_record.name.strip()          # expectation is single string
+            aliases = gene_record.aliases               # expectation is list of strings
+            # Perform union of all gene symbols available for the current record
+            tmp_symbols = list(set([gene_id]) | set(aliases))
+            # Try to match current gene record (any alias) to the provided gene symbols
+            for tmp_symbol in tmp_symbols:
+                # Use uppercase to ensure consistency of gene symbols
+                this_symbol = tmp_symbol.strip().upper()
+                if this_symbol in genes:
+                    toKeep = True
+                    break
 
+        if toKeep:
+            results.append(gene_record)
 
-## Execute asynchronous API calls to query CIVIC (can be used for both genes and variants)
-## Included into a function in order to make error-handling work
-def query_civic(elements, urlbase, isBatch=False):
-    old_loop = asyncio.get_event_loop()
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    future = asyncio.ensure_future(run(elements, urlbase, isBatch))
-    results = loop.run_until_complete(future)
-    loop.close()
-    asyncio.set_event_loop(old_loop)
-    return results
-
+    # At this point, all CIVIC results for queried genes have been retrieved in a list
+    # Process gene records into a dictionary with structured format
+    # gene -> variants -> evidence_items
+    (dict_results,retrieved_genes,no_variants,all_variants) = reformat_results(results, identifier_type)
+    return (dict_results,retrieved_genes,no_variants,all_variants)
 
 
 ### Other functions
@@ -354,7 +545,6 @@ if highLevelList == ['']:
 
 ### Retrieve all input genes to query CIViC for variant info
 genes = []
-skipGenes = []
 naGenes = []
 for line in infile:
     lineSplit = line.strip().split("\t")
@@ -365,31 +555,27 @@ for line in infile:
     # Uppercase as a sanity check
     gene = lineSplit[index_geneCol].strip().upper()
     logfc_annot = lineSplit[index_logFC].strip().upper()
-
-    ## Skip genes with logFC='NA' (ie could not asses differential expression), since empty values '.' will be assigned in CIVIC columns anyway
-    if logfc_annot == 'NA':
-        if gene not in naGenes:
-            naGenes.append(gene)
-        continue
-    ## Skip exception cases like 'BX255925.3' or 'AL929554.17'
-    if '.' in gene:
-        if gene not in skipGenes:
-            skipGenes.append(gene)
-        continue
-    if gene not in genes:
-        genes.append(gene)
+    # Check gene is not empty as a sanity check
+    if gene:
+        ## Skip genes with logFC='NA' (ie could not asses differential expression), since empty values '.' will be assigned in CIVIC columns anyway
+        if logfc_annot == 'NA':
+            if gene not in naGenes:
+                naGenes.append(gene)
+            continue
+        if gene not in genes:
+            genes.append(gene)
 infile.close()
 
 # When no genes are found, write empty files (necessary for snakemake pipeline) and exit without error
 # eg. empty input file containing only header because patient had no DE genes at all
-if (not genes) and (not skipGenes) and (not naGenes):
+if (not genes) and (not naGenes):
     print("\nDid not find any genes in column \'{}\' of file {}.".format(args.colName_gene, args.inputFile))
     outfile.close()
     sys.exit(0)
-# When no genes were found because all existing were skipped (either logFC='NA' or symbol containing dots '.'),
+# When no genes were found because all existing were skipped due to logFC='NA',
 # write output identical to input file plus additional CIVIC columns being empty
-elif (not genes) and (skipGenes or naGenes):
-    print("\nCould not find any genes that allow query to CIVIC (either all with logFC=NA or non-allowed gene symbols).")
+elif (not genes) and naGenes:
+    print("\nAll genes parsed have logFC=NA.")
     ## Write corresponding "empty" output file: identical to input file + empty new CIVIC columns
     infile = open(args.inputFile,'r')
     next(infile)
@@ -402,180 +588,17 @@ elif (not genes) and (skipGenes or naGenes):
     sys.exit(0)
 
 
-### Asynchronous batch queries to CIViC (genes)
+### Query CIViC for the genes of interest
 
-## There seems to be a maximum request size for the gene batch query
-## Generate gene batches of smaller size to be able to query successfully
-batchSize = 200
-geneBatches = [genes[x:x+batchSize] for x in range(0, len(genes), batchSize)]
-
-urlGenes = 'https://civic.nexus.ethz.ch/api/genes/{}?identifier_type=entrez_symbol'
-# urlGenes = 'https://civicdb.org/api/genes/{}?identifier_type=entrez_symbol'
 print('\nTotal # genes to query: {}'.format(len(genes)))
-if skipGenes:
-    print('\nOmitted gene symbols: {}\n'.format(','.join(list(skipGenes))))
-if naGenes:
-    print('\nOmitted genes due to unavailable logFC: {}\n'.format(','.join(list(naGenes))))
-print('Retrieving gene data from CIViC...')
-## Query CIVIC for the genes of interest
-start = time.time()
-results = query_civic(elements=geneBatches, urlbase=urlGenes, isBatch=True)
-end = time.time()
-print('  Response time: {}'.format(end-start))
+print('\nRetrieving data from CIViC...')
 
-## Error handling: when an exception occurs for a given query, it will be returned within the results
-for r in results:
-    if isinstance(r,Exception):
-        print("Something went wrong! Exception: %s" %(r))
-        sys.exit(1)
+(varMap,retrieved_genes,no_variants,all_variants) = query_civic_genes(genes, identifier_type="entrez_symbol")
 
-### Gather all variants for retrieved genes
-print('\nParsing results...')
-allvariants = []
-retrieved = []
-# Not all gene records will contain variants
-for lb in results:
-    # Sanity check for queries containing one single gene
-    # Instead of a nested list (batches and genes), will return one single list (gene)
-    if isinstance(lb, dict):
-        lb = [lb]
-    for dg in lb:
-        # Only perfect matches are allowed (even gene aliases will not give a match)
-        if dg['name'] not in retrieved:
-            retrieved.append(dg['name'])
-        for dv in dg['variants']:
-            if dv['id'] not in allvariants:
-                allvariants.append(dv['id'])
-
-retrieved = set(retrieved)
+retrieved = set(retrieved_genes)
 unmatched = list(set(genes) - retrieved)
-# TODO: report only total # of genes instead of whole list? Specially for CNVs this list becomes huge
-print('  Genes Matched: {}'.format(','.join(list(retrieved))))
-print('\n  Genes Not Matched: {}'.format(','.join(unmatched)))
-print('\nTotal # variants to query: {}'.format(len(allvariants)))
-
-
-### Asynchronous queries to CIViC (variants)
-
-urlVars = 'https://civic.nexus.ethz.ch/api/variants/{}'
-# urlVars = 'https://civicdb.org/api/variants/{}'
-print('Retrieving variant data from CIViC...')
-## Query CIVIC for the variants of interest
-start = time.time()
-results = query_civic(elements=allvariants, urlbase=urlVars, isBatch=False)
-end = time.time()
-print('  Response time: {}'.format(end-start))
-
-## Error handling: when an exception occurs for a given query, it will be returned within the results
-for r in results:
-    if isinstance(r,Exception):
-        print("Something went wrong! Exception: %s" %(r))
-        sys.exit(1)
-
-### Parse results and create dictionary of gene-variant information
-print('\nParsing results...')
-varMap = {}
-for dv in results:
-    # Skip variants which do not have any clinical data associated to them
-    if not dv['evidence_items']:
-#     if not (dv['evidence_items'] or dv['assertions']):
-        continue
-    # Iterate through the evidence items and store relevant information
-    for item in dv['evidence_items']:
-        # Sanity check that all critical elements are present and non-empty
-        if not (dv['entrez_name'] and dv['name'] and item['evidence_type'] and item['disease']['name']):
-            continue
-        # Skip records that are not accepted evidence
-        if item['status'].upper() != 'ACCEPTED':
-            continue
-
-        # Gene names in CIVIC are HUGO symbols (uppercase) but do a sanity check nevertheless
-        gene = dv['entrez_name'].upper()
-        variant = dv['name'].upper()
-        evidenceType = item['evidence_type'].upper()
-        cancerType = item['disease']['name'].upper()
-        # Sanity check for empty evidence direction, clinical significance or level
-        # 'NULL' is introduced to distinguish from 'N/A' tag
-        if item['evidence_direction'] is None:
-            item['evidence_direction'] = 'NULL'
-        if item['clinical_significance'] is None:
-            item['clinical_significance'] = 'NULL'
-        if item['evidence_level'] is None:
-            item['evidence_level'] = 'NULL'
-        # Combine the direction and significance of the evidence in one term
-        evidence = item['evidence_direction'].upper() + ':' + item['clinical_significance'].upper()
-        level = item['evidence_level'].upper()
-        if gene not in varMap.keys():
-            varMap[gene] = {}
-        # Variant name should be unique within gene
-        # (found some duplicates but all were submitted, not accepted data)
-        if variant not in varMap[gene].keys():
-            varMap[gene][variant] = {}
-            # Internal CIViC ID
-            varMap[gene][variant]['id'] = dv['id']
-            # Score to assess the accumulation of evidence for each variant (quantity and quality)
-            # Sanity check for empty scores
-            if dv['civic_actionability_score'] is not None:
-                varMap[gene][variant]['civic_score'] = dv['civic_actionability_score']
-            else:
-                varMap[gene][variant]['civic_score'] = 'NULL'
-
-            # Keep original HGVS annotations (empty list when nothing is available)
-            # Use uppercase to avoid mismatches due to case
-            varMap[gene][variant]['hgvs'] = [h.upper() for h in dv['hgvs_expressions']]
-
-        # TODO: there is no sanity check for detecting possible variant name duplicates
-        if evidenceType not in varMap[gene][variant].keys():
-            varMap[gene][variant][evidenceType] = {}
-        if cancerType not in varMap[gene][variant][evidenceType].keys():
-            varMap[gene][variant][evidenceType][cancerType] = {}
-        if item['drugs']:
-            drugs = [d['name'].upper() for d in item['drugs']]
-            # When more than 1 drug are listed for the same evidence item, 'drug_interaction_type' is not null and defines the nature of this multiple drug entry 
-            if item['drug_interaction_type'] is not None:
-                # 'Substitutes' indicates that drugs can be considered individually
-                if item['drug_interaction_type'].upper() != 'SUBSTITUTES':
-                    # Remaining terms ('Sequential' and 'Combination') indicate that drugs should be considered together, so join their names into a single tag
-                    # Sort drugs alphabetically to ensure that their order in the combination treatment is always the same
-                    drugs.sort()
-                    drugs = ['+'.join(drugs)]
-#                     # Consider all possible permutations of the drug list
-#                     drugs = ['+'.join(per) for per in permutations(drugs)]
-#                     drugMatch = None
-#                     for drug in drugs:
-#                         if drug in varMap[gene][variant][evidenceType][cancerType].keys():
-#                             drugMatch = drug
-#                             break
-#                     # If drug combination is new, get the first permutation
-#                     if drugMatch is None:
-#                         drugs = [drugs[0]]
-#                     else:
-#                         drugs = [drugMatch]
-        else:
-            # Only non-Predictive evidences and Predictive ones without drugs will have this dummy level
-            # Introduced for consistency purposes within the varMap structure
-            drugs = ['NULL']
-
-        # Iterate through drugs to add evidences associated to them
-        #   For non-Predictive evidences or Predictive with empty drugs, drugs=['NULL']
-        #   For Predictive and interaction=None, len(drugs) = 1
-        #   For Predictive and interaction='Substitutes', len(drugs)>1
-        #   For Predictive and interaction!='Substitutes', len(drugs)=1 (combiantion of several using '+')
-        for drug in drugs:
-            if drug not in varMap[gene][variant][evidenceType][cancerType].keys():
-                varMap[gene][variant][evidenceType][cancerType][drug] = {}
-            if evidence not in varMap[gene][variant][evidenceType][cancerType][drug].keys():
-                varMap[gene][variant][evidenceType][cancerType][drug][evidence] = {}
-            if level not in varMap[gene][variant][evidenceType][cancerType][drug][evidence].keys():
-                varMap[gene][variant][evidenceType][cancerType][drug][evidence][level] = []
-            # Group all publications associated to the same level. Do not check publication status
-            ## On 25.01.2019, source structure was changed to introduce ASCO abstracts as a source type
-            ## TODO: sanity check for empty ID. Check for type of source?
-            varMap[gene][variant][evidenceType][cancerType][drug][evidence][level].append(item['source']['citation_id'])
-#             varMap[gene][variant][evidenceType][cancerType][drug][evidence][level].append(item['source']['pubmed_id'])
-
-    # TODO: iterate through assertions and repeat above process
-    # for item in dv['assertions']:
+print("Found %s/%s genes in CIVIC associated to %s variants. Found %s CIVIC genes that had no variants available." %(len(retrieved_genes),len(genes),len(all_variants),len(no_variants)))
+print('\nGenes with no CIVIC data: {}'.format(','.join(unmatched)))
 
 
 ### Iterate through input table once more and create output table
@@ -667,7 +690,7 @@ for lineIndx,line in enumerate(infile):
             for this_string in civicNames:
                 (isExon,exprType) = expr_is_exon_string(this_string)
                 if isExon and exprType:
-                    ## TODO: Records of the type 'P16 EXPRESSION' would be missed
+                    # TODO: Records of the type 'P16 EXPRESSION' would be missed
                     if exprType in matched:
                         if this_string not in matched:
                             matched.append(this_string)

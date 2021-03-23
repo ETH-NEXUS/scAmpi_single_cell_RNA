@@ -25,8 +25,8 @@ class UnsupervisedMethod(metaclass=ABCMeta):
 
     def load_from_hdf5(self, input_file):
         h5f = h5py.File(input_file, 'r')
-        self.matrix = h5f['cor_counts'].value
-        barcodes = h5f['cell_attrs']['cell_names'].value
+        self.matrix = h5f['cor_counts'][()]
+        barcodes = h5f['cell_attrs']['cell_names'][()]
         # decoder is needed since the input is a binary string
         decoder = np.vectorize(lambda t: t.decode('UTF-8'))
         self.barcodes = decoder(barcodes)

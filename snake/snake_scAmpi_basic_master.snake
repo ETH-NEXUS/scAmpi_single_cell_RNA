@@ -2,7 +2,6 @@ import os, glob, sys, datetime
 
 # This function adapts the config object to include full path information
 include: "misc_snake.py"
-#configfile: 'config_scTranscriptomics.json'
 
 # input files and folders
 SAMPLEMAPPING = config['inputOutput']['sample_map']
@@ -75,12 +74,11 @@ PERCENTAGE_OUT = OUTDIR + 'clustering/'
 DRUGCOMBINATION = OUTDIR + 'drugCombination/'
 
 # Include the rules
-#include: "clinical_rules_snake.py"
-include: "sc_transcriptomics_rules.py"
+include: "scAmpi_basic_rules.py"
 
 # This rule defines which files should be created
-localrules: scTranscriptomics
-rule scTranscriptomics:
+localrules: scAmpi_basic
+rule scAmpi_basic:
     input:
         expand(PERCENTAGE_OUT + '{sample}.genes_cells_filtered.corrected.atypical_removed.clusters_cell_count_percent.txt', sample = getSampleNames()),
         expand(DIFF_EXP_OUT + '{sample}.genes_cells_filtered.corrected.atypical_removed.diffExp_success.txt', sample = getSampleNames()),
@@ -88,18 +86,16 @@ rule scTranscriptomics:
         expand(CREATEHD5_OUT + '{sample}.h5.histogram_library_sizes.png', sample = getSampleNames()),
         expand(FILTER_GENES_CELLS_OUT + '{sample}.genes_cells_filtered.h5.histogram_library_sizes.png', sample = getSampleNames()),
         expand(PLOTTING_OUT + '{sample}.genes_cells_filtered.corrected.atypical_removed.celltype_barplot.png', sample = getSampleNames()),
-        expand(BOXPLOT_OUT + '{sample}.genes_cells_filtered.corrected.atypical_removed.boxplot_cell_types_cohort.png', sample = getSampleNames()),
-        expand(INTEGRATION_OUT + '{sample}.genes_cells_filtered.corrected.atypical_removed.sample_integration_highlight_current.png', sample = getSampleNames()),
         expand(GSVA_OUT + '{sample}.genes_cells_filtered.corrected.atypical_removed.gsetscore_hm.png', sample = getSampleNames()),
     output:
-        OUTDIR + 'complete_sc_transcriptomics.txt'
+        OUTDIR + 'complete_scAmpi_basic.txt'
     params:
-        lsfoutfile = OUTDIR + 'complete_sc_transcriptomics.lsfout.log',
-        lsferrfile = OUTDIR + 'complete_sc_transcriptomics.lsferr.log',
+        lsfoutfile = OUTDIR + 'complete_scAmpi_basic.lsfout.log',
+        lsferrfile = OUTDIR + 'complete_scAmpi_basic.lsferr.log',
         mem = '1000',
         scratch = '1000',
         time = '1'
     benchmark:
-        OUTDIR + 'complete_sc_transcriptomics.txt.benchmark'
+        OUTDIR + 'complete_scAmpi_basic.txt.benchmark'
     shell:
         'date > {output}'

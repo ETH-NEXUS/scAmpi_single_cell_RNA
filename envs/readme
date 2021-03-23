@@ -1,4 +1,0 @@
-###   storing the environments as textfile   ###
-> source activate async_API; conda env export --no-builds | grep -v prefix > queryCIVIC_conda_env.yml
--> Removed line 325 (phenograph==1.5.2) to solve problems during the environment installation
-# > source activate async_API; conda env export | grep -v prefix > queryCIVIC_conda_env.yml
