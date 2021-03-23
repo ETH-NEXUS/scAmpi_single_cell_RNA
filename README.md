@@ -8,18 +8,23 @@ The latter (`clinical`) part includes the search for disease relevant drug targe
 
 #### Software
 
-The installation of Snakemake is prerequisite for this workflow.
-
 The pipeline consists of R and python scripts. Most of the relevant R and python packages used in this workflow can be installed as a conda environment using the yaml file `scAmpi_scRNA_conda_env.yml` provided in the sub folder "envs".
 
-Example:
+Example (this will install the conda environment in your home):
 ```
-conda env create -f scAmpi_scRNA_conda_env.yml --name scAmpi_scRNA
+> conda env create -f scAmpi_scRNA_conda_env.yml --name scAmpi_scRNA
+> conda activate scAmpi_scRNA
 ```
 
+Additionally required installations:
+- Cellranger: Follow the instructions on the 10xGenomics support page and include the cellranger binary to your path.
+Webpage: https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/installation
+- Phenograph: 1: activate the conda environment, 2: use `pip install PhenoGraph` to install the package
+
+
+*Temporary*
 For the normalisation step the R package `sctransform` is used. As there is a known bug in the latest release, at the moment either an older package version (e.g. 0.2) or the development version should be installed. The development version can be installed within R using `remotes::install_github("ChristophH/sctransform@develop")`.
 
-Phenograph is used for the unsupervised clustering step. It can be installed using `pip install PhenoGraph` (with the conda environment activated).
 
 #### Example data
 
@@ -48,7 +53,7 @@ Example call:
 snakemake --notemp --latency-wait 60 -s snake_scAmpi_basic_master.snake --configfile config_scAmpi.json --cluster 'bsub -M {params.mem} -n {threads} -W {params.time} -R "rusage[mem={params.mem},scratch={params.scratch}]" -eo {params.lsferrfile} -oo {params.lsfoutfile}' -j 100 -p -k
 ```
 
-Note that the section that follows parameter `--cluster` denotes the cluster specific notattion to indicate memory and timr ressources for a job. Please adapt according to the respective job scheduling system used.
+Note that the section that follows parameter `--cluster` denotes the cluster specific notation to indicate memory and timr ressources for a job. Please adapt according to the respective job scheduling system used.
 
 
 #### Clinical part
@@ -59,5 +64,5 @@ Example call:
 snakemake --notemp --latency-wait 60 -s snake_scAmpi_clinical_master.snake --configfile config_scTranscriptomics.json --cluster 'bsub -M {params.mem} -n {threads} -W {params.time} -R "rusage[mem={params.mem},scratch={params.scratch}]" -eo {params.lsferrfile} -oo {params.lsfoutfile}' -j 100 -p -k
 ```
 
-Note that the section that follows parameter `--cluster` denotes the cluster specific notattion to indicate memory and timr ressources for a job. Please adapt according to the respective job scheduling system used.
+Note that the section that follows parameter `--cluster` denotes the cluster specific notation to indicate memory and timr ressources for a job. Please adapt according to the respective job scheduling system used.
 

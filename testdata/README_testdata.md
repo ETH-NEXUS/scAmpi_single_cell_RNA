@@ -1,16 +1,17 @@
 # Guidelines to run testdata with scAmpi
 
-The following instructions provide a quick guideline to (i) download example data, (ii) prepare all resources and installations, and (iii) run the basic scAmpi workflow.
+The following instructions provide a quick guideline to (i) download example data, (ii) install necessary software, (iii) prepare the config file, and (iv) run the basic scAmpi workflow.
 
 In the following, we refer to your test directory as `testdir` and to the directory of the scAmpi git repository as `git_scAmpi`.
 
-### (i) Create sub folder and Download example data
+### (i) Create sub folder and download example data
 
-Create a folder for the fastq files and the analysis in `testdir`:
+Create a folder for the fastq files, the analysis, and the genome reference in `testdir`:
 
 ```
 > mkdir fastqs
 > mkdir analysis
+> mkdir reference
 ```
 
 Download and untar 10X Genomics PBMC example data:
@@ -21,7 +22,7 @@ Download and untar 10X Genomics PBMC example data:
 > tar -xvf 5k_pbmc_v3_fastqs.tar
 ```
 
-The test data files should look like this:
+The testdata files should look like this:
 
 ```
 > ls 5k_pbmc_v3_fastqs/
@@ -39,7 +40,14 @@ The test data files should look like this:
 5k_pbmc_v3_S1_L004_R2_001.fastq.gz
 ```
 
-### Prepare installation
+Download the 10x Genomics reference sequence (e.g. hg38)
+
+```
+> cd reference
+> 
+```
+
+### (ii) Prepare installation
 
 You can skip this section if you already installed all software necessary for scAmpi and activated the conda environment.
 
@@ -51,13 +59,17 @@ In order to run scAmpi, you need to install the related conda environment `scAmp
 
 Activate the environment:
 ```
-conda activate scAmpi_scRNA
+> conda activate scAmpi_scRNA
 ```
 
 Install Phenogrpah:
 ```
 > pip install PhenoGraph
 ```
+
+Install cellranger:
+follow the steps on the 10xGenomics webpage:
+https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/installation
 
 NOTE:
 *Temporary* addition to accomodate for sctransform bug:
@@ -66,13 +78,13 @@ Open an R session and install the development version of sctransform:
 remotes::install_github("ChristophH/sctransform@develop")
 ```
 
-### Prepare resources
+### (iii) Prepare config file
 
 All resources required to run scAmpi on the testdata have been included in the scAmpi repository. The config file provided in the sub folder testdata (`git_scAmpi/testdata/config_scAmpi_testdata.json`) already contains the relative paths to the respective resources. 
 
-The relative paths in the config file need to be adapted to the path of `git_scAmpi`.
+The relative paths in the config file need to be adapted to point to the paths of `git_scAmpi` and `testdir`.
 
-### Run scAmpi on testdata
+### (iv) Run scAmpi on testdata
 
 
 

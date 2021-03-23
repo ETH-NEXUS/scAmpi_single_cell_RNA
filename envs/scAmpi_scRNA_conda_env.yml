@@ -1,4 +1,4 @@
-name: tp_scRNA
+name: scAmpi_scRNA
 channels:
   - bioconda
   - conda-forge
@@ -6,6 +6,7 @@ channels:
   - anaconda
   - defaults
 dependencies:
+  - snakemake
 ## R
   - r>=4.0
   - bioconductor-rdgidb

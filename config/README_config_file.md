@@ -46,6 +46,6 @@ The above logic is applied separately for each evidence type (one of `Predictive
 
 To ease the selection of the appropriate parameter terms for a particular disease, we provide a helper file `civic_available_diseases_[DATE].txt` listing all disease names available in CIVICdb as of `[DATE]`. To update this file, run the following script as follows, replacing `[DATE]` withe new date:
 
-    > python ../scripts/get_available_diseases_in_civic.py --outFile ../doc/civic_available_diseases_[DATE].txt
+    > python /path_to_git_scAmpi/scripts/get_available_diseases_in_civic.py --outFile /path_to_git_scAmpi/required_files/civic_available_diseases_[DATE].txt
 
 
