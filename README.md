@@ -10,7 +10,7 @@ The latter (`clinical`) part includes the search for disease relevant drug targe
 
 The pipeline consists of R and python scripts. Most of the relevant R and python packages used in this workflow can be installed as a conda environment using the yaml file `scAmpi_scRNA_conda_env.yml` provided in the sub folder "envs".
 
-Example (this will install the conda environment in your home):
+Example (This will install the conda environment in your home. Note that the installation may take a while.):
 ```
 > conda env create -f scAmpi_scRNA_conda_env.yml --name scAmpi_scRNA
 > conda activate scAmpi_scRNA
@@ -48,6 +48,7 @@ Before running the pipeline the `config` file needs to be adapted to contain the
 
 Further, a "sample_map" must be provided, a tab delimited text file that lists all samples that should be analysed (one row per sample).
 The sample map contains four columns (refer to example below): column 1: experiment ID, column 2: sample name (this ID will be used to name files and identify the sample throughout the pipeline); column 3: sample_info (free-text), e.g. tumor/normal/tissue_type; column 4: time point.
+Am example file ready for adpatation is provided in the directory 'snake'.
 
 Example:
 ```
@@ -67,7 +68,7 @@ snakemake --notemp --latency-wait 60 -s snake_scAmpi_basic_master.snake --config
 Note that the section that follows parameter `--cluster` denotes the cluster specific notation to indicate memory and timr ressources for a job. Please adapt according to the respective job scheduling system used.
 
 
-#### Clinical part
+#### scAmpi_clinical part
 
 Example call:
 

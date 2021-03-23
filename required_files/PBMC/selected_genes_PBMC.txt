@@ -1,0 +1,86 @@
+SYMBOL	group	notes	known_mutations
+ITGAX	immunoregulatory	integrine subunit	NA
+HLA-A	immunoregulatory		NA
+HLA-B	immunoregulatory		NA
+HLA-C	immunoregulatory		NA
+PDCD1	immunoregulatory	PD-1, the gene was first included in this list as CD279;ALIAS:PD-1;	
+CD274	immunoregulatory	PD-L1;ALIAS:PD-L1;	
+PDCD1LG2	immunoregulatory	PD-L2	
+CTLA4	immunoregulatory		
+LAG3	immunoregulatory		
+GZMB	immunoregulatory		
+HLA-DRA	immunoregulatory		
+HLA-DRB1	immunoregulatory		
+HLA-DRB3	immunoregulatory		
+HLA-DRB4	immunoregulatory		
+HLA-DRB5	immunoregulatory		
+HAVCR2	immunoregulatory	the gene was first included in this list as TIM3;ALIAS:TIM3;	
+TIGIT	immunoregulatory		
+IDO1	immunoregulatory		
+IDO2	immunoregulatory		
+ICOS	immunoregulatory		
+CD80	immunoregulatory		
+CD86	immunoregulatory		
+CD28	immunoregulatory		
+B2M	immunoregulatory		
+TNFRSF9	immunoregulatory	4-1BB	
+TNFRSF18	immunoregulatory	the gene was first included in this list as GITR	
+PTPRC	immunoregulatory	CD45;ALIAS:CD45;	
+VSIR	immunoregulatory	;ALIAS:VISTA;	
+FOXP3	immunoregulatory	Possible marker for Tregs cells	
+IL2RA	immunoregulatory	Possible marker for Tregs cells	
+CD19	Bcell_marker	general B cell marker	
+MS4A1	Bcell_marker	general B cell marker	
+CD79A	Bcell_marker	general B cell marker	
+CXCR5	Bcell_marker	pos for memory B cell	
+CR2	Bcell_marker	CD21, high for marginal zone B cells, pos for follicular B cells	
+FCER2	Bcell_marker	CD23, high for follicular B cells, pos for marginal zone B cells	
+CD24	Bcell_marker	high on regulatory B cells	
+CD1D	Bcell_marker	high on regulatory B cells	
+CD1	Bcell_marker	pos for marginal zone B cells	
+CD38	Bcell_marker	activated B cell marker	
+CD5	Bcell_marker	pos for regulatory B cells	
+PRDM1	Bcell_marker	BLIMP1, plasma cell transcription factor	
+CD27	Bcell_marker	pos for activated B cells including plasmablasts/cells	
+BCL6	Bcell_marker	germinal centre B cell specific transcription factor	
+AICDA	Bcell_marker	key germinal centre marker gene (dark zone), DNA editing	
+CD69	Bcell_marker	activated B cells	
+IL2RA	Bcell_marker	activated B cells	
+TNFRSF8	Bcell_marker	activated B cells	
+MME	Bcell_marker	CD10, pos for germinal centre B cells	
+SDC1	Bcell_marker	CD138, plasma cell marker	
+IRF4	Bcell_marker	plasma cell transcription marker	
+XBP1	Bcell_marker	plasma cell transcription factor	
+CD40	Bcell_marker	pos for memory B cells	
+CD83	Bcell_marker	high on germinal centre light zone cells	
+BCL2A1	Bcell_marker	apoptosis, high on GC light zone cells	
+IL10	Bcell_marker	cytokine of regulatory B cells	
+TGFB1	Bcell_marker	cytokine of regulatory B cells	
+IL12A	Bcell_marker	cytokine of regulatory B cells	
+JCHAIN	Bcell_marker		IGJ, on plasma cells secreting antibodies of either IgM or IgA isotype
+CD4	Tcell_marker	CD4 pos, Treg	
+CD8A	Tcell_marker	CD8 pos	
+CD8B	Tcell_marker	CD8 pos	
+IL2RA	Tcell_marker	Treg	
+PDCD1	Tcell_marker	CD8 pos	
+BATF	Tcell_marker	CD8 pos	
+PTPN6	Tcell_marker	CD8 pos	
+CD3E	Tcell_marker	general	
+CD3G	Tcell_marker	general	
+CD3D	Tcell_marker	general	
+TRAC	Tcell_marker	gamma delta	
+TRGC2	Tcell_marker	gamma delta	
+IFNG	Tcell_marker	activates macrophages	
+TBX21	Tcell_marker	TH1 cells	
+IL4	Tcell_marker	activated, TH 2	
+IL13	Tcell_marker	activated TH2 cells	
+GATA3	Tcell_marker	TH2 cells	
+EBI3	Tcell_marker	Cd4 differentiation	
+IL21	Tcell_marker	potentially NK cell differentiation	
+TNF	Tcell_marker	activator and regulator of immune function	
+KLRD1	Tcell_marker	NK cells	
+NCAM1	Tcell_marker	NK cells	
+CCL4	Tcell_marker	NK cells	
+FCGR3A	Tcell_marker	NK cells	
+CD7	Tcell_marker	NK cells	
+PRF1	Tcell_marker	Perforin, cytotoxicity marker	

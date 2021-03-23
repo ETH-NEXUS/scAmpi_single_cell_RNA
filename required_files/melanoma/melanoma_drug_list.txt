@@ -1,0 +1,14 @@
+orig-name	rank (comment)	approved for melanoma (CH)
+Trametinib	1 (MEKi, any MAPK driven melanoma)	approved
+Dabrafenib	2 (BRAFi, any BRAF mutated melanoma)	approved
+Palbociclib	3 (CDK4/6i, CDKN2A loss melanomas)	off label
+Crizotinib	4 (METi)	off label
+Imatinib	5 (KITi, PDGFRi, ABLi, ckit driven melanomas)	off label
+Sorafenib	6 (RAFi, VEGFRi, any MAPK driven melanoma incl. GNA/GNAQ mut.)	off label
+Erlotinib	7 (EGFRi, BRAFi resistant melanomas)	off label
+Everolimus	8 (mTORi, PTEN loss or PI3K mut. Melanomas)	off label
+Temozolomide	9 (chemo, alkylating agent)	off label
+Cisplatin	10 (chemo, alkylating)	approved
+Paclitaxel	11 (chemo,microtubule disassembly)	off label
+Dacarbazine	12 (chemo, antimetabolite, alkylating) 	approved
+Vindesine	13 (chemo, vinca-alkaloid, prevents microtubule formation)	approved

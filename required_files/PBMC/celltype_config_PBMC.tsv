@@ -1,0 +1,8 @@
+Major	Subtype
+B.cells_normal_Newman15.MERGED	B.cells.naive_normal_Newman15,B.cells.memory_normal_Newman15
+Plasma.cells_normal_Newman15	none
+T.cells_melanoma_Tirosh16	T.cells.CD8_normal_Newman15,T.cells.naive_normal_Newman15,T.cells.memory.resting_normal_Newman15,T.cells.memory.activated_normal_Newman15,T.cells.regulatory_normal_Newman15,T.cells.gamma.delta_normal_Newman15,NK.cells_normal_Newman15.MERGED
+Myeloid.cell.Blood_Normal_Zhang18	none
+Monocytes_normal_Newman15	none
+Dendritic.cells_normal_Newman15.MERGED	CD141.CLEC9A.dendritic.cell_Normal_Zhang18,CD1C.A.dendritic.cell_Normal_Zhang18,CD1C.B.dendritic.cell_Normal_Zhang18,CD1Cmin.CD141min.dendr.cell_Normal_Zhang18,AXL.SIGLEC6.dendritic.cell_Normal_Zhang18
+Plasmacytoid.dendritic.cell_Normal_Zhang18	none

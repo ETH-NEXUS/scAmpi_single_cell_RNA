@@ -1,24 +1,24 @@
 {
     "inputOutput":{
-        "input_fastqs":"/testdir/fastqs/",
+        "input_fastqs":"testdir/fastqs/",
         "input_fastqc":"",
-        "analysis_output_dir":"/testdir/output/",
-        "analysis_temp_dir":"/testdir/snake_temp/",
+        "analysis_output_dir":"testdir/output/",
+        "analysis_temp_dir":"testdir/snake_temp/",
         "sample_map":"path_to_scAmpi_git/testdata/sample_map_testdata.tsv",
         "malignant_cell_type":"none",
     },
     "resources":{
-        "pathwayDB":"../required_files/hallmark_human_MAPK_and_filtered_converted.gmt",
-        "drugList":"../required_files/melanoma_drug_list_converted_corrected.txt",
-        "drugCombinations":"../required_files/drug_combinations_melanoma.txt",
-        "civicDict":"../required_files/drug_synonyms_civic.txt",
-        "reference_transcriptome":"/resources/refdata-cellranger-GRCh38-3.0.0",
+        "pathwayDB":"path_to_scAmpi_git/required_files/hallmark_pathways_converted_example.gmt",
+        "drugList":"",
+        "drugCombinations":"",
+        "civicDict":"",
+        "reference_transcriptome":"testdir/reference/refdata-cellranger-GRCh38-3.0.0",
         "transcriptome_code":"GRCh38",
-        "celltype_lists":"../required_files/celltype_list_melanoma.gmx",
-        "celltype_config":"./celltype_config_melanoma.tsv",
-        "colour_config":"./colour_config_melanoma.txt",
-        "genesets":"../required_files/hallmark_human_MAPK_and_filtered.gmt",
-        "priority_genes":"../required_files/selected_genes_melanoma.txt"
+        "celltype_lists":"path_to_scAmpi_git/required_files/PBMC/celltype_list_PBMC_all.gmx",
+        "celltype_config":"path_to_scAmpi_git/required_files/PBMC/celltype_config_melanoma.tsv",
+        "colour_config":"path_to_scAmpi_git/required_files/PBMC/colour_config_PBMC.txt",
+        "genesets":"path_to_scAmpi_git/required_files/hallmark_pathways_example.gmt",
+        "priority_genes":"path_to_scAmpi_git/required_files/PBMC/selected_genes_PBMC.txt"
     },
     "tools":{
         "cellranger_count":{
@@ -29,24 +29,23 @@
             "time":"1440",
             "threads":24,
             "variousParams":"",
-            "cellranger_sampleName":"SAMPLE_NAME_CANNOT_CONTAIN_DOTS"
         },
         "create_hd5":{
-            "call":"python ../scripts/create_hdf5.py ",
+            "call":"python path_to_scAmpi_git/scripts/create_hdf5.py ",
             "scratch":"2000",
             "mem":"2000",
             "time":"100",
             "threads":4
         },
         "identify_doublets":{
-            "call":"Rscript ../scripts/identify_doublets.R ",
+            "call":"Rscript path_to_scAmpi_git/scripts/identify_doublets.R ",
             "scratch":"1000",
             "mem":"8000",
             "time":"400",
             "threads":4
         },
         "filter_genes_and_cells":{
-            "call":"Rscript ../scripts/filter_genes_and_cells.R ",
+            "call":"Rscript path_to_scAmpi_git/scripts/filter_genes_and_cells.R ",
             "nmads_fractionMT":"100",
             "nmads_NODG":"100",
             "threshold_NODG":"400",
@@ -59,7 +58,7 @@
             "threads":4
         },
         "sctransform_preprocessing":{
-            "call":"Rscript ../scripts/sctransform_preprocessing.R ",
+            "call":"Rscript path_to_scAmpi_git/scripts/sctransform_preprocessing.R ",
             "scratch":"2000",
             "mem":"4000",
             "time":"200",
@@ -70,7 +69,7 @@
         },
         "clustering":{
             "phenograph":{
-                "call":"python ../scripts/apply_phenograph.py ",
+                "call":"python path_to_scAmpi_git/scripts/apply_phenograph.py ",
                 "n_neighbours":30,
                 "log_normalize":false,
                 "min_cluster_size":20,
@@ -81,14 +80,14 @@
             }
         },
         "prepare_celltyping":{
-            "call":"Rscript ../scripts/prepare_celltyping.R ",
+            "call":"Rscript path_to_scAmpi_git/scripts/prepare_celltyping.R ",
             "scratch":"2000",
             "mem":"4000",
             "time":"200",
             "threads":4
         },
         "cell_type_classification":{
-            "call":"Rscript ../scripts/celltyping.r ",
+            "call":"Rscript path_to_scAmpi_git/scripts/celltyping.r ",
             "min_genes":"5",
             "scratch":"2000",
             "mem":"4000",
@@ -96,7 +95,7 @@
             "threads":4
         },
         "remove_atypical":{
-            "call":"Rscript ../scripts/filter_out_atypical_cells.R ",
+            "call":"Rscript path_to_scAmpi_git/scripts/filter_out_atypical_cells.R ",
             "scratch":"2000",
             "mem":"4000",
             "time":"100",
@@ -106,14 +105,14 @@
             "threshold_type":"percentage_cells"
         },
         "gsva":{
-            "call":"Rscript ../scripts/gsva.r ",
+            "call":"Rscript path_to_scAmpi_git/scripts/gsva.r ",
             "scratch":"2000",
             "mem":"4000",
             "time":"200",
             "threads":4
         },
         "plotting":{
-            "call":"Rscript ../scripts/scRNA_pipeline_plotting.R ",
+            "call":"Rscript path_to_scAmpi_git/scripts/scRNA_pipeline_plotting.R ",
             "use_alias":"TRUE",
             "scratch":"2000",
             "mem":"4000",
@@ -121,7 +120,7 @@
             "threads":4
         },
         "diff_exp":{
-            "call":"Rscript ../scripts/apply_DE_analysis.R",
+            "call":"Rscript path_to_scAmpi_git/scripts/apply_DE_analysis.R",
             "threshold_comparison":"20",
             "fdr_cut":"0.01",
             "fc_cut":"2",
@@ -133,7 +132,7 @@
             "threads":4
         },
         "gene_exp":{
-            "call":"Rscript ../scripts/get_cluster_gene_expression.R ",
+            "call":"Rscript path_to_scAmpi_git/scripts/get_cluster_gene_expression.R ",
             "scratch":"2000",
             "mem":"8000",
             "time":"100",
@@ -142,7 +141,7 @@
             "type_sample":"number_cells"
         },
         "parseAndFilter_DEgenes":{
-            "call":"python ../scripts/parseAndFilter_DEgenes.py ",
+            "call":"python path_to_scAmpi_git/scripts/parseAndFilter_DEgenes.py ",
             "scratch":"2000",
             "mem":"300",
             "time":"100",
@@ -150,7 +149,7 @@
             "variousParams":"0.01 gene_names padj diff test_statistic nonmal_max nonmal_min malig_mean 1 1 'pct_nonzero'"
         },
         "annotateClinical":{
-            "call":"python ../scripts/annotateWithClinicalInfo.py ",
+            "call":"python path_to_scAmpi_git/scripts/annotateWithClinicalInfo.py ",
             "scratch":"2000",
             "mem":"200",
             "time":"100",
@@ -158,7 +157,7 @@
             "variousParams":"--colName_gene gene_names"
         },
         "queryDGIDB":{
-            "call":"Rscript ../scripts/query_dgidb.r ",
+            "call":"Rscript path_to_scAmpi_git/scripts/query_dgidb.r ",
             "scratch":"2000",
             "mem":"200",
             "time":"239",
@@ -167,7 +166,7 @@
             "minDatabaseNum":"4"
         },
         "queryCIVIC":{
-            "call":"python ../scripts/Query_CIViC_expr.py ",
+            "call":"python path_to_scAmpi_git/scripts/Query_CIViC_expr.py ",
             "scratch":"2000",
             "mem":"2000",
             "time":"200",
@@ -180,7 +179,7 @@
             "strictExpression":"y"
         },
         "geneSetEnrichment":{
-            "call":"Rscript ../scripts/GeneSetEnrichmentAnalysis.R ",
+            "call":"Rscript path_to_scAmpi_git/scripts/GeneSetEnrichmentAnalysis.R ",
             "scratch":"2000",
             "mem":"200",
             "time":"200",
@@ -188,7 +187,7 @@
             "variousParams":"test_statistic"
         },
         "plotGeneSetEnrichment":{
-            "call":"Rscript ../scripts/plot_genesets_heatmap.R ",
+            "call":"Rscript path_to_scAmpi_git/scripts/plot_genesets_heatmap.R ",
             "scratch":"2000",
             "mem":"200",
             "time":"100",
@@ -196,7 +195,7 @@
             "variousParams":""
         },
         "queryClinicalTrials":{
-            "call":"python ../scripts/queryClinicalTrials.py ",
+            "call":"python path_to_scAmpi_git/scripts/queryClinicalTrials.py ",
             "scratch":"3000",
             "mem":"500",
             "time":"200",
@@ -212,7 +211,7 @@
             "cancerType":"cancer"
         },
         "cellPercentInCluster":{
-            "call":"python ../scripts/count_cells_in_clusters.py ",
+            "call":"python path_to_scAmpi_git/scripts/count_cells_in_clusters.py ",
             "scratch":"2000",
             "mem":"200",
             "time":"100",
@@ -220,7 +219,7 @@
             "variousParams":"--malignant Melanoma"
         },
         "plot_tSNE_nonmalignant":{
-            "call":"Rscript ../scripts/plot_tSNEs_non_malignant_cell_libraries.R ",
+            "call":"Rscript path_to_scAmpi_git/scripts/plot_tSNEs_non_malignant_cell_libraries.R ",
             "scratch":"2000",
             "mem":"32000",
             "time":"200",
@@ -228,7 +227,7 @@
             "variousParams":""
         },
         "parseDgidbTrialsTable_for_minSetCover":{
-            "call":"python ../scripts/parseDgidbTrialsTable_for_minSetCover.py ",
+            "call":"python path_to_scAmpi_git/scripts/parseDgidbTrialsTable_for_minSetCover.py ",
             "scratch":"2000",
             "mem":"200",
             "time":"100",
@@ -237,7 +236,7 @@
             "colName_clinTrial":"ClinicalTrials"
         },
         "findminSetCover":{
-            "call":"python ../scripts/minSetCover.py ",
+            "call":"python path_to_scAmpi_git/scripts/minSetCover.py ",
             "scratch":"2000",
             "mem":"200",
             "time":"100",
@@ -245,7 +244,7 @@
             "variousParams":"--considerClusterSize no"
         },
         "filterDrugs":{
-            "call":"python ../scripts/filter_by_drug_list.py ",
+            "call":"python path_to_scAmpi_git/scripts/filter_by_drug_list.py ",
             "scratch":"2000",
             "mem":"200",
             "time":"200",
@@ -253,14 +252,14 @@
             "variousParams":""
         },
         "preprocessForUpSetR":{
-            "call":"python ../scripts/preprocess_parsedTrialsTable_forUpsetplot.py ",
+            "call":"python path_to_scAmpi_git/scripts/preprocess_parsedTrialsTable_forUpsetplot.py ",
             "scratch":"2000",
             "mem":"200",
             "time":"200",
             "threads":1
         },
         "plotUpSetR":{
-            "call":"Rscript ../scripts/generate_upsetplot_drugs_targeting_clusters.R",
+            "call":"Rscript path_to_scAmpi_git/scripts/generate_upsetplot_drugs_targeting_clusters.R",
             "scratch":"2000",
             "mem":"200",
             "time":"200",
@@ -268,28 +267,28 @@
             "variousParams":"--nintersects 20 --nsets 100"
         },
         "generate_qc_plots":{
-            "call":"Rscript ../scripts/generate_QC_plots.R ",
+            "call":"Rscript path_to_scAmpi_git/scripts/generate_QC_plots.R ",
             "scratch":"2000",
             "mem":"8000",
             "time":"100",
             "threads":4
         },
         "generate_cell_type_boxplot":{
-            "call":"Rscript ../scripts/generate_boxplot_fractions_celltypes.R ",
+            "call":"Rscript path_to_scAmpi_git/scripts/generate_boxplot_fractions_celltypes.R ",
             "scratch":"2000",
             "mem":"4000",
             "time":"100",
             "threads":4
         },
         "sample_integration":{
-            "call":"Rscript ../scripts/sample_integration.R ",
+            "call":"Rscript path_to_scAmpi_git/scripts/sample_integration.R ",
             "scratch":"2000",
             "mem":"10000",
             "time":"200",
             "threads":12
         },
         "show_drugPrediction_on_clones":{
-            "call":"Rscript ../scripts/show_drugPrediction_on_clones.R ",
+            "call":"Rscript path_to_scAmpi_git/scripts/show_drugPrediction_on_clones.R ",
             "scratch":"2000",
             "mem":"4000",
             "time":"200",
@@ -297,7 +296,7 @@
             "variousParams":"--drugPredEnd 'clinicalAnnotation.civic.txt' --name_DGIDB 'DGIDB-drugs(Score,Type)' --name_CIVIC 'CIViC_Drug_Support'"
         },
         "get_full_druglist_to_subclones":{
-            "call":"python ../scripts/get_full_druglist_to_subclones_assignm.py ",
+            "call":"python path_to_scAmpi_git/scripts/get_full_druglist_to_subclones_assignm.py ",
             "scratch":"2000",
             "mem":"1000",
             "time":"400",
