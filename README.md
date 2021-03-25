@@ -55,6 +55,8 @@ For a test run the freely available 10X Genomics data from PBMC cells can be use
 
 #### Before running the pipeline
 
+Note: some steps of the scAmpi workflow perform online queries. Please make sure that this is possible on your computing system, e.g. by loading the respective modules to enable the proxy connection. (Most systems will have this enabled per default).
+
 Before running the pipeline the `config` file needs to be adapted to contain the input and output paths for the intended analysis. Those are provided in the first section (`inputOutput`) of the config file. In addition to input and output paths, further resource information must be provided in the section `resources`. This information is primarily specifying input required for the cell type classification and the genomic reference used for the cellranger mapping. An example config file ready for adaptation, as well as a brief description of the relevant config blocks, is provided in the directory `config`.
 
 Further, a "sample_map" must be provided, a tab delimited text file that lists all samples that should be analysed (one row per sample).
