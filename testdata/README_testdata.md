@@ -12,39 +12,49 @@ For instructions on how to install the necessary software to run scAmpi, please 
 In order to do a test run, you need to activate the conda environment and you need to export the path to the cellranger installation to your PATH. The following example calls assume that the conda environemt was installed in your HOME directory and that cellranger (version 6.0.0) was installed in "cellranger_dir". Note: if you do not want to add cellranger to your PATH, you can also provide the full path to the cellranger installation in the config file at the cellranger_count config block.
 
 ```
-> conda avtivate scAmpi_scRNA
-> export PATH=/cellranger_dir/cellranger-6.0.0:$PATH
+>> conda avtivate scAmpi_scRNA
+>> export PATH=/cellranger_dir/cellranger-6.0.0:$PATH
 ```
 
-Note: some steps of the scAmpi workflow perform online queries. Please make sure that this is possible on your computing system, e.g. by loading the respective modules to enable the proxy connection. (Most systems will have this enabled per default).
+NOTE: some steps of the scAmpi workflow perform online queries. Please make sure that this is possible on your computing system, e.g. by loading the respective modules to enable the proxy connection. (Most systems will have this enabled per default).
 
 #### (ii) Run script to prepare test directory
 The helper script `prepare_testrun.sh` will create the fastqs and analysis directories, as well as downloads the testdata, and prepares the config file for the test run:
 
 ```
-> cd testdir
-> sh [path_git_scAmpi]/testdata/prepare_testrun.sh [path_git_scAmpi] [reference_dir]
+>> cd testdir
+>> sh [path_git_scAmpi]/testdata/prepare_testrun.sh [path_git_scAmpi] [reference_dir]
 ```
 
 #### (iii) Run scAmpi
 
 The helper script created a sub folder called "snake_files" in your test directory and prepared the commands for a dry run and full run of the workflow.
-NOTE: `run_scAmpi.sh` is prepared for LSF job scheduling. If a different job scheduler is used on your HPC, please adapt run_scAmpi.sh accordinly by changing the lsf-related parts of the call (e.g. replacing bsub)
 
 ```
-> cd snake_files/
+>> cd snake_files/
 ```
 
 Call the dry run to check if all preparations were correct:
 
 ```
-> ./dryrun_scAmpi.sh
+>> ./dryrun_scAmpi.sh
 ```
 
 Call the actual run:
 
+You have two options, either you run scAmpi locally or using a job scheduling system.
+
+For local runs, type:
+
 ```
-> ./run_scAmpi.sh
+>> ./run_scAmpi_local.sh
 ```
 
+To use job scheduling, type:
+
+```
+>> ./run_scAmpi.sh
+```
+
+NOTE: `run_scAmpi.sh` is prepared for LSF job scheduling. If a different job scheduler is used on your HPC, please adapt run_scAmpi.sh accordinly by changing the lsf-related parts of the call.
 

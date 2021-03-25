@@ -15,7 +15,7 @@
         "reference_transcriptome":"reference_dir",
         "transcriptome_code":"GRCh38",
         "celltype_lists":"path_to_scAmpi_git/required_files/PBMC/celltype_list_PBMC_all.gmx",
-        "celltype_config":"path_to_scAmpi_git/required_files/PBMC/celltype_config_melanoma.tsv",
+        "celltype_config":"path_to_scAmpi_git/required_files/PBMC/celltype_config_PBMC.tsv",
         "colour_config":"path_to_scAmpi_git/required_files/PBMC/colour_config_PBMC.txt",
         "genesets":"path_to_scAmpi_git/required_files/hallmark_pathways_example.gmt",
         "priority_genes":"path_to_scAmpi_git/required_files/PBMC/selected_genes_PBMC.txt"

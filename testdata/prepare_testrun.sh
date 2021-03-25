@@ -66,3 +66,6 @@ chmod +x dryrun_scAmpi.sh
 
 echo "bsub -J scAmpi_test -eo ${testrun_dir}/snake_files/scAmpi_test.err -oo ${testrun_dir}/snake_files/scAmpi_test.out -W 23:59 \"snakemake --latency-wait 60 -s ${scAmpi_path}/snake/snake_scAmpi_basic_master.snake --configfile config_scAmpi_testdata.json --cluster 'bsub -M {params.mem} -n {threads} -W {params.time} -R \"rusage[mem={params.mem},scratch={params.scratch}]\" -eo {params.lsferrfile} -oo {params.lsfoutfile}' -j 10 -p -k\"" > run_scAmpi.sh
 chmod +x run_scAmpi.sh
+
+echo "snakemake -s ${scAmpi_path}/snake/snake_scAmpi_basic_master.snake --configfile config_scAmpi_testdata.json -j 10 -p -k" > run_scAmpi_local.sh
+chmod +x run_scAmpi_local.sh
