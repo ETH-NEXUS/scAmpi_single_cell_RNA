@@ -12,7 +12,7 @@
         "drugList":"",
         "drugCombinations":"",
         "civicDict":"",
-        "reference_transcriptome":"reference_dir/refdata-cellranger-GRCh38-3.0.0",
+        "reference_transcriptome":"reference_dir",
         "transcriptome_code":"GRCh38",
         "celltype_lists":"path_to_scAmpi_git/required_files/PBMC/celltype_list_PBMC_all.gmx",
         "celltype_config":"path_to_scAmpi_git/required_files/PBMC/celltype_config_melanoma.tsv",

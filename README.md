@@ -11,50 +11,46 @@ scAmpi_clinial includes the search for disease relevant drug targets for differe
 
 scAmpi provides a yml file to enable installing most software used in the default workflow as a conda environment (yaml file `scAmpi_scRNA_conda_env.yml` provided in the sub folder "envs").
 
-Example (This will install the conda environment in your home. Note that the installation may take a while.):
+Example (This will install the conda environment in your home. Note that the conda may take a while to install all software packages):
 ```
-> conda env create -f scAmpi_scRNA_conda_env.yml --name scAmpi_scRNA
+>> conda env create -f scAmpi_scRNA_conda_env.yml --name scAmpi_scRNA
 ```
+
 To activate the environment, type:
 ```
-> conda activate scAmpi_scRNA
+>> conda activate scAmpi_scRNA
 ```
 
 Additionally required installations that are not available via conda:
 - [Phenograph](https://github.com/dpeerlab/phenograph):
-with activated conda environment:
+To install, first activate the conda environment and then use pip install:
+
 ```
-> pip install PhenoGraph
+>> pip install PhenoGraph
 ```
+
 - [CIViCpy](https://github.com/griffithlab/civicpy): 
-with activated conda environment:
+To install, first activate the conda environment and then use pip install:
+
 ```
-> pip install civicpy
+>> pip install civicpy
 ```
 
-- [Cellranger](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/what-is-cell-ranger): Follow the instructions on the 10xGenomics support page and include the cellranger binary to your path.
+- [Cellranger](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/what-is-cell-ranger): Follow the instructions on the 10xGenomics installation support page to install cellranger and to include the cellranger binary to your path.
 Webpage: [https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/installation](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/installation)
-
-3: download local cache of the [CIViC](https://civicdb.org) database using functionality from `civicpy`.
-Webpage: https://docs.civicpy.org/en/latest/install.html
-
-First-time download of the CIViCpy cache:
-
-    >> from civicpy import civic
-    >> civic.load_cache(on_stale='ignore')
-
-Note that updates to this file are not handled by scAmpi and is the user who should do this using:
-
-    >> civic.update_cache()
 
 
 *Temporary*
-For the normalisation step the R package `sctransform` is used. As there is a known bug in the latest release, at the moment either an older package version (e.g. 0.2) or the development version should be installed. The development version can be installed within R using `remotes::install_github("ChristophH/sctransform@develop")`.
+For the normalisation step the R package `sctransform` is used. As there is a known bug in the latest release, at the moment it is recommended to use the development version.
+To install, activate the scAmpi environment, open an R session, and type:
 
+```
+>> remotes::install_github("ChristophH/sctransform@develop")
+```
 
 #### Example data
 
-For a test run the freely available 10X Genomics data from PBMC cells can be used. Please find an example config file and in the directory `testdata`
+For a test run the freely available 10X Genomics data from PBMC cells can be used. A step by step guideline and example config file are provided in the directory `testdata`.
 
 
 #### Before running the pipeline
@@ -77,7 +73,7 @@ Example:
 Example call:
 
 ```
-snakemake --notemp --latency-wait 60 -s snake_scAmpi_basic_master.snake --configfile config_scAmpi.json --cluster 'bsub -M {params.mem} -n {threads} -W {params.time} -R "rusage[mem={params.mem},scratch={params.scratch}]" -eo {params.lsferrfile} -oo {params.lsfoutfile}' -j 100 -p -k
+snakemake -s snake_scAmpi_basic_master.snake --configfile config_scAmpi.json --cluster 'bsub -M {params.mem} -n {threads} -W {params.time} -R "rusage[mem={params.mem},scratch={params.scratch}]" -eo {params.lsferrfile} -oo {params.lsfoutfile}' -j 100 -p -k
 ```
 
 Note that the section that follows parameter `--cluster` denotes the cluster specific notation to indicate memory and timr ressources for a job. Please adapt according to the respective job scheduling system used.
@@ -88,8 +84,16 @@ Note that the section that follows parameter `--cluster` denotes the cluster spe
 Example call:
 
 ```
-snakemake --notemp --latency-wait 60 -s snake_scAmpi_clinical_master.snake --configfile config_scTranscriptomics.json --cluster 'bsub -M {params.mem} -n {threads} -W {params.time} -R "rusage[mem={params.mem},scratch={params.scratch}]" -eo {params.lsferrfile} -oo {params.lsfoutfile}' -j 100 -p -k
+snakemake -s snake_scAmpi_clinical_master.snake --configfile config_scTranscriptomics.json --cluster 'bsub -M {params.mem} -n {threads} -W {params.time} -R "rusage[mem={params.mem},scratch={params.scratch}]" -eo {params.lsferrfile} -oo {params.lsfoutfile}' -j 100 -p -k
 ```
 
 Note that the section that follows parameter `--cluster` denotes the cluster specific notation to indicate memory and timr ressources for a job. Please adapt according to the respective job scheduling system used.
 
+#### A note on using CIViC
+
+The CIViC query implemented in scAmpi makes use of an offline cache file of the CIViC database. The cache is retrieved with the initial installation of the scAmpi software. Afterwards, users have to manually update the cache file if they want to use a new version. 
+To update the cache file, load the scAmpi environemnt and open an R session.
+Then type:
+```
+>> civic.update_cache()
+```
