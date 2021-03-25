@@ -2,9 +2,9 @@
     "inputOutput":{
         "input_fastqs":"testdir/fastqs/",
         "input_fastqc":"",
-        "analysis_output_dir":"testdir/output/",
+        "analysis_output_dir":"testdir/analysis/",
         "analysis_temp_dir":"testdir/snake_temp/",
-        "sample_map":"path_to_scAmpi_git/testdata/sample_map_testdata.tsv",
+        "sample_map":"testdir/snake_files/sample_map_testdata.tsv",
         "malignant_cell_type":"none",
     },
     "resources":{
@@ -12,7 +12,7 @@
         "drugList":"",
         "drugCombinations":"",
         "civicDict":"",
-        "reference_transcriptome":"testdir/reference/refdata-cellranger-GRCh38-3.0.0",
+        "reference_transcriptome":"reference_dir/refdata-cellranger-GRCh38-3.0.0",
         "transcriptome_code":"GRCh38",
         "celltype_lists":"path_to_scAmpi_git/required_files/PBMC/celltype_list_PBMC_all.gmx",
         "celltype_config":"path_to_scAmpi_git/required_files/PBMC/celltype_config_melanoma.tsv",

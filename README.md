@@ -2,25 +2,40 @@
 
 #### General overview
 
-This scAmpi workflow is organized into two main parts: the `scAmpi_basic` part and the `scAmpi_clinical` part. The first comprises general scRNA preprocessing steps, filtering, normalisation, unsupervised clustering, cell type classification, and DE analysis.
+This scAmpi workflow is organized into two main parts: the `scAmpi_basic` part and the `scAmpi_clinical` part, which can be run independently. scAmpi_basic includes general scRNA processing steps, such as mapping, QC, normalisation, unsupervised clustering, cell type classification, and DE analysis.
 
-The latter (`clinical`) part includes the search for disease relevant drug targets of differentially expressed genes when comparing the malignant cells to the non-malignant cells of a sample. Note that the clinical part is only applied if at least one cluster identified in your sample is indicated as a diseased ("malignant") cell type.
+scAmpi_clinial includes the search for disease relevant drug targets for differentially expressed genes. Note that the clinical part is only applied if at least one cluster identified in your sample is indicated as a diseased ("malignant") cell type.
 
-#### Software
 
-The pipeline consists of R and python scripts. Most of the relevant R and python packages used in this workflow can be installed as a conda environment using the yaml file `scAmpi_scRNA_conda_env.yml` provided in the sub folder "envs".
+#### Installation instructions
+
+scAmpi provides a yml file to enable installing most software used in the default workflow as a conda environment (yaml file `scAmpi_scRNA_conda_env.yml` provided in the sub folder "envs").
 
 Example (This will install the conda environment in your home. Note that the installation may take a while.):
 ```
 > conda env create -f scAmpi_scRNA_conda_env.yml --name scAmpi_scRNA
+```
+To activate the environment, type:
+```
 > conda activate scAmpi_scRNA
 ```
 
-Additionally required installations:
+Additionally required installations that are not available via conda:
+- [Phenograph](https://github.com/dpeerlab/phenograph):
+with activated conda environment:
+```
+> pip install PhenoGraph
+```
+- [CIViCpy](https://github.com/griffithlab/civicpy): 
+with activated conda environment:
+```
+> pip install civicpy
+```
+
 - [Cellranger](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/what-is-cell-ranger): Follow the instructions on the 10xGenomics support page and include the cellranger binary to your path.
-Webpage: https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/installation
-- [Phenograph](https://github.com/dpeerlab/phenograph): 1: activate the conda environment, 2: use `pip install PhenoGraph` to install the package.
-- [CIViCpy](https://github.com/griffithlab/civicpy): 1: activate the conda environment, 2: use `pip install civicpy` to install the package, 3: download local cache of the [CIViC](https://civicdb.org) database using functionality from `civicpy`.
+Webpage: [https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/installation](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/installation)
+
+3: download local cache of the [CIViC](https://civicdb.org) database using functionality from `civicpy`.
 Webpage: https://docs.civicpy.org/en/latest/install.html
 
 First-time download of the CIViCpy cache:
