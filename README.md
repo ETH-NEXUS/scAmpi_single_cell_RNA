@@ -9,7 +9,7 @@ scAmpi_clinial includes the search for disease relevant drug targets for differe
 
 #### Installation instructions
 
-scAmpi provides a yml file to enable installing most software used in the default workflow as a conda environment (yaml file `scAmpi_scRNA_conda_env.yml` provided in the sub folder "envs").
+scAmpi provides a yml file to enable installing most software used in the default workflow as a conda environment (yaml file `scAmpi_scRNA_conda_env.yml` provided in the subfolder "envs"). Additionally, you find one concrete example of the conda environment used to run scAmpi with detailed package versions (`scAmpi_scRNA_detailed.yml`).
 
 Example (This will install the conda environment in your home. Note that the conda may take a while to install all software packages):
 ```
@@ -41,7 +41,7 @@ Webpage: [https://support.10xgenomics.com/single-cell-gene-expression/software/p
 
 
 *Temporary*
-For the normalisation step the R package `sctransform` is used. As there is a known bug in the latest release, at the moment it is recommended to use the development version.
+For the normalisation step the R package `sctransform` is used. As there is a known bug in the latest release (`0.3.2` - 2020-12-16), at the moment it is recommended to use the development version. For more information please have a look at the github repository of [sctransform](https://github.com/ChristophH/sctransform).
 To install, activate the scAmpi environment, open an R session, and type:
 
 ```

@@ -218,14 +218,6 @@
             "threads":1,
             "variousParams":"--malignant Melanoma"
         },
-        "plot_tSNE_nonmalignant":{
-            "call":"Rscript path_to_scAmpi_git/scripts/plot_tSNEs_non_malignant_cell_libraries.R ",
-            "scratch":"2000",
-            "mem":"32000",
-            "time":"200",
-            "threads":1,
-            "variousParams":""
-        },
         "parseDgidbTrialsTable_for_minSetCover":{
             "call":"python path_to_scAmpi_git/scripts/parseDgidbTrialsTable_for_minSetCover.py ",
             "scratch":"2000",

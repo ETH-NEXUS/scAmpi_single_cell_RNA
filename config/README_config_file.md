@@ -26,7 +26,7 @@ The scAmpi repository already includes resources for several tissue types, those
         "celltype_lists":"../required_files/melanoma/celltype_list_melanoma.gmx",  # tab separated file with marker genes for each cell type we can expect in the respective tissue
         "celltype_config":"../required_files/melanoma/celltype_config_melanoma.tsv",  # tab separated file that indicates which of the cell types in "celltype_lists" are major and which are sub types
         "colour_config":"../required_files/melanoma/colour_config_melanoma.txt",  # specify the colour for each cell type mentioned in "celltype_config"
-        "genesets":"../required_files/hallmark_pathways_example.gmt",  # only required for clinical part
+        "genesets":"../required_files/hallmark_pathways_example.gmt",  # required for GSVA analysis and clinical part
         "priority_genes":"../required_files/melanoma/selected_genes_melanoma.txt"  # tab separated file that lists genes that shall be visualized on a UMAP. Genes are categorized into to user-defined gene-categories to allow better interpretation.
     },
 
