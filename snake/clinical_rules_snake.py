@@ -305,13 +305,12 @@ rule filterDrugs:
         scratch = config['tools']['filterDrugs']['scratch'],
         mem = config['tools']['filterDrugs']['mem'],
         time = config['tools']['filterDrugs']['time'],
-        variousParams = config['tools']['filterDrugs']['variousParams']
     threads:
         config['tools']['filterDrugs']['threads']
     benchmark:
         FILTERDRUGS_OUT + '{sample}.{clusterid}.filterDrugs.benchmark'
     shell:
-        '{config[tools][filterDrugs][call]} --inFile {input.infile} --outFile {output.out} --drugList {input.drugList} {params.variousParams}'
+        '{config[tools][filterDrugs][call]} --inFile {input.infile} --outFile {output.out} --drugList {input.drugList}'
 
 
 if not 'PREPROCESSUPSETR_IN' in globals():

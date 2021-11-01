@@ -6,9 +6,9 @@
 ####    R Version: 3.5.1
 #########################################
 
-# This script takes an hdf5 file of sc-RNA expression data and returns several QC plots.
-# Plots are saved in the same directory where the input file is.
-# The plots are based on the scRNA tutorial by Atul Sethi and Panagiotis Papasaikas on ECCB in Athens.
+# This script takes an hdf5 file of sc-RNA expression data and returns several QC plots
+# Plots are saved in the same directory where the input file is
+# The plots are based on the scRNA tutorial on ECCB in Athens
 
 library(rhdf5)
 library(optparse)
