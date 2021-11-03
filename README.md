@@ -7,13 +7,18 @@ This scAmpi workflow is organized into two main parts: the `scAmpi_basic` part a
 scAmpi_clinial includes the search for disease relevant drug targets for differentially expressed genes. Note that the clinical part is only applied if at least one cluster identified in your sample is indicated as a diseased ("malignant") cell type.
 
 
+![scAmpi_both_rulegraphs](https://user-images.githubusercontent.com/38692323/140029020-6292b989-722d-4c93-909d-1d65c8aacddd.png)
+
+
+
 #### Installation instructions
 
 scAmpi provides a yml file to enable installing most software used in the default workflow as a conda environment (yaml file `scAmpi_scRNA_conda_env.yml` provided in the subfolder "envs"). Additionally, you find one concrete example of the conda environment used to run scAmpi with detailed package versions (`scAmpi_scRNA_detailed.yml`).
 
 Example (This will install the conda environment in your home. Note that the conda may take a while to install all software packages):
 ```
->> conda env create -f scAmpi_scRNA_conda_env.yml --name scAmpi_scRNA
+>> conda env create -f scAmpi_scRNA_conda_env.yml --name scAmpi_scRNA![Slide1](https://user-images.githubusercontent.com/38692323/140026143-18ff1054-c488-42ab-9f81-89b6737feaf6.png)
+
 ```
 
 To activate the environment, type:
