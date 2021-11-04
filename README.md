@@ -55,8 +55,9 @@ To install, activate the scAmpi environment, open an R session, and type:
 
 #### Example data
 
-For a test run the freely available 10X Genomics data from PBMC cells can be used. A step by step guideline and example config file are provided in the directory `testdata`.
-
+For a test run the freely available 10X Genomics data from PBMC cells can be used. A step by step guideline and example config file are provided in the directory `testdata`.  
+If you want to avoid the cellranger step the file `5k_pbmc_v3.h5.tar` that you find in `testdata` can be used as a starting point.
+With `tar -xvf 5k_pbmc_v3.h5.tar` the file can be unpacked. Then, it should be copied into the direcory `analysis_output_dir/rawCounts/`. With this, scAmpi basic starts after the cellranger step, saving time for the test run.
 
 #### Before running the pipeline
 
@@ -80,7 +81,9 @@ Example:
 Example call:
 
 ```
-snakemake -s snake_scAmpi_basic_master.snake --configfile config_scAmpi.json --cluster 'bsub -M {params.mem} -n {threads} -W {params.time} -R "rusage[mem={params.mem},scratch={params.scratch}]" -eo {params.lsferrfile} -oo {params.lsfoutfile}' -j 100 -p -k
+snakemake -s snake_scAmpi_basic_master.snake --configfile config_scAmpi.json --cluster 'bsub -M {params.mem}  
+-n {threads} -W {params.time} -R "rusage[mem={params.mem},scratch={params.scratch}]"  
+-eo {params.lsferrfile} -oo {params.lsfoutfile}' -j 100 -p -k
 ```
 
 Note that the section that follows parameter `--cluster` denotes the cluster specific notation to indicate memory and timr ressources for a job. Please adapt according to the respective job scheduling system used.
@@ -91,7 +94,9 @@ Note that the section that follows parameter `--cluster` denotes the cluster spe
 Example call:
 
 ```
-snakemake -s snake_scAmpi_clinical_master.snake --configfile config_scTranscriptomics.json --cluster 'bsub -M {params.mem} -n {threads} -W {params.time} -R "rusage[mem={params.mem},scratch={params.scratch}]" -eo {params.lsferrfile} -oo {params.lsfoutfile}' -j 100 -p -k
+snakemake -s snake_scAmpi_clinical_master.snake --configfile config_scTranscriptomics.json --cluster 'bsub  
+-M {params.mem} -n {threads} -W {params.time} -R "rusage[mem={params.mem},scratch={params.scratch}]"  
+-eo {params.lsferrfile} -oo {params.lsfoutfile}' -j 100 -p -k
 ```
 
 Note that the section that follows parameter `--cluster` denotes the cluster specific notation to indicate memory and timr ressources for a job. Please adapt according to the respective job scheduling system used.
@@ -107,7 +112,7 @@ Then type:
 
 #### Running scAmpi_clinical independently
 
-It is possible to run the scAmpi_clinical part independently of scAmpi_basic, following some restrictions to the file names and formatting. For this use case please use the master snake file `snake_scAmpi_clinical-only_master.snake`. Generally, as input scAmpi_clinical expects the results of a DE analysis on a cell cluster level, with four mandatory columns. If the column header names differ from the example below this can be specified in the relevant blocks of the config file.
+It is possible to run the scAmpi_clinical part independently of scAmpi_basic, following some restrictions to the file names and formatting. For this use case please use the master snake file `snake_scAmpi_clinical-only_master.snake`. Generally, as input scAmpi_clinical expects the results of a DE analysis on a cell cluster level, with four mandatory columns. The input files should be provided in the input directory specified in the config file ("input_fastqs"). If the column header names differ from the example below this can be specified in the relevant blocks of the config file.
 ```
 gene_names  diff    padj      test_statistic
 ATP1A1      1.679   3.05e-15  14.506
