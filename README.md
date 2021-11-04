@@ -45,7 +45,7 @@ To install, first activate the conda environment and then use pip install:
 Webpage: [https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/installation](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/installation)
 
 
-*Temporary*
+*Temporary*  
 For the normalisation step the R package `sctransform` is used. As there is a known bug in the latest release (`0.3.2` - 2020-12-16), at the moment it is recommended to use the development version. For more information please have a look at the github repository of [sctransform](https://github.com/ChristophH/sctransform).
 To install, activate the scAmpi environment, open an R session, and type:
 
@@ -104,6 +104,19 @@ Then type:
 ```
 >> civic.update_cache()
 ```
+
+#### Running scAmpi_clinical independently
+
+It is possible to run the scAmpi_clinical part independently of scAmpi_basic, following some restrictions to the file names and formatting. For this use case please use the master snake file `snake_scAmpi_clinical-only_master.snake`. Generally, as input scAmpi_clinical expects the results of a DE analysis on a cell cluster level, with four mandatory columns. If the column header names differ from the example below this can be specified in the relevant blocks of the config file.
+```
+gene_names  diff    padj      test_statistic
+ATP1A1      1.679   3.05e-15  14.506
+```
+The input table should be given twice, with slightly different file name conventions:
+- SAMPLEID.3.DEgenes.tsv
+- SAMPLEID.3.txt
+where SAMPLEID is the sample name specified in the sample map, 3 is the cell cluster ID, and `DEgenes.tsv` and `txt` are the suffixes expected by two initial steps of the clinical pipeline.
+
 
 #### Adapting/Integrating rules in Snakemake
 Snakemake is a Python-based workflow management system for building and executing pipelines. A pipeline is made up of ["rules"](snake/scAmpi_basic_rules.py) that represent single steps of the analysis. In a [yaml config file](config/config_scAmpi.yaml) parameters and rule-specific input can be adjusted to a new analysis without changing the rules. In a ["master" snake file](snake/snake_scAmpi_basic_master.snake) the desired end points of the analysis are specified. With the input and the desired output defined, Snakemake is able infer all steps that have to be performed in-between.
