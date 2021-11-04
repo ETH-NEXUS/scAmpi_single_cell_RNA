@@ -1,0 +1,98 @@
+import os, glob, sys, datetime
+from os import path
+
+# This function adapts the config object to include full path information
+include: "misc_snake.py"
+
+# input files and folders
+SAMPLEMAPPING = config['inputOutput']['sample_map']
+INPUTDIR = config['inputOutput']['input_fastqs']
+OUTDIR = config['inputOutput']['analysis_output_dir']
+TMPDIR = config['inputOutput']['analysis_temp_dir']
+
+# Check if the uses specified the proper input and output directories
+if not 'INPUTDIR' in globals():
+    print('You have to specify the root directory of the cluster files!')
+    sys.exit(1)
+if not 'OUTDIR' in globals():
+    print('You have to specify the root directory where the results will be generated!')
+    sys.exit(1)
+if not 'TMPDIR' in globals():
+    print('You have to specify the root directory where temporary files will be stored!')
+    sys.exit(1)
+
+
+# This is the default order in which the programs are executed
+# Note: currently this is the default also specified in the rule files, so currently this is only for explanatory reasons displayed here
+# If the user specified a different order in the project specific snake file, the user specified version is chosen.
+
+CLUSTER_IDS  = [file.split(".")[-2] for file in glob.glob(INPUTDIR + '*.txt')]
+print(CLUSTER_IDS)
+
+REMOVE_ATYPICAL_OUT = OUTDIR + 'atypical_removed/'
+DIFF_EXP_OUT = OUTDIR + 'diff_exp/'
+PERCENTAGE_IN = OUTDIR + 'atypical_removed/'
+PERCENTAGE_OUT = OUTDIR + 'clustering/'
+
+DGIDB_IN = INPUTDIR
+DGIDB_OUT = OUTDIR + 'dgidb/'
+CLINICALTRIALS_OUT = OUTDIR + 'clinicalTrials/'
+DRUGCOMBINATION = OUTDIR + 'drugCombination/'
+
+ANNOTATECLINICAL_IN = INPUTDIR
+ANNOTATECLINICAL_OUT = OUTDIR + 'clinicalAnnotation/'
+CIVIC_IN = ANNOTATECLINICAL_OUT
+CIVIC_OUT = ANNOTATECLINICAL_OUT
+
+PLOT_DRUGS_IN = CIVIC_OUT
+PLOT_DRUGS_OUT = DRUGCOMBINATION
+GENESETANALYSIS_IN = INPUTDIR
+GENESETANALYSIS_OUT = OUTDIR + 'geneSetAnalysis/'
+FILTERDRUGS_OUT = CLINICALTRIALS_OUT
+
+if not os.path.exists(GENESETANALYSIS_OUT):
+	os.mkdir(GENESETANALYSIS_OUT)
+
+# Include the rules
+
+# make sure that rules are only called when also input is there
+FINAL_FILE = []
+if len(CLUSTER_IDS) > 0:
+	FINAL_FILE = OUTDIR + 'complete_clinical.txt'
+	include: "clinical_rules_snake.py"
+
+localrules: all_avoidEmptyInput
+rule all_avoidEmptyInput:
+	input:
+		FINAL_FILE
+	output:
+		finalOutfile = OUTDIR + 'completed_' + str(len(CLUSTER_IDS)) + '_clusters.txt'
+	shell:
+		'date > {output.finalOutfile}'
+
+
+
+# This rule defines which files should be created
+localrules: clinical_scTranscriptomics
+rule clinical_scTranscriptomics:
+	input:
+		expand(ANNOTATECLINICAL_OUT + '{sample}.{clusterid}.clinicalAnnotation.txt', sample = getSampleNames(), clusterid = CLUSTER_IDS),
+		expand(CIVIC_OUT + '{sample}.{clusterid}.clinicalAnnotation.civic.txt', sample = getSampleNames(), clusterid = CLUSTER_IDS),
+		expand(DRUGCOMBINATION + '{sample}.drugToCluster.allDrugs.vennplot.png', sample = getSampleNames()),
+		expand(DRUGCOMBINATION + '{sample}.drugToCluster.filteredDrugs.vennplot.png', sample = getSampleNames()),
+		expand(GENESETANALYSIS_OUT + '{sample}.{clusterid}.enrichedGeneSets.txt', sample = getSampleNames(), clusterid = CLUSTER_IDS),
+		expand(GENESETANALYSIS_OUT + '{sample}.heatmap_enrichment.png', sample = getSampleNames()),
+		expand(DRUGCOMBINATION + '{sample}.full_druglist_to_subclones.txt', sample = getSampleNames()),
+	output:
+		OUTDIR + 'complete_clinical.txt'
+	params:
+		lsfoutfile = OUTDIR + 'complete_clinical.lsfout.log',
+		lsferrfile = OUTDIR + 'complete_clinical.lsferr.log',
+		mem = '1000',
+		scratch = '1000',
+		time = '500'
+	benchmark:
+		OUTDIR + 'complete_clinical.txt.benchmark'
+	shell:
+		'date > {output}'
+
