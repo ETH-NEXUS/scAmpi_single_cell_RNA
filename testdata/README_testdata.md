@@ -58,3 +58,5 @@ To use job scheduling, type:
 
 NOTE: `run_scAmpi.sh` is prepared for LSF job scheduling. If a different job scheduler is used on your HPC, please adapt run_scAmpi.sh accordinly by changing the lsf-related parts of the call.
 
+#### Avoid cellranger step
+If the cellranger step should be avoided in the test run, the file `5k_pbmc_v3.h5.tar` can be used as a starting point. With `tar -xvf 5k_pbmc_v3.h5.tar` the file can be unpacked. Then, it should be copied into the direcory `analysis_output_dir/rawCounts/`, where "analysis_output_dir" is the output directory specified in the config file. This way scAmpi_basic starts after the cellranger step, saving time and other resources.
