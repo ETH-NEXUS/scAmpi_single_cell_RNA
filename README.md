@@ -13,7 +13,7 @@ scAmpi_clinial includes the search for disease relevant drug targets for differe
 
 #### Installation instructions
 
-scAmpi provides a yml file to enable installing most software used in the default workflow as a conda environment (yaml file `scAmpi_scRNA_conda_env.yml` provided in the subfolder "envs"). Additionally, you find one concrete example of the conda environment used to run scAmpi with detailed package versions (`scAmpi_scRNA_detailed.yml`).
+scAmpi provides a yml file to enable installing most software used in the default workflow as a conda environment. After cloning this repository you find the yaml file `scAmpi_scRNA_conda_env.yml` in the subfolder "envs". Additionally, you find in this directory one concrete example of the conda environment used to run scAmpi with detailed package versions, `scAmpi_scRNA_detailed.yml`.
 
 Example (This will install the conda environment in your home. Note that the conda may take a while to install all software packages):
 ```
