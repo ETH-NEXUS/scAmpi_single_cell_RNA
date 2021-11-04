@@ -112,10 +112,10 @@ Then type:
 
 #### Running scAmpi_clinical independently
 
-It is possible to run the scAmpi_clinical part independently of scAmpi_basic, following some restrictions to the file names and formatting. For this use case please use the master snake file `snake_scAmpi_clinical-only_master.snake`. Generally, as input scAmpi_clinical expects the results of a DE analysis on a cell cluster level, with four mandatory columns. The input files should be provided in the input directory specified in the config file ("input_fastqs"). If the column header names differ from the example below this can be specified in the relevant blocks of the config file.
+It is possible to run the scAmpi_clinical part independently of scAmpi_basic, following some restrictions to the file names and formatting. For this use case please use the master snake file `snake_scAmpi_clinical-only_master.snake`. Generally, as input scAmpi_clinical expects the results of a DE analysis on a cell cluster level, with five mandatory columns. The input files should be provided in the input directory specified in the config file ("input_fastqs"). If the column header names differ from the example below this can be specified in the relevant blocks of the config file.
 ```
-gene_names  diff    padj      test_statistic
-ATP1A1      1.679   3.05e-15  14.506
+gene_names  diff    padj      test_statistic  pct_nonzero
+ATP1A1      1.679   3.05e-15  14.506          81.42
 ```
 The input table should follow the following file name convention: `SAMPLEID.3.txt`, where SAMPLEID is the sample name specified in the sample map, 3 is the cell cluster ID, and `txt` is the suffix expected by the two initial steps of the clinical pipeline.
 
