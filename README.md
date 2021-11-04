@@ -112,10 +112,7 @@ It is possible to run the scAmpi_clinical part independently of scAmpi_basic, fo
 gene_names  diff    padj      test_statistic
 ATP1A1      1.679   3.05e-15  14.506
 ```
-The input table should be given twice, with slightly different file name conventions:
-- SAMPLEID.3.DEgenes.tsv
-- SAMPLEID.3.txt
-where SAMPLEID is the sample name specified in the sample map, 3 is the cell cluster ID, and `DEgenes.tsv` and `txt` are the suffixes expected by two initial steps of the clinical pipeline.
+The input table should follow the following file name convention: `SAMPLEID.3.txt`, where SAMPLEID is the sample name specified in the sample map, 3 is the cell cluster ID, and `txt` is the suffix expected by the two initial steps of the clinical pipeline.
 
 
 #### Adapting/Integrating rules in Snakemake
