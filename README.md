@@ -61,7 +61,8 @@ With `tar -xvf 5k_pbmc_v3.h5.tar` the file can be unpacked. Then, it should be c
 
 #### Before running the pipeline
 
-Note: some steps of the scAmpi workflow perform online queries. Please make sure that this is possible on your computing system, e.g. by loading the respective modules to enable the proxy connection. (Most systems will have this enabled per default).
+Note: some steps of the scAmpi workflow perform online queries. Please make sure that this is possible on your computing system, e.g. by loading the respective modules to enable the proxy connection. (Most systems will have this enabled per default).  
+Also note that currently the filtering step of scAmpi_basic is designed to handle human data only.
 
 Before running the pipeline the `config` file needs to be adapted to contain the input and output paths for the intended analysis. Those are provided in the first section (`inputOutput`) of the config file. In addition to input and output paths, further resource information must be provided in the section `resources`. This information is primarily specifying input required for the cell type classification and the genomic reference used for the cellranger mapping. An example config file ready for adaptation, as well as a brief description of the relevant config blocks, is provided in the directory `config`.
 
@@ -117,7 +118,7 @@ It is possible to run the scAmpi_clinical part independently of scAmpi_basic, fo
 gene_names  diff    padj      test_statistic  pct_nonzero
 ATP1A1      1.679   3.05e-15  14.506          81.42
 ```
-Here, "gene_names" contains the HGNC gene symbols, "diff" contains the fold change or a similar value, "padj" contains the adjusted p-value, and "pct_nonzero" contains the percentag of cells in this cluster with non-zero expression in the respective gene. 
+Here, "gene_names" contains the HGNC gene symbols, "diff" contains the fold change or a similar value, "padj" contains the adjusted p-value, and "pct_nonzero" contains the percentage of cells in this cluster with non-zero expression in the respective gene. 
 
 The input table should follow the following file name convention: `SAMPLEID.3.txt`, where SAMPLEID is the sample name specified in the sample map, 3 is the cell cluster ID, and `txt` is the suffix expected by the two initial steps of the clinical pipeline.
 
