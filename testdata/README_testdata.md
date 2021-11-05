@@ -2,7 +2,7 @@
 
 The following instructions provide a short guideline to download example data and execute the scAmpi basic scRNA-seq analysis workflow. 
 
-In the following, we refer to your test directory as `testdir` and to the directory of the scAmpi git repository as `path_git_scAmpi`. Note that the testdata are human PBMCs, so you need to have a version of the cellranger human reference data files available. (For download instructions from cellranger, refer to the [10xGenomics Webpage](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/installation)).
+In the following, we refer to your test directory as `testdir` and to the directory of the scAmpi git repository as `path_git_scAmpi`. Note that the testdata are human PBMCs (available for download from the 10xGenomics website with `wget https://cg.10xgenomics.com/samples/cell-exp/3.0.2/5k_pbmc_v3/5k_pbmc_v3_fastqs.tar`), so you need to have a version of the cellranger human reference data files available. (For download instructions from cellranger, refer to the [10xGenomics Webpage](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/installation)).
 In the following we assume that the reference files are located in `reference_dir`.
 
 #### (i) Activate environment and export cellranger path
