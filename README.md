@@ -113,15 +113,18 @@ Then type:
 
 #### Running scAmpi_clinical independently
 
-It is possible to run the scAmpi_clinical part independently of scAmpi_basic, following some restrictions to the file names and formatting. For this use case please use the master snake file `snake_scAmpi_clinical-only_master.snake`. Generally, as input scAmpi_clinical expects the results of a DE analysis on a cell cluster level, with five mandatory columns. The input files should be provided in the input directory specified in the config file ("input_fastqs"). If the column header names differ from the example below this can be specified in the relevant blocks of the config file.
+It is possible to run the scAmpi_clinical part independently of scAmpi_basic, following some restrictions to the file names and formatting. For this use case please use the master snake file `snake_scAmpi_clinical-only_master.snake`. Generally, as input scAmpi_clinical expects the results of a DE analysis on a cell cluster level, with five mandatory columns. The input files should be provided in the input directory specified in the config file ("input_fastqs").
 ```
 gene_names  diff    padj      test_statistic  pct_nonzero
 ATP1A1      1.679   3.05e-15  14.506          81.42
 ```
-Here, "gene_names" contains the HGNC gene symbols, "diff" contains the fold change or a similar value, "padj" contains the adjusted p-value, and "pct_nonzero" contains the percentage of cells in this cluster with non-zero expression in the respective gene. 
+Here, "gene_names" contains the HGNC gene symbols, "diff" contains the fold change or a similar value, "padj" contains the adjusted p-value, "test_statistic" contains the value of the test statistics, and "pct_nonzero" contains the percentage of cells in this cluster with non-zero expression in the respective gene.
 
-The input table should follow the following file name convention: `SAMPLEID.3.txt`, where SAMPLEID is the sample name specified in the sample map, 3 is the cell cluster ID, and `txt` is the suffix expected by the two initial steps of the clinical pipeline.
+With two versions of this input table the core steps of the clinical pipeline can be executed.
 
+Input for the in-silico drug prediction is the output of a DE analysis, formatted as described above and containing only those genes that are assumed to be differentially expressed. The file should follow the file name convention `SAMPLEID.3.txt`, where SAMPLEID is the sample name specified in the sample map, 3 is the cell cluster ID, and `txt` is the expected suffix.  
+
+Input for the gene set enrichment steps is the output of a DE analysis, formatted as described above and containing all tested genes. The file should follow the file name convention `SAMPLEID.3.DEgenes.tsv`, where SAMPLEID is the sample name specified in the sample map, 3 is the cell cluster ID, and `DEgenes.tsv` is the expected suffix.
 
 #### Adapting/Integrating rules in Snakemake
 Snakemake is a Python-based workflow management system for building and executing pipelines. A pipeline is made up of ["rules"](snake/scAmpi_basic_rules.py) that represent single steps of the analysis. In a [yaml config file](config/config_scAmpi.yaml) parameters and rule-specific input can be adjusted to a new analysis without changing the rules. In a ["master" snake file](snake/snake_scAmpi_basic_master.snake) the desired end points of the analysis are specified. With the input and the desired output defined, Snakemake is able infer all steps that have to be performed in-between.
