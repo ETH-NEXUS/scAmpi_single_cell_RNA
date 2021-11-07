@@ -76,13 +76,15 @@ rule all_avoidEmptyInput:
 localrules: clinical_scTranscriptomics
 rule clinical_scTranscriptomics:
 	input:
+		# in-silico drug prediction
 		expand(ANNOTATECLINICAL_OUT + '{sample}.{clusterid}.clinicalAnnotation.txt', sample = getSampleNames(), clusterid = CLUSTER_IDS),
 		expand(CIVIC_OUT + '{sample}.{clusterid}.clinicalAnnotation.civic.txt', sample = getSampleNames(), clusterid = CLUSTER_IDS),
 		expand(DRUGCOMBINATION + '{sample}.drugToCluster.allDrugs.vennplot.png', sample = getSampleNames()),
 		expand(DRUGCOMBINATION + '{sample}.drugToCluster.filteredDrugs.vennplot.png', sample = getSampleNames()),
+		expand(DRUGCOMBINATION + '{sample}.full_druglist_to_subclones.txt', sample = getSampleNames()),
+		# gene set enrichment analysis
 		expand(GENESETANALYSIS_OUT + '{sample}.{clusterid}.enrichedGeneSets.txt', sample = getSampleNames(), clusterid = CLUSTER_IDS),
 		expand(GENESETANALYSIS_OUT + '{sample}.heatmap_enrichment.png', sample = getSampleNames()),
-		expand(DRUGCOMBINATION + '{sample}.full_druglist_to_subclones.txt', sample = getSampleNames()),
 	output:
 		OUTDIR + 'complete_clinical.txt'
 	params:
