@@ -182,4 +182,3 @@ hm1 = pheatmap(rgsa, scale="none", clustering_method = "ward.D2",
                annotation_names_col = T, fontsize_row = 8)
 ggsave(path %&% ".gsetscore_hm.png", hm1$gtable,
        width = 30, height = 24, units = "cm", dpi = 600)
-
