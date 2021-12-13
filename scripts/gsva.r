@@ -6,7 +6,7 @@
 ################################################################################
 
 lby = c("optparse", "scran", "reshape2", "uwot", "GSVA", "aroma.light",
-        "ggplot2", "pheatmap","RColorBrewer", "limma", "viridis")
+        "ggplot2", "pheatmap","RColorBrewer", "limma", "viridis", "dplyr")
 resp = lapply(lby, require, character.only=T, warn.conflicts=F, quietly=T)
 if(!all(unlist(resp))) stop("Could not load one or more packages")
 rm(resp, lby)
@@ -83,13 +83,22 @@ t.m = assay(sce_data, "pearson_resid")[all.genes,]
 # estimate geneset-sample matrix from gene-sample matrix
 rgsa = gsva(t.m, gset, method="gsva")
 # plot
-t.plot = melt(rgsa)
-names(t.plot) = c("gene.set", "barcodes", "value")
-tomerge = reducedDim(sce_data, "umap_hvg")
-tomerge = as.data.frame(tomerge)
-tomerge$barcodes = rownames(tomerge)
-tomerge = merge(tomerge, as.data.frame(colData(sce_data)))
-t.plot = merge(t.plot, tomerge)
+gsva_results = melt(rgsa)
+names(gsva_results) = c("gene.set", "barcodes", "value")
+
+# get UMAP coordinates
+umap_coord = reducedDim(sce_data, "umap_hvg")
+umap_coord = as.data.frame(umap_coord)
+umap_coord$barcodes = rownames(umap_coord)
+
+# add UMAP coordinates to cell meta data
+tomerge = dplyr::left_join(umap_coord, as.data.frame(colData(sce_data)), by = "barcodes")
+stopifnot(tomerge$barcodes == as.data.frame(colData(sce_data))$barcodes)
+
+# merge gsva results with cell meta data
+# preserve order of cells in `gsva_results`
+t.plot = dplyr::left_join(gsva_results, tomerge, by = "barcodes")
+stopifnot(t.plot$barcodes == gsva_results$barcodes)
 print("str(t.plot):")
 print(str(t.plot))
 print("summary(t.plot):")
@@ -166,19 +175,42 @@ saveRDS(sce_gsva, path %&% ".sce_gsva.RDS")
 ## heatmaps of geneset-cell matrix, with phcl-annotation.
 annot.col = data.frame(Phenograph=factor(tomerge$phenograph_clusters),
                        Cell.type=tomerge$celltype_final)
+rownames(annot.col) = tomerge$barcodes
 # levels(annot.col$Phenograph) = levels(annot.col$Phenograph) %&% " (" %&% 
 #   clu.pu[-nrow(clu.pu)+c(0,1), ncol(clu.pu)-1] %&% ")"
-rownames(annot.col) = colnames(rgsa)
-ancol.col = cols33[seq(length(levels(annot.col$Phenograph)))]
-names(ancol.col) = levels(annot.col$Phenograph)
+# rownames(annot.col) = colnames(rgsa)
+stopifnot(rownames(annot.col) == colnames(rgsa))
+
+# have clusters sorted to colours
+all_clusters <- levels(annot.col$Phenograph)
+number_clusters <- length(all_clusters)
+ancol.col = cols33[seq(number_clusters)]
+names(ancol.col) = all_clusters
+
+# have cell types sorted to colours
 ctan.col = ct.color
 names(ctan.col) = levels(annot.col$Cell.type)
+
+# have colours for clusters and cell types together
 ancolor = list(Phenograph=ancol.col, Cell.type=ctan.col)
+
 col.pal = colorRampPalette( rev(brewer.pal(11, "RdBu")) )(255)
-rgsa = rgsa[ , order(annot.col$Phenograph)]
-hm1 = pheatmap(rgsa, scale="none", clustering_method = "ward.D2", 
-               show_colnames = F, color = col.pal, cluster_cols = F,
-               annotation_col = annot.col, annotation_colors = ancolor,
-               annotation_names_col = T, fontsize_row = 8)
+
+# have gsva results ordered by clusters
+rgsa_plotting = rgsa[ , order(annot.col$Phenograph)]
+
+# plot heatmap
+hm1 = pheatmap(rgsa_plotting,
+               scale="none",
+               clustering_method = "ward.D2",
+               show_colnames = F,
+               color = col.pal,
+               cluster_cols = F,
+               annotation_col = annot.col,
+               annotation_colors = ancolor,
+               annotation_names_col = T,
+               fontsize_row = 8)
+
 ggsave(path %&% ".gsetscore_hm.png", hm1$gtable,
        width = 30, height = 24, units = "cm", dpi = 600)
+
