@@ -1,26 +1,13 @@
 import os, glob, sys, datetime
 
+# Include Config file
+configfile: "config/config.yaml"
+
+
 # This function adapts the config object to include full path information
 include: "rules/misc_snake.smk"
 
-# input files and folders
-SAMPLEMAPPING = config['inputOutput']['sample_map']
-INPUTDIR = config['inputOutput']['input_fastqs']
-OUTDIR = config['inputOutput']['analysis_output_dir']
-TMPDIR = config['inputOutput']['analysis_temp_dir']
-
-# Check if the uses specified the proper input and output directories
-if not 'INPUTDIR' in globals():
-    print('You have to specify the root directory of the fastq files!')
-    sys.exit(1)
-if not 'OUTDIR' in globals():
-    print('You have to specify the root directory where the results will be generated!')
-    sys.exit(1)
-if not 'TMPDIR' in globals():
-    print('You have to specify the root directory where temporary files will be stored!')
-    sys.exit(1)
-
-
+config["inputOutput"]["sample_map"]
 # Include the rules
 include: "rules/scAmpi_basic_rules.smk"
 
