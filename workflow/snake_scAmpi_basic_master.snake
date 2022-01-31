@@ -1,7 +1,7 @@
 import os, glob, sys, datetime
 
 # This function adapts the config object to include full path information
-include: "misc_snake.py"
+include: "misc_snake.smk"
 
 # input files and folders
 SAMPLEMAPPING = config['inputOutput']['sample_map']
@@ -22,7 +22,7 @@ if not 'TMPDIR' in globals():
 
 
 # Include the rules
-include: "rules/scAmpi_basic_rules.py"
+include: "rules/scAmpi_basic_rules.smk"
 
 # This rule defines which files should be created
 localrules: scAmpi_basic
