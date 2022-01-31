@@ -74,7 +74,7 @@ PERCENTAGE_OUT = OUTDIR + 'clustering/'
 DRUGCOMBINATION = OUTDIR + 'drugCombination/'
 
 # Include the rules
-include: "scAmpi_basic_rules.py"
+include: "rules/scAmpi_basic_rules.py"
 
 # This rule defines which files should be created
 localrules: scAmpi_basic
