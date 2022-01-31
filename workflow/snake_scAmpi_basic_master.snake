@@ -1,7 +1,7 @@
 import os, glob, sys, datetime
 
 # This function adapts the config object to include full path information
-include: "misc_snake.smk"
+include: "rules/misc_snake.smk"
 
 # input files and folders
 SAMPLEMAPPING = config['inputOutput']['sample_map']
