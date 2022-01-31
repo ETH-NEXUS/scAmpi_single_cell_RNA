@@ -24,31 +24,31 @@ class Error(object):
     def __getitem__(self, value):
         return Error(key=self.__key, name=self.__name)
 
-class Config(object):
-    def __init__(self, kwargs, name='Config'):
-        self.__name = name
-        self.__members = {}
-        for (key, value) in kwargs.items():
-            if isinstance(value, dict):
-                self.__members[key] = Config(kwargs=value, name=key)
-            else:
-                self.__members[key] = value
-    
-    def __getitem__(self, key):
-        if key in self.__members:
-            return self.__members[key]
-        else:
-            if fail_instantly:
-                sys.exit(
-                    """
-                    ===============================================
-                    You have not specified '{}' for '{}'
-                    ===============================================
-                    """.format(key, self.__name))
-            else:
-                return Error(key=key, name=self.__name)
+#class Config(object):
+#    def __init__(self, kwargs, name='Config'):
+#        self.__name = name
+#        self.__members = {}
+#        for (key, value) in kwargs.items():
+#            if isinstance(value, dict):
+#                self.__members[key] = Config(kwargs=value, name=key)
+#            else:
+#                self.__members[key] = value
+#    
+#    def __getitem__(self, key):
+#        if key in self.__members:
+#            return self.__members[key]
+#        else:
+#            if fail_instantly:
+#                sys.exit(
+#                    """
+#                    ===============================================
+#                    You have not specified '{}' for '{}'
+#                    ===============================================
+#                    """.format(key, self.__name))
+#            else:
+#                return Error(key=key, name=self.__name)
 
-config = Config(config)
+#config = Config(config)
 
 def getSampleNames():
     output = [] #[samplename.replace(FASTQDIR,'').replace('/','')for samplename in glob.glob(FASTQDIR + '*/')]
