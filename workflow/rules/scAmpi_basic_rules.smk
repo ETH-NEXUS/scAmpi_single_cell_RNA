@@ -15,8 +15,8 @@ rule cellranger_count:
         web_summary = 'results/cellranger_run/{sample}.web_summary.html',
 	mySample = '{sample}' # needs to be the prefix of all fastq files that belong to this sample. NOTE: no dots are allowed in sample names!
     resources:
-        mem = config['tools']['cellranger_count']['mem'],
-        time = config['tools']['cellranger_count']['time']
+        mem_mb = config['tools']['cellranger_count']['mem'],
+        time_min = config['tools']['cellranger_count']['time']
     threads:
         config['tools']['cellranger_count']['threads']
     benchmark:
@@ -35,8 +35,8 @@ rule create_hdf5:
     output:
         outfile = 'results/rawCounts/{sample}.h5'
     resources:
-        mem = config['tools']['create_hd5']['mem'],
-        time = config['tools']['create_hd5']['time']
+        mem_mb = config['tools']['create_hd5']['mem'],
+        time_min = config['tools']['create_hd5']['time']
     threads:
         config['tools']['create_hd5']['threads']
     benchmark:
@@ -54,8 +54,8 @@ rule identify_doublets:
         sample = '{sample}',
         outdir = 'results/filteredCounts/',
     resources:
-        mem = config['tools']['identify_doublets']['mem'],
-        time = config['tools']['identify_doublets']['time']
+        mem_mb = config['tools']['identify_doublets']['mem'],
+        time_min = config['tools']['identify_doublets']['time']
     threads:
         config['tools']['identify_doublets']['threads']
     benchmark:
@@ -86,8 +86,8 @@ rule filter_genes_and_cells:
         genomeVersion = config['tools']['filter_genes_and_cells']['genomeVersion'],
         sample = '{sample}'
     resources:
-        mem = config['tools']['filter_genes_and_cells']['mem'],
-        time = config['tools']['filter_genes_and_cells']['time'],
+        mem_mb = config['tools']['filter_genes_and_cells']['mem'],
+        time_min = config['tools']['filter_genes_and_cells']['time'],
     threads:
         config['tools']['filter_genes_and_cells']['threads']
     benchmark:
@@ -121,8 +121,8 @@ rule sctransform_preprocessing:
         n_nn = config['tools']['sctransform_preprocessing']['n_nn'],
         outDir = 'results/counts_corrected/',
     resources:
-        mem = config['tools']['sctransform_preprocessing']['mem'],
-        time = config['tools']['sctransform_preprocessing']['time'],
+        mem_mb = config['tools']['sctransform_preprocessing']['mem'],
+        time_min = config['tools']['sctransform_preprocessing']['time'],
     threads:
         config['tools']['sctransform_preprocessing']['threads']
     benchmark:
@@ -144,8 +144,8 @@ rule phenograph:
         min_cluster_size = config['tools']['clustering']['phenograph']['min_cluster_size'],
         log_normalize = config['tools']['clustering']['phenograph']['log_normalize'],
     resources:
-        mem = config['tools']['clustering']['phenograph']['mem'],
-        time = config['tools']['clustering']['phenograph']['time']
+        mem_mb = config['tools']['clustering']['phenograph']['mem'],
+        time_min = config['tools']['clustering']['phenograph']['time']
     threads:
         config['tools']['clustering']['phenograph']['threads']
     benchmark:
@@ -175,8 +175,8 @@ rule prepare_celltyping:
         outputDirec = 'results/prep_celltyping/',
         sampleName = '{sample}',
     resources:
-        mem = config['tools']['prepare_celltyping']['mem'],
-        time = config['tools']['prepare_celltyping']['time'],
+        mem_mb = config['tools']['prepare_celltyping']['mem'],
+        time_min = config['tools']['prepare_celltyping']['time'],
     threads:
         config['tools']['prepare_celltyping']['threads']
     benchmark:
@@ -199,8 +199,8 @@ rule cell_type_classification:
         outputDirec = 'results/celltype_classification/',
         sampleName = '{sample}',
     resources:
-        mem = config['tools']['cell_type_classification']['mem'],
-        time = config['tools']['cell_type_classification']['time'],
+        mem_mb = config['tools']['cell_type_classification']['mem'],
+        time_min = config['tools']['cell_type_classification']['time'],
     threads:
         config['tools']['cell_type_classification']['threads']
     benchmark:
@@ -231,8 +231,8 @@ rule remove_atypical:
         min_threshold = config['tools']['remove_atypical']['min_threshold'],
         threshold_type = config['tools']['remove_atypical']['threshold_type'],
     resources:
-        mem = config['tools']['remove_atypical']['mem'],
-        time = config['tools']['remove_atypical']['time']
+        mem_mb = config['tools']['remove_atypical']['mem'],
+        time_min = config['tools']['remove_atypical']['time']
     threads:
         config['tools']['remove_atypical']['threads']
     benchmark:
@@ -252,8 +252,8 @@ rule gsva:
         sampleName = '{sample}',
         genesets = config['resources']['genesets'],
     resources:
-        mem = config['tools']['gsva']['mem'],
-        time = config['tools']['gsva']['time'],
+        mem_mb = config['tools']['gsva']['mem'],
+        time_min = config['tools']['gsva']['time'],
     threads:
         config['tools']['gsva']['threads']
     benchmark:
@@ -275,8 +275,8 @@ rule plotting:
         colour_config = config['resources']['colour_config'],
         use_alias = config['tools']['plotting']['use_alias']
     resources:
-        mem = config['tools']['plotting']['mem'],
-        time = config['tools']['plotting']['time'],
+        mem_mb = config['tools']['plotting']['mem'],
+        time_min = config['tools']['plotting']['time'],
     threads:
         config['tools']['plotting']['threads']
     benchmark:
@@ -299,8 +299,8 @@ rule assemble_nonmalignant_cohort:
         outDir = 'results/non_malignant_reference/',
         non_malignant_types = config['tools']['assemble_non_malignant_reference']['non_malignant_types'],
     resources:
-        mem = config['tools']['assemble_non_malignant_reference']['mem'],
-        time = config['tools']['assemble_non_malignant_reference']['time']
+        mem_mb = config['tools']['assemble_non_malignant_reference']['mem'],
+        time_min = config['tools']['assemble_non_malignant_reference']['time']
     threads:
         config['tools']['assemble_non_malignant_reference']['threads']
     benchmark:
@@ -316,8 +316,8 @@ rule plot_tSNEs_nonmalignant_cohort:
         outfile_batch = 'results/non_malignant_reference/nonmalignant_reference_cohort.tSNE_batch.png',
 	outfile_ct = 'results/non_malignant_reference/nonmalignant_reference_cohort.tSNE_celltype.png'
     resources:
-        mem = config['tools']['plot_tSNE_nonmalignant']['mem'],
-        time = config['tools']['plot_tSNE_nonmalignant']['time']
+        mem_mb = config['tools']['plot_tSNE_nonmalignant']['mem'],
+        time_min = config['tools']['plot_tSNE_nonmalignant']['time']
     threads:
         config['tools']['plot_tSNE_nonmalignant']['threads']
     benchmark:
@@ -344,8 +344,8 @@ rule diff_exp_genes:
         minNumberNonMalignant = config['tools']['diff_exp']['minNumberNonMalignant'],
         outpath = 'results/diff_exp/'
     resources:
-        mem = config['tools']['diff_exp']['mem'],
-        time = config['tools']['diff_exp']['time'],
+        mem_mb = config['tools']['diff_exp']['mem'],
+        time_min = config['tools']['diff_exp']['time'],
     threads:
         config['tools']['diff_exp']['threads']
     benchmark:
@@ -377,8 +377,8 @@ rule gene_exp:
         type_sample = config['tools']['gene_exp']['type_sample'],
         priority_genes = config['resources']['priority_genes'],
     resources:
-        mem = config['tools']['gene_exp']['mem'],
-        time = config['tools']['gene_exp']['time'],
+        mem_mb = config['tools']['gene_exp']['mem'],
+        time_min = config['tools']['gene_exp']['time'],
     threads:
         config['tools']['gene_exp']['threads']
     benchmark:
@@ -394,8 +394,8 @@ rule generate_qc_plots :
     output:
         out = '{sample}.h5.histogram_library_sizes.png'
     resources:
-        mem = config['tools']['generate_qc_plots']['mem'],
-        time = config['tools']['generate_qc_plots']['time'],
+        mem_mb = config['tools']['generate_qc_plots']['mem'],
+        time_min = config['tools']['generate_qc_plots']['time'],
     threads:
         config['tools']['generate_qc_plots']['threads']
     benchmark:
@@ -416,8 +416,8 @@ rule generate_cell_type_boxplot:
         sampleName_short = config['tools']['cellranger_count']['cellranger_sampleName'],
         outDir = 'results/plotting/',
     resources:
-        mem = config['tools']['generate_cell_type_boxplot']['mem'],
-        time = config['tools']['generate_cell_type_boxplot']['time'],
+        mem_mb = config['tools']['generate_cell_type_boxplot']['mem'],
+        time_min = config['tools']['generate_cell_type_boxplot']['time'],
     threads:
         config['tools']['generate_cell_type_boxplot']['threads']
     benchmark:
@@ -440,8 +440,8 @@ rule sample_integration:
         sampleName_short = config['tools']['cellranger_count']['cellranger_sampleName'],
 	colour_config = config['resources']['colour_config']
     resources:
-        mem = config['tools']['sample_integration']['mem'],
-        time = config['tools']['sample_integration']['time'],
+        mem_mb = config['tools']['sample_integration']['mem'],
+        time_min = config['tools']['sample_integration']['time'],
     threads:
         config['tools']['sample_integration']['threads']
     benchmark:
@@ -461,8 +461,8 @@ rule cellPercentInCluster:
     params:
         variousParams = config['tools']['cellPercentInCluster']['variousParams']
     resources:
-        mem = config['tools']['cellPercentInCluster']['mem'],
-        time = config['tools']['cellPercentInCluster']['time'],
+        mem_mb = config['tools']['cellPercentInCluster']['mem'],
+        time_min = config['tools']['cellPercentInCluster']['time'],
     threads:
         config['tools']['cellPercentInCluster']['threads']
     benchmark:
