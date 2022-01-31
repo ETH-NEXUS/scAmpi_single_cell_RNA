@@ -10,15 +10,13 @@ rule cellranger_count:
     params:
         cr_out = 'results/cellranger_run/',
         local_cores = config['tools']['cellranger_count']['local_cores'],
-        lsfoutfile = 'results/cellranger_run/{sample}.cellranger_count.lsfout.log',
-        lsferrfile = 'results/cellranger_run/{sample}.cellranger_count.lsferr.log',
-        scratch = config['tools']['cellranger_count']['scratch'],
-        mem = config['tools']['cellranger_count']['mem'],
-        time = config['tools']['cellranger_count']['time'],
         variousParams = config['tools']['cellranger_count']['variousParams'],
         metrics_summary = 'results/cellranger_run/{sample}.metrics_summary.csv',
         web_summary = 'results/cellranger_run/{sample}.web_summary.html',
 	mySample = '{sample}' # needs to be the prefix of all fastq files that belong to this sample. NOTE: no dots are allowed in sample names!
+    resources:
+        mem = config['tools']['cellranger_count']['mem'],
+        time = config['tools']['cellranger_count']['time']
     threads:
         config['tools']['cellranger_count']['threads']
     benchmark:
@@ -36,10 +34,7 @@ rule create_hdf5:
         barcodes_file = 'results/cellranger_run/{sample}.barcodes.tsv'
     output:
         outfile = 'results/rawCounts/{sample}.h5'
-    params:
-        lsfoutfile = 'results/rawCounts/{sample}.create_hd5.lsfout.log',
-        lsferrfile = 'results/rawCounts/{sample}.create_hd5.lsferr.log',
-        scratch = config['tools']['create_hd5']['scratch'],
+    resources:
         mem = config['tools']['create_hd5']['mem'],
         time = config['tools']['create_hd5']['time']
     threads:
@@ -58,9 +53,7 @@ rule identify_doublets:
     params:
         sample = '{sample}',
         outdir = 'results/filteredCounts/',
-        lsfoutfile = 'results/filteredCounts/{sample}.identify_doublets.lsfout.log',
-        lsferrfile = 'results/filteredCounts/{sample}.identify_doublets.lsferr.log',
-        scratch = config['tools']['identify_doublets']['scratch'],
+    resources:
         mem = config['tools']['identify_doublets']['mem'],
         time = config['tools']['identify_doublets']['time']
     threads:
@@ -90,13 +83,11 @@ rule filter_genes_and_cells:
         threshold_NODG = config['tools']['filter_genes_and_cells']['threshold_NODG'],
         remove_doublets = config['tools']['filter_genes_and_cells']['remove_doublets'],
         outDir = 'results/filteredCounts/',
-        lsfoutfile = 'results/filteredCounts/{sample}.filter_genes_and_cells.lsfout.log',
-        lsferrfile = 'results/filteredCounts/{sample}.filter_genes_and_cells.lsferr.log',
-        scratch = config['tools']['filter_genes_and_cells']['scratch'],
-        mem = config['tools']['filter_genes_and_cells']['mem'],
-        time = config['tools']['filter_genes_and_cells']['time'],
         genomeVersion = config['tools']['filter_genes_and_cells']['genomeVersion'],
         sample = '{sample}'
+    resources:
+        mem = config['tools']['filter_genes_and_cells']['mem'],
+        time = config['tools']['filter_genes_and_cells']['time'],
     threads:
         config['tools']['filter_genes_and_cells']['threads']
     benchmark:
@@ -124,16 +115,14 @@ rule sctransform_preprocessing:
         outfile = 'results/counts_corrected/{sample}.corrected.RDS',
         highly_variable = 'results/counts_corrected/{sample}.corrected.variable_genes.h5',
     params:
-        lsfoutfile = 'results/counts_corrected/{sample}.corrected.lsfout.log',
-        lsferrfile = 'results/counts_corrected/{sample}.corrected.lsferr.log',
-        scratch = config['tools']['sctransform_preprocessing']['scratch'],
-        mem = config['tools']['sctransform_preprocessing']['mem'],
-        time = config['tools']['sctransform_preprocessing']['time'],
         sample = '{sample}',
         number_genes = config['tools']['sctransform_preprocessing']['number_genes'],
         min_var = config['tools']['sctransform_preprocessing']['min_var'],
         n_nn = config['tools']['sctransform_preprocessing']['n_nn'],
         outDir = 'results/counts_corrected/',
+    resources:
+        mem = config['tools']['sctransform_preprocessing']['mem'],
+        time = config['tools']['sctransform_preprocessing']['time'],
     threads:
         config['tools']['sctransform_preprocessing']['threads']
     benchmark:
@@ -154,9 +143,7 @@ rule phenograph:
         n_neighbours = config['tools']['clustering']['phenograph']['n_neighbours'],
         min_cluster_size = config['tools']['clustering']['phenograph']['min_cluster_size'],
         log_normalize = config['tools']['clustering']['phenograph']['log_normalize'],
-        lsfoutfile = 'results/clustering/{sample}.phenograph.lsfout.log',
-        lsferrfile = 'results/clustering/{sample}.phenograph.lsferr.log',
-        scratch = config['tools']['clustering']['phenograph']['scratch'],
+    resources:
         mem = config['tools']['clustering']['phenograph']['mem'],
         time = config['tools']['clustering']['phenograph']['time']
     threads:
@@ -185,13 +172,11 @@ rule prepare_celltyping:
     output:
         outfile = 'results/prep_celltyping/{sample}.RDS'
     params:
-        lsfoutfile = 'results/prep_celltyping/{sample}.prepare_celltyping.lsfout.log',
-        lsferrfile = 'results/prep_celltyping/{sample}.prepare_celltyping.lsferr.log',
-        scratch = config['tools']['prepare_celltyping']['scratch'],
-        mem = config['tools']['prepare_celltyping']['mem'],
-        time = config['tools']['prepare_celltyping']['time'],
         outputDirec = 'results/prep_celltyping/',
         sampleName = '{sample}',
+    resources:
+        mem = config['tools']['prepare_celltyping']['mem'],
+        time = config['tools']['prepare_celltyping']['time'],
     threads:
         config['tools']['prepare_celltyping']['threads']
     benchmark:
@@ -208,16 +193,14 @@ rule cell_type_classification:
         outfile = 'results/celltype_classification/{sample}.phenograph_celltype_association.txt',
         out_sce = 'results/celltype_classification/{sample}.RDS'
     params:
-        lsfoutfile = 'results/celltype_classification/{sample}.cell_type_classification.lsfout.log',
-        lsferrfile = 'results/celltype_classification/{sample}.cell_type_classification.lsferr.log',
-        scratch = config['tools']['cell_type_classification']['scratch'],
-        mem = config['tools']['cell_type_classification']['mem'],
-        time = config['tools']['cell_type_classification']['time'],
         min_genes = config['tools']['cell_type_classification']['min_genes'],
         celltype_lists = config['resources']['celltype_lists'],
         celltype_config = config['resources']['celltype_config'],
         outputDirec = 'results/celltype_classification/',
         sampleName = '{sample}',
+    resources:
+        mem = config['tools']['cell_type_classification']['mem'],
+        time = config['tools']['cell_type_classification']['time'],
     threads:
         config['tools']['cell_type_classification']['threads']
     benchmark:
@@ -241,17 +224,15 @@ rule remove_atypical:
         out_sce = 'results/atypical_removed/{sample}.atypical_removed.RDS',
         out_table = 'results/atypical_removed/{sample}.atypical_removed.phenograph_celltype_association.txt'
     params:
-        lsfoutfile = 'results/atypical_removed/{sample}.atypical_removed.lsfout.log',
-        lsferrfile = 'results/atypical_removed/{sample}.atypical_removed.lsferr.log',
-        scratch = config['tools']['remove_atypical']['scratch'],
-        mem = config['tools']['remove_atypical']['mem'],
-        time = config['tools']['remove_atypical']['time'],
         celltype_config = config['resources']['celltype_config'],
         outputDirec = 'results/atypical_removed/',
         sample_name = '{sample}',
         threshold_filter = config['tools']['remove_atypical']['threshold_filter'],
         min_threshold = config['tools']['remove_atypical']['min_threshold'],
         threshold_type = config['tools']['remove_atypical']['threshold_type'],
+    resources:
+        mem = config['tools']['remove_atypical']['mem'],
+        time = config['tools']['remove_atypical']['time']
     threads:
         config['tools']['remove_atypical']['threads']
     benchmark:
@@ -267,14 +248,12 @@ rule gsva:
     output:
         outfile = 'results/gsva/{sample}.gsetscore_hm.png',
     params:
-        lsfoutfile = 'results/gsva/{sample}.gsva.lsfout.log',
-        lsferrfile = 'results/gsva/{sample}.gsva.lsferr.log',
-        scratch = config['tools']['gsva']['scratch'],
-        mem = config['tools']['gsva']['mem'],
-        time = config['tools']['gsva']['time'],
         outputDirec = 'results/gsva/',
         sampleName = '{sample}',
         genesets = config['resources']['genesets'],
+    resources:
+        mem = config['tools']['gsva']['mem'],
+        time = config['tools']['gsva']['time'],
     threads:
         config['tools']['gsva']['threads']
     benchmark:
@@ -290,16 +269,14 @@ rule plotting:
     output:
         outfile = 'results/plotting/{sample}.celltype_barplot.png',
     params:
-        lsfoutfile = 'results/plotting/{sample}.plotting.lsfout.log',
-        lsferrfile = 'results/plotting/{sample}.plotting.lsferr.log',
-        scratch = config['tools']['plotting']['scratch'],
-        mem = config['tools']['plotting']['mem'],
-        time = config['tools']['plotting']['time'],
         outputDirec = 'results/plotting/',
         sampleName = '{sample}',
         genes_of_interest = config['resources']['priority_genes'],
         colour_config = config['resources']['colour_config'],
         use_alias = config['tools']['plotting']['use_alias']
+    resources:
+        mem = config['tools']['plotting']['mem'],
+        time = config['tools']['plotting']['time'],
     threads:
         config['tools']['plotting']['threads']
     benchmark:
@@ -321,9 +298,7 @@ rule assemble_nonmalignant_cohort:
     params:
         outDir = 'results/non_malignant_reference/',
         non_malignant_types = config['tools']['assemble_non_malignant_reference']['non_malignant_types'],
-        lsfoutfile = 'results/non_malignant_reference/nonmalignant_reference_cohort.lsfout.log',
-        lsferrfile = 'results/non_malignant_reference/nonmalignant_reference_cohort.lsferr.log',
-        scratch = config['tools']['assemble_non_malignant_reference']['scratch'],
+    resources:
         mem = config['tools']['assemble_non_malignant_reference']['mem'],
         time = config['tools']['assemble_non_malignant_reference']['time']
     threads:
@@ -340,10 +315,7 @@ rule plot_tSNEs_nonmalignant_cohort:
     output:
         outfile_batch = 'results/non_malignant_reference/nonmalignant_reference_cohort.tSNE_batch.png',
 	outfile_ct = 'results/non_malignant_reference/nonmalignant_reference_cohort.tSNE_celltype.png'
-    params:
-        lsfoutfile = 'results/non_malignant_reference/plot_tSNEs_nonmalignant.lsfout.log',
-        lsferrfile = 'results/non_malignant_reference/plot_tSNEs_nonmalignant.lsferr.log',
-        scratch = config['tools']['plot_tSNE_nonmalignant']['scratch'],
+    resources:
         mem = config['tools']['plot_tSNE_nonmalignant']['mem'],
         time = config['tools']['plot_tSNE_nonmalignant']['time']
     threads:
@@ -370,12 +342,10 @@ rule diff_exp_genes:
         fc_cut = config['tools']['diff_exp']['fc_cut'],
         mindiff2second = config['tools']['diff_exp']['mindiff2second'],
         minNumberNonMalignant = config['tools']['diff_exp']['minNumberNonMalignant'],
-        lsfoutfile = 'results/diff_exp/{sample}.diff_exp.lsfout.log',
-        lsferrfile = 'results/diff_exp/{sample}.diff_exp.lsferr.log',
-        scratch = config['tools']['diff_exp']['scratch'],
+        outpath = 'results/diff_exp/'
+    resources:
         mem = config['tools']['diff_exp']['mem'],
         time = config['tools']['diff_exp']['time'],
-        outpath = 'results/diff_exp/',
     threads:
         config['tools']['diff_exp']['threads']
     benchmark:
@@ -402,15 +372,13 @@ rule gene_exp:
         out = 'results/gene_exp/{sample}.gene_expression_per_cluster.tsv'
     params:
         sampleName = '{sample}',
-        lsfoutfile = 'results/gene_exp/{sample}.gene_exp.lsfout.log',
-        lsferrfile = 'results/gene_exp/{sample}.gene_exp.lsferr.log',
-        scratch = config['tools']['gene_exp']['scratch'],
-        mem = config['tools']['gene_exp']['mem'],
-        time = config['tools']['gene_exp']['time'],
         outpath = 'results/gene_exp/',
         threshold_sample = config['tools']['gene_exp']['threshold_sample'],
         type_sample = config['tools']['gene_exp']['type_sample'],
         priority_genes = config['resources']['priority_genes'],
+    resources:
+        mem = config['tools']['gene_exp']['mem'],
+        time = config['tools']['gene_exp']['time'],
     threads:
         config['tools']['gene_exp']['threads']
     benchmark:
@@ -425,10 +393,7 @@ rule generate_qc_plots :
         infile = '{sample}.h5'
     output:
         out = '{sample}.h5.histogram_library_sizes.png'
-    params:
-        lsfoutfile = '{sample}.generate_qc_plots.lsfout.log',
-        lsferrfile = '{sample}.generate_qc_plots.lsferr.log',
-        scratch = config['tools']['generate_qc_plots']['scratch'],
+    resources:
         mem = config['tools']['generate_qc_plots']['mem'],
         time = config['tools']['generate_qc_plots']['time'],
     threads:
@@ -450,9 +415,7 @@ rule generate_cell_type_boxplot:
         sampleName = '{sample}',
         sampleName_short = config['tools']['cellranger_count']['cellranger_sampleName'],
         outDir = 'results/plotting/',
-        lsfoutfile = 'results/plotting/{sample}.boxplot_cell_types_cohort.lsfout.log',
-        lsferrfile = 'results/plotting/{sample}.boxplot_cell_types_cohort.lsferr.log',
-        scratch = config['tools']['generate_cell_type_boxplot']['scratch'],
+    resources:
         mem = config['tools']['generate_cell_type_boxplot']['mem'],
         time = config['tools']['generate_cell_type_boxplot']['time'],
     threads:
@@ -474,13 +437,11 @@ rule sample_integration:
     params:
         sampleName = '{sample}',
         outDir = 'results/plotting/',
-        lsfoutfile = 'results/plotting/{sample}.sample_integration.lsfout.log',
-        lsferrfile = 'results/plotting/{sample}.sample_integration.lsferr.log',
-        scratch = config['tools']['sample_integration']['scratch'],
-        mem = config['tools']['sample_integration']['mem'],
-        time = config['tools']['sample_integration']['time'],
         sampleName_short = config['tools']['cellranger_count']['cellranger_sampleName'],
 	colour_config = config['resources']['colour_config']
+    resources:
+        mem = config['tools']['sample_integration']['mem'],
+        time = config['tools']['sample_integration']['time'],
     threads:
         config['tools']['sample_integration']['threads']
     benchmark:
@@ -498,12 +459,10 @@ rule cellPercentInCluster:
 #    print(drugID)
         out = 'results/clusterpercent/{sample}.clusters_cell_count_percent.txt'
     params:
-        lsfoutfile = 'results/clusterpercent/{sample}.clusterPercent.lsfout.log',
-        lsferrfile =  'results/clusterpercent/{sample}.clusterPercent.lsferr.log',
-        scratch = config['tools']['cellPercentInCluster']['scratch'],
+        variousParams = config['tools']['cellPercentInCluster']['variousParams']
+    resources:
         mem = config['tools']['cellPercentInCluster']['mem'],
         time = config['tools']['cellPercentInCluster']['time'],
-        variousParams = config['tools']['cellPercentInCluster']['variousParams']
     threads:
         config['tools']['cellPercentInCluster']['threads']
     benchmark:
