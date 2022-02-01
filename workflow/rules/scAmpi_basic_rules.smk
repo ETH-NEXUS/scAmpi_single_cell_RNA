@@ -15,10 +15,10 @@ rule cellranger_count:
         web_summary = 'results/cellranger_run/{sample}.web_summary.html',
 	mySample = '{sample}' # needs to be the prefix of all fastq files that belong to this sample. NOTE: no dots are allowed in sample names!
     resources:
-        mem_mb = config['tools']['cellranger_count']['mem'],
-        time_min = config['tools']['cellranger_count']['time']
+        mem_mb = config['computingResources']['highRequirements']['mem'],
+        time_min = config['computingResources']['highRequirements']['time']
     threads:
-        config['tools']['cellranger_count']['threads']
+        config['computingResources']['highRequirements']['threads']
     benchmark:
         'results/cellranger_run/{sample}.cellranger_count.benchmark'
     # NOTE: cellranger count function cannot specify the output directory, the output it the path you call it from.
@@ -35,14 +35,14 @@ rule create_hdf5:
     output:
         outfile = 'results/rawCounts/{sample}.h5'
     resources:
-        mem_mb = config['tools']['create_hd5']['mem'],
-        time_min = config['tools']['create_hd5']['time']
+        mem_mb = config['computingResources']['mediumRequirements']['mem'],
+        time_min = config['computingResources']['mediumRequirements']['time']
     threads:
-        config['tools']['create_hd5']['threads']
+        config['computingResources']['mediumRequirements']['threads']
     benchmark:
         'results/rawCounts/{sample}.create_hd5.benchmark'
     shell:
-        '{config[tools][create_hd5][call]} -g {input.genes_file} -m {input.matrix_file} -b {input.barcodes_file} -o {output.outfile}'
+        'python ../scripts/create_hdf5.py -g {input.genes_file} -m {input.matrix_file} -b {input.barcodes_file} -o {output.outfile}'
 
 # identify doublets with scDblFinder
 rule identify_doublets:
@@ -54,14 +54,14 @@ rule identify_doublets:
         sample = '{sample}',
         outdir = 'results/filteredCounts/',
     resources:
-        mem_mb = config['tools']['identify_doublets']['mem'],
-        time_min = config['tools']['identify_doublets']['time']
+        mem_mb = config['computingResources']['mediumRequirements']['mem'],
+        time_min = config['computingResources']['mediumRequirements']['time']
     threads:
-        config['tools']['identify_doublets']['threads']
+        config['computingResources']['mediumRequirements']['threads']
     benchmark:
         'results/filteredCounts/{sample}.identify_doublets.benchmark'
     shell:
-        "{config[tools][identify_doublets][call]} " +
+        "Rscript ../scripts/identify_doublets.R " +
         "--hdf5File {input.infile} " +
         "--sample {params.sample} " +
         "--outdir {params.outdir}"
@@ -86,14 +86,14 @@ rule filter_genes_and_cells:
         genomeVersion = config['tools']['filter_genes_and_cells']['genomeVersion'],
         sample = '{sample}'
     resources:
-        mem_mb = config['tools']['filter_genes_and_cells']['mem'],
-        time_min = config['tools']['filter_genes_and_cells']['time'],
+        mem_mb = config['computingResources']['mediumRequirements']['mem'],
+        time_min = config['computingResources']['mediumRequirements']['time'],
     threads:
-        config['tools']['filter_genes_and_cells']['threads']
+        config['computingResources']['mediumRequirements']['threads']
     benchmark:
         'results/filteredCounts/{sample}.filter_genes_and_cells.benchmark'
     shell:
-            '{config[tools][filter_genes_and_cells][call]} ' +
+            'Rscript ../scripts/filter_genes_and_cells.R ' +
             '--hdf5File {input.infile} ' +
             '--nmads_NODG {params.nmads_NODG} ' +
             '--nmads_fractionMT {params.nmads_fractionMT} ' +
@@ -121,14 +121,14 @@ rule sctransform_preprocessing:
         n_nn = config['tools']['sctransform_preprocessing']['n_nn'],
         outDir = 'results/counts_corrected/',
     resources:
-        mem_mb = config['tools']['sctransform_preprocessing']['mem'],
-        time_min = config['tools']['sctransform_preprocessing']['time'],
+        mem_mb = config['computingResources']['mediumRequirements']['mem'],
+        time_min = config['computingResources']['mediumRequirements']['time'],
     threads:
-        config['tools']['sctransform_preprocessing']['threads']
+        config['computingResources']['mediumRequirements']['threads']
     benchmark:
         'results/counts_corrected/{sample}.corrected.benchmark'
     shell:
-        "{config[tools][sctransform_preprocessing][call]} --inHDF5 {input.hdf5_file} --sample {params.sample} --number_genes {params.number_genes} --min_var {params.min_var} --n_nn {params.n_nn} --outdir {params.outDir} "
+        "Rscript ../scripts/sctransform_preprocessing.R --inHDF5 {input.hdf5_file} --sample {params.sample} --number_genes {params.number_genes} --min_var {params.min_var} --n_nn {params.n_nn} --outdir {params.outDir} "
 
 
 # perform clustering with phenograph
@@ -144,14 +144,14 @@ rule phenograph:
         min_cluster_size = config['tools']['clustering']['phenograph']['min_cluster_size'],
         log_normalize = config['tools']['clustering']['phenograph']['log_normalize'],
     resources:
-        mem_mb = config['tools']['clustering']['phenograph']['mem'],
-        time_min = config['tools']['clustering']['phenograph']['time']
+        mem_mb = config['computingResources']['mediumRequirements']['mem'],
+        time_min = config['computingResources']['mediumRequirements']['time']
     threads:
-        config['tools']['clustering']['phenograph']['threads']
+        config['computingResources']['mediumRequirements']['threads']
     benchmark:
         'results/clustering/{sample}.phenograph.benchmark'
     shell:
-        '{config[tools][clustering][phenograph][call]} ' +
+        'python ../scripts/apply_phenograph.py ' +
         '--input_file {input.infile} ' +
         '--output_file {output.outfile} ' +
         '--distance_matrix {output.distance_matrix} ' +
@@ -175,14 +175,14 @@ rule prepare_celltyping:
         outputDirec = 'results/prep_celltyping/',
         sampleName = '{sample}',
     resources:
-        mem_mb = config['tools']['prepare_celltyping']['mem'],
-        time_min = config['tools']['prepare_celltyping']['time'],
+        mem_mb = config['computingResources']['mediumRequirements']['mem'],
+        time_min = config['computingResources']['mediumRequirements']['time'],
     threads:
-        config['tools']['prepare_celltyping']['threads']
+        config['computingResources']['mediumRequirements']['threads']
     benchmark:
         'results/prep_celltyping/{sample}.prepare_celltyping.benchmark'
     shell:
-        "{config[tools][prepare_celltyping][call]} --in_sce {input.RDS_file} --phenograph_cluster {input.cluster} --outputDirec {params.outputDirec} --sampleName {params.sampleName} --distanceMatrix {input.distanceMatrix} --modularity_score {input.modularity_score} "
+        "Rscript ../scripts/prepare_celltyping.R --in_sce {input.RDS_file} --phenograph_cluster {input.cluster} --outputDirec {params.outputDirec} --sampleName {params.sampleName} --distanceMatrix {input.distanceMatrix} --modularity_score {input.modularity_score} "
 
 
 # perform cell type classification
@@ -199,14 +199,14 @@ rule cell_type_classification:
         outputDirec = 'results/celltype_classification/',
         sampleName = '{sample}',
     resources:
-        mem_mb = config['tools']['cell_type_classification']['mem'],
-        time_min = config['tools']['cell_type_classification']['time'],
+        mem_mb = config['computingResources']['mediumRequirements']['mem'],
+        time_min = config['computingResources']['mediumRequirements']['time'],
     threads:
-        config['tools']['cell_type_classification']['threads']
+        config['computingResources']['mediumRequirements']['threads']
     benchmark:
         'results/celltype_classification/{sample}.cell_type_classification.benchmark'
     shell:
-        '{config[tools][cell_type_classification][call]} ' +
+        'Rscript ../scripts/celltyping.r ' +
         '--SCE {input.infile} ' +
         '--celltype_lists {params.celltype_lists} ' +
         '--celltype_config {params.celltype_config} ' +
@@ -231,14 +231,14 @@ rule remove_atypical:
         min_threshold = config['tools']['remove_atypical']['min_threshold'],
         threshold_type = config['tools']['remove_atypical']['threshold_type'],
     resources:
-        mem_mb = config['tools']['remove_atypical']['mem'],
-        time_min = config['tools']['remove_atypical']['time']
+        mem_mb = config['computingResources']['mediumRequirements']['mem'],
+        time_min = config['computingResources']['mediumRequirements']['time']
     threads:
-        config['tools']['remove_atypical']['threads']
+        config['computingResources']['mediumRequirements']['threads']
     benchmark:
         'results/atypical_removed/{sample}.atypical_removed.benchmark'
     shell:
-        "{config[tools][remove_atypical][call]} --sce_in {input.infile} --cluster_table {input.cluster_table} --celltype_config {params.celltype_config} --threshold_filter {params.threshold_filter} --min_threshold {params.min_threshold} --threshold_type {params.threshold_type} --outDir {params.outputDirec} --sample_name {params.sample_name} "
+        "Rscripts ../scripts/filter_out_atypical_cells.R --sce_in {input.infile} --cluster_table {input.cluster_table} --celltype_config {params.celltype_config} --threshold_filter {params.threshold_filter} --min_threshold {params.min_threshold} --threshold_type {params.threshold_type} --outDir {params.outputDirec} --sample_name {params.sample_name} "
 
 
 # perform gsva gene set analysis
@@ -252,14 +252,14 @@ rule gsva:
         sampleName = '{sample}',
         genesets = config['resources']['genesets'],
     resources:
-        mem_mb = config['tools']['gsva']['mem'],
-        time_min = config['tools']['gsva']['time'],
+        mem_mb = config['computingResources']['mediumRequirements']['mem'],
+        time_min = config['computingResources']['mediumRequirements']['time'],
     threads:
-        config['tools']['gsva']['threads']
+        config['computingResources']['mediumRequirements']['threads']
     benchmark:
         'results/gsva/{sample}.gsva.benchmark'
     shell:
-        "{config[tools][gsva][call]} --SCE {input.infile} --geneset {params.genesets} --outputDirec {params.outputDirec} --sampleName {params.sampleName} "
+        "Rscript ../scripts/gsva.r --SCE {input.infile} --geneset {params.genesets} --outputDirec {params.outputDirec} --sampleName {params.sampleName} "
 
 
 # generate plots about sample composition and gene expression
@@ -275,14 +275,14 @@ rule plotting:
         colour_config = config['resources']['colour_config'],
         use_alias = config['tools']['plotting']['use_alias']
     resources:
-        mem_mb = config['tools']['plotting']['mem'],
-        time_min = config['tools']['plotting']['time'],
+        mem_mb = config['computingResources']['mediumRequirements']['mem'],
+        time_min = config['computingResources']['mediumRequirements']['time'],
     threads:
-        config['tools']['plotting']['threads']
+        config['computingResources']['mediumRequirements']['threads']
     benchmark:
         'results/plotting/{sample}.plotting.benchmark'
     shell:
-        "{config[tools][plotting][call]} --sce_in {input.infile} --genelist {params.genes_of_interest} --outDir {params.outputDirec} --sampleName {params.sampleName} --colour_config {params.colour_config} --toggle_label {params.use_alias}"
+        "Rscript ../scripts/scRNA_pipeline_plotting.R  --sce_in {input.infile} --genelist {params.genes_of_interest} --outDir {params.outputDirec} --sampleName {params.sampleName} --colour_config {params.colour_config} --toggle_label {params.use_alias}"
 
 
 # adapt this directory in master snake file to prevent recomputing the cohort in each analysis
@@ -299,10 +299,10 @@ rule assemble_nonmalignant_cohort:
         outDir = 'results/non_malignant_reference/',
         non_malignant_types = config['tools']['assemble_non_malignant_reference']['non_malignant_types'],
     resources:
-        mem_mb = config['tools']['assemble_non_malignant_reference']['mem'],
-        time_min = config['tools']['assemble_non_malignant_reference']['time']
+        mem_mb = config['computingResources']['mediumRequirements']['mem'],
+        time_min = config['computingResources']['mediumRequirements']['time']
     threads:
-        config['tools']['assemble_non_malignant_reference']['threads']
+        config['computingResources']['mediumRequirements']['threads']
     benchmark:
         'results/non_malignant_reference/nonmalignant_reference_cohort.benchmark'
     shell:
@@ -316,10 +316,10 @@ rule plot_tSNEs_nonmalignant_cohort:
         outfile_batch = 'results/non_malignant_reference/nonmalignant_reference_cohort.tSNE_batch.png',
 	outfile_ct = 'results/non_malignant_reference/nonmalignant_reference_cohort.tSNE_celltype.png'
     resources:
-        mem_mb = config['tools']['plot_tSNE_nonmalignant']['mem'],
-        time_min = config['tools']['plot_tSNE_nonmalignant']['time']
+        mem_mb = config['computingResources']['mediumRequirements']['mem'],
+        time_min = config['computingResources']['mediumRequirements']['time']
     threads:
-        config['tools']['plot_tSNE_nonmalignant']['threads']
+        config['computingResources']['mediumRequirements']['threads']
     benchmark:
         'results/non_malignant_reference/plot_tSNEs_nonmalignant.benchmark'
     shell:
@@ -344,14 +344,14 @@ rule diff_exp_genes:
         minNumberNonMalignant = config['tools']['diff_exp']['minNumberNonMalignant'],
         outpath = 'results/diff_exp/'
     resources:
-        mem_mb = config['tools']['diff_exp']['mem'],
-        time_min = config['tools']['diff_exp']['time'],
+        mem_mb = config['computingResources']['mediumRequirements']['mem'],
+        time_min = config['computingResources']['mediumRequirements']['time'],
     threads:
-        config['tools']['diff_exp']['threads']
+        config['computingResources']['mediumRequirements']['threads']
     benchmark:
         'results/diff_exp/{sample}.diff_exp.benchmark'
     shell:
-        "{config[tools][diff_exp][call]} --sample_data {input.sce_in} " +
+        "Rscript ../scripts/apply_DE_analysis.R --sample_data {input.sce_in} " +
         "--sampleName {params.sampleName} " +
         "--cluster_table {input.cell_types} " +
         "--malignant_tag {params.malignant} " +
@@ -377,14 +377,14 @@ rule gene_exp:
         type_sample = config['tools']['gene_exp']['type_sample'],
         priority_genes = config['resources']['priority_genes'],
     resources:
-        mem_mb = config['tools']['gene_exp']['mem'],
-        time_min = config['tools']['gene_exp']['time'],
+        mem_mb = config['computingResources']['mediumRequirements']['mem'],
+        time_min = config['computingResources']['mediumRequirements']['time'],
     threads:
-        config['tools']['gene_exp']['threads']
+        config['computingResources']['mediumRequirements']['threads']
     benchmark:
         'results/gene_exp/{sample}.gene_exp.benchmark'
     shell:
-        "{config[tools][gene_exp][call]} --sce_in {input.sce_in} --priority_genes {params.priority_genes} --filtering_threshold_sample {params.threshold_sample} --filter_type_sample {params.type_sample} --outDir {params.outpath} --sample_name {params.sampleName} "
+        "Rscript ../scripts/get_cluster_gene_expression.R --sce_in {input.sce_in} --priority_genes {params.priority_genes} --filtering_threshold_sample {params.threshold_sample} --filter_type_sample {params.type_sample} --outDir {params.outpath} --sample_name {params.sampleName} "
 
 
 # This rule generates general quality control plots to hdf5 expression files
@@ -394,14 +394,14 @@ rule generate_qc_plots :
     output:
         out = '{sample}.h5.histogram_library_sizes.png'
     resources:
-        mem_mb = config['tools']['generate_qc_plots']['mem'],
-        time_min = config['tools']['generate_qc_plots']['time'],
+        mem_mb = config['computingResources']['mediumRequirements']['mem'],
+        time_min = config['computingResources']['mediumRequirements']['time'],
     threads:
-        config['tools']['generate_qc_plots']['threads']
+        config['computingResources']['mediumRequirements']['threads']
     benchmark:
         '{sample}.generate_qc_plots.benchmark'
     shell:
-        '{config[tools][generate_qc_plots][call]} --hdf5File {input.infile} '
+        'Rscript ../scripts/generate_QC_plots.R --hdf5File {input.infile} '
 
 
 # This rule creates a box plot comparing cell type fractions across samples
@@ -416,14 +416,14 @@ rule generate_cell_type_boxplot:
         sampleName_short = config['tools']['cellranger_count']['cellranger_sampleName'],
         outDir = 'results/plotting/',
     resources:
-        mem_mb = config['tools']['generate_cell_type_boxplot']['mem'],
-        time_min = config['tools']['generate_cell_type_boxplot']['time'],
+        mem_mb = config['computingResources']['mediumRequirements']['mem'],
+        time_min = config['computingResources']['mediumRequirements']['time'],
     threads:
-        config['tools']['generate_cell_type_boxplot']['threads']
+        config['computingResources']['mediumRequirements']['threads']
     benchmark:
         'results/plotting/{sample}.boxplot_cell_types_cohort.benchmark'
     shell:
-        '{config[tools][generate_cell_type_boxplot][call]} --previous_samples {input.previous_samples} --current_sample {input.sample_cell_types} --sampleName {params.sampleName} --sampleName_short {params.sampleName_short} --outDir {params.outDir}'
+        'Rscript ../scripts/generate_boxplot_fractions_celltypes.R --previous_samples {input.previous_samples} --current_sample {input.sample_cell_types} --sampleName {params.sampleName} --sampleName_short {params.sampleName_short} --outDir {params.outDir}'
 
 
 
@@ -440,14 +440,14 @@ rule sample_integration:
         sampleName_short = config['tools']['cellranger_count']['cellranger_sampleName'],
 	colour_config = config['resources']['colour_config']
     resources:
-        mem_mb = config['tools']['sample_integration']['mem'],
-        time_min = config['tools']['sample_integration']['time'],
+        mem_mb = config['computingResources']['mediumRequirements']['mem'],
+        time_min = config['computingResources']['mediumRequirements']['time'],
     threads:
-        config['tools']['sample_integration']['threads']
+        config['computingResources']['mediumRequirements']['threads']
     benchmark:
         'results/plotting/{sample}.sample_integration.benchmark'
     shell:
-        '{config[tools][sample_integration][call]} --cohort_list {input.previous_samples} --sample_data {input.current_sample} --sampleName {params.sampleName} --sampleName_short {params.sampleName_short} --colour_config {params.colour_config} --outdir {params.outDir}'
+        'Rscript ../scripts/sample_integration.R  --cohort_list {input.previous_samples} --sample_data {input.current_sample} --sampleName {params.sampleName} --sampleName_short {params.sampleName_short} --colour_config {params.colour_config} --outdir {params.outDir}'
 
 
 
@@ -461,11 +461,11 @@ rule cellPercentInCluster:
     params:
         variousParams = config['tools']['cellPercentInCluster']['variousParams']
     resources:
-        mem_mb = config['tools']['cellPercentInCluster']['mem'],
-        time_min = config['tools']['cellPercentInCluster']['time'],
+        mem_mb = config['computingResources']['mediumRequirements']['mem'],
+        time_min = config['computingResources']['mediumRequirements']['time'],
     threads:
-        config['tools']['cellPercentInCluster']['threads']
+        config['computingResources']['mediumRequirements']['threads']
     benchmark:
         'results/clusterpercent/{sample}.clusterPercent.benchmark'
     shell:
-        '{config[tools][cellPercentInCluster][call]} --inputTable {input.clusterCsv} --outFile {output.out} {params.variousParams}'
+        'python ../scripts/count_cells_in_clusters.py  --inputTable {input.clusterCsv} --outFile {output.out} {params.variousParams}'
