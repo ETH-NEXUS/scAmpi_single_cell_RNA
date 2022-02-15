@@ -1,1 +1,4 @@
 results
+logs
+.lintr
+.snakemake
