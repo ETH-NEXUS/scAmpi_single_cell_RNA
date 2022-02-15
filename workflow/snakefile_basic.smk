@@ -24,9 +24,9 @@ localrules: scAmpi_basic
 rule scAmpi_basic:
     input:
         expand('results/cellranger_run/{sample}.features.tsv', sample = getSampleNames()),
-        expand('results/rawCounts/{sample}.h5', sample = getSampleNames()),
-        expand('results/rawCounts/{sample}.h5.histogram_library_sizes.png', sample = getSampleNames()),
-        expand('results/filteredCounts/{sample}.genes_cells_filtered.h5.histogram_library_sizes.png', sample = getSampleNames()),
+        expand('results/counts_raw/{sample}.h5', sample = getSampleNames()),
+        expand('results/counts_raw/{sample}.h5.histogram_library_sizes.png', sample = getSampleNames()),
+        expand('results/counts_filtered/{sample}.genes_cells_filtered.h5.histogram_library_sizes.png', sample = getSampleNames()),
         expand('results/counts_corrected/{sample}.genes_cells_filtered.corrected.RDS', sample = getSampleNames()),
         expand('results/clustering/{sample}.genes_cells_filtered.corrected.clusters_phenograph.csv', sample = getSampleNames()),
         expand('results/atypical_removed/{sample}.genes_cells_filtered.corrected.atypical_removed.RDS', sample = getSampleNames()),

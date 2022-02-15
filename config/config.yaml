@@ -117,6 +117,6 @@ tools:
     # annotate with user-defined gene aliases
     use_alias: "TRUE"
 
-  cellPercentInCluster:
+  cell_percent_in_cluster:
     variousParams: "--malignant Melanoma"
 

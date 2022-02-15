@@ -52,33 +52,33 @@ rule create_hdf5:
         matrix_file = 'results/cellranger_run/{sample}.matrix.mtx',
         barcodes_file = 'results/cellranger_run/{sample}.barcodes.tsv'
     output:
-        outfile = 'results/rawCounts/{sample}.h5'
+        outfile = 'results/counts_raw/{sample}.h5'
     resources:
         mem_mb = config['computingResources']['mediumRequirements']['mem'],
         time_min = config['computingResources']['mediumRequirements']['time']
     threads:
         config['computingResources']['mediumRequirements']['threads']
     benchmark:
-        'results/rawCounts/{sample}.create_hd5.benchmark'
+        'results/counts_raw/{sample}.create_hd5.benchmark'
     shell:
         'python ../scripts/create_hdf5.py -g {input.genes_file} -m {input.matrix_file} -b {input.barcodes_file} -o {output.outfile}'
 
 # identify doublets with scDblFinder
 rule identify_doublets:
     input:
-        infile = 'results/rawCounts/{sample}.h5'
+        infile = 'results/counts_raw/{sample}.h5'
     output:
-        outfile = 'results/filteredCounts/{sample}.doublet_barcodes.txt'
+        outfile = 'results/counts_filtered/{sample}.doublet_barcodes.txt'
     params:
         sample = '{sample}',
-        outdir = 'results/filteredCounts/',
+        outdir = 'results/counts_filtered/',
     resources:
         mem_mb = config['computingResources']['mediumRequirements']['mem'],
         time_min = config['computingResources']['mediumRequirements']['time']
     threads:
         config['computingResources']['mediumRequirements']['threads']
     benchmark:
-        'results/filteredCounts/{sample}.identify_doublets.benchmark'
+        'results/counts_filtered/{sample}.identify_doublets.benchmark'
     shell:
         "Rscript ../scripts/identify_doublets.R " +
         "--hdf5File {input.infile} " +
@@ -91,17 +91,17 @@ rule identify_doublets:
 # Filter out genes if they are not protein coding, if they are mitochondrial genes, or if they encode for ribosomal proteins.
 rule filter_genes_and_cells:
     input:
-        infile = 'results/rawCounts/{sample}.h5',
-        doublets = 'results/filteredCounts/{sample}.doublet_barcodes.txt'
+        infile = 'results/counts_raw/{sample}.h5',
+        doublets = 'results/counts_filtered/{sample}.doublet_barcodes.txt'
     output:
-        outfile = 'results/filteredCounts/{sample}.genes_cells_filtered.h5'
+        outfile = 'results/counts_filtered/{sample}.genes_cells_filtered.h5'
     params:
         nmads_fractionMT = config['tools']['filter_genes_and_cells']['nmads_fractionMT'],
         nmads_NODG = config['tools']['filter_genes_and_cells']['nmads_NODG'],
         threshold_fractionMT = config['tools']['filter_genes_and_cells']['threshold_fractionMT'],
         threshold_NODG = config['tools']['filter_genes_and_cells']['threshold_NODG'],
         remove_doublets = config['tools']['filter_genes_and_cells']['remove_doublets'],
-        outDir = 'results/filteredCounts/',
+        outDir = 'results/counts_filtered/',
         genomeVersion = config['tools']['filter_genes_and_cells']['genomeVersion'],
         sample = '{sample}'
     resources:
@@ -110,7 +110,7 @@ rule filter_genes_and_cells:
     threads:
         config['computingResources']['mediumRequirements']['threads']
     benchmark:
-        'results/filteredCounts/{sample}.filter_genes_and_cells.benchmark'
+        'results/counts_filtered/{sample}.filter_genes_and_cells.benchmark'
     shell:
             'Rscript ../scripts/filter_genes_and_cells.R ' +
             '--hdf5File {input.infile} ' +
@@ -129,7 +129,7 @@ rule filter_genes_and_cells:
 # perform normalisation, cell cycle correction and other preprocessing using sctransform
 rule sctransform_preprocessing:
     input:
-        hdf5_file =  'results/filteredCounts/{sample}.h5',
+        hdf5_file =  'results/counts_filtered/{sample}.h5',
     output:
         outfile = 'results/counts_corrected/{sample}.corrected.RDS',
         highly_variable = 'results/counts_corrected/{sample}.corrected.variable_genes.h5',
@@ -471,14 +471,14 @@ rule generate_qc_plots :
 
 
 # calculate for each cluster the number of cells it countains and the percentage of all cells
-rule cellPercentInCluster:
+rule cell_percent_in_cluster:
     input:
         clusterCsv = 'results/atypical_removed/{sample}.phenograph_celltype_association.txt'
     output:
 #    print(drugID)
         out = 'results/clustering/{sample}.clusters_cell_count_percent.txt'
     params:
-        variousParams = config['tools']['cellPercentInCluster']['variousParams']
+        variousParams = config['tools']['cell_percent_in_cluster']['variousParams']
     resources:
         mem_mb = config['computingResources']['mediumRequirements']['mem'],
         time_min = config['computingResources']['mediumRequirements']['time'],
