@@ -1,0 +1,122 @@
+inputOutput:
+  input_fastqs: /cluster/work/nexus/anne/tests/2021-08-26_testrun_scampi/fastqs/
+  input_fastqs_adt:
+  sample_map: config/sample_map.tsv
+  malignant_cell_type: "Melanoma"
+
+resources:
+  # The following needs to point to the reference transcriptome that will be used by cellranger. 
+  reference_transcriptome: /cluster/work/nexus/utilities/databases/singlecell/10xGenomics/gene_expression_3_0_2/refdata-cellranger-GRCh38-3.0.0
+  # celltype_lists gmx file containing a library of cell type classification gene lists
+  celltype_lists: "path_to_scAmpi_git/required_files/melanoma/celltype_list_melanoma.gmx"
+  # celltype_config to easily adapt the cell type classification step
+  celltype_config: "path_to_scAmpi_git/required_files/melanoma/celltype_config_melanoma.tsv"
+  # colour_config for a fixed assignment of colours to the cell types in celltype_config
+  colour_config: "pfilter_genes_and_cells.Rath_to_scAmpi_git/required_files/melanoma/colour_config_melanoma.txt"
+  # gene expression of priority genes will be plotted and highlighted in per cluster gene expression (gene_exp)
+  priority_genes: "path_to_scAmpi_git/required_files/melanoma/selected_genes_melanoma.txt"
+  # genesets for GSVA analysis (scAmpi_basic) and geneSetEnrichment (scAmpi_clinical)
+  genesets: "path_to_scAmpi_git/required_files/hallmark_pathways_example.gmt"
+
+
+# The tools in this pipeline use a broad range of resources and have been assigned to the following three categories.
+# If there aren't enough resources specified it can be adapted in the tools corresponding section.
+computingResources:
+  lowRequirements:
+    mem: 400
+    time: 100
+    threads: 1
+
+  mediumRequirements:
+    mem: 4000
+    time: 700
+    threads: 8
+
+  highRequirements:
+    mem: 10000
+    time: 500
+    threads: 8
+
+tools:
+  # Cellranger cannot be installed through Conda currently.
+  # It needs to be installed manually & the call in both cellranger rules needs to be adapted.
+  # variousParams can be set as described in the Cellranger documentation 
+  cellranger_count:
+    call: /cluster/work/nexus/utilities/sharedPrograms/cellranger/cellranger-6.1.1/bin/cellranger
+    variousParams:
+    local_cores: 8
+
+  cellranger_count_adt:
+    call:
+    variousParams:
+
+  filter_genes_and_cells:
+    # cell outlier detection based on fractionMT, disabled per default ("100")
+    nmads_fractionMT: "100"
+    # cell outlier detection based on number of detected genes, disabled per default ("100")
+    nmads_NODG: "100"
+    # minimum number of detected genes for cells
+    threshold_NODG: "400"
+    # maximum fraction of reads mapping to MT genes for cells. Should be adapted based on cell types and expected values.
+    threshold_fractionMT: "0.5"
+    # genome version for selecting only protein-coding genes
+    genomeVersion: "GRCh38"
+    # remove doublets detected in previous step
+    remove_doublets: "TRUE"
+
+  sctransform_preprocessing:
+    # number of genes with highest residual variance used for UMAP calculation and clustering
+    number_genes: "2000"
+    # minimum residual variance for genes to be used  for UMAP calculation and clustering
+    min_var: "1.5"
+    # number of nearest neighbours for UMAP calculation
+    n_nn: "30"
+
+  cell_type_classification:
+    # minimum number of cell-type-specific genes expressed by a cell to consider cell type, default is "5"
+    min_genes: "5"
+
+  remove_atypical:
+    # threshold type, either "number_cells" or "percentage_cells"
+    threshold_type: "percentage_cells"
+    # default is "percentage_cells" and "5":
+    # cells with cell type that less than 5 % of the cells in the cluster have are removed
+    threshold_filter: "5"
+    # absolute minimum number of cells of a cell type that will not be removed
+    min_threshold: "5"
+
+  clustering:
+    phenograph:
+      # number of nearest neighbours
+      n_neighbours: 30
+      log_normalize: false
+      # minimum number of cells to form a cluster
+      min_cluster_size: 20
+
+  diff_exp:
+    # minimum number of cells to be tested in DE analysis
+    threshold_comparison: "20"
+    # cut-off for p-value
+    fdr_cut: "0.01"
+    # cut-off for fold change
+    fc_cut: "2"
+    # minimum difference in mean expression
+    mindiff2second: "1"
+    # minimum number of non-malignant clusters to test DE to each malignant cluster
+    minNumberNonMalignant: "2"
+
+  gene_exp:
+    # script includes filtering of genes that show non-zero expression in too few cells
+    # either "number_cells" or "percentage_cells"
+    type_sample: "number_cells"
+    # threshold for cells with  non-zero expression to calculate mean expression for gene
+    # default "0" keeps all genes
+    threshold_sample: "0"
+
+  plotting:
+    # annotate with user-defined gene aliases
+    use_alias: "TRUE"
+
+  cellPercentInCluster:
+    variousParams: "--malignant Melanoma"
+
