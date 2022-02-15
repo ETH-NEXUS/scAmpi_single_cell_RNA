@@ -1,19 +1,27 @@
-import os
-import glob
-import sys
-import datetime
+#import os
+#import glob
+#import sys
+#import datetime
+from snakemake.utils import min_version
+from snakemake.utils import validate
+import pandas as pd
+
+# Define minimum Snakemake version
+min_version("6.12.1")
 
 # Include Config file
 configfile: "config/config.yaml"
 
+# Include report functionality
+#report: "../report/workflow.rst"
 
-# This function adapts the config object to include full path information
+# This file includes common functions used in the pipeline
 include: "rules/misc_snake.smk"
 
-config["inputOutput"]["sample_map"]
+#config["inputOutput"]["sample_map"]
 
 # old framework
-SAMPLEMAPPING = config['inputOutput']['sample_map']
+#SAMPLEMAPPING = config['inputOutput']['sample_map']
 
 
 # Include the rules
@@ -23,18 +31,18 @@ include: "rules/scAmpi_basic_rules.smk"
 localrules: scAmpi_basic
 rule scAmpi_basic:
     input:
-        expand('results/cellranger_run/{sample}.features.tsv', sample = getSampleNames()),
-        expand('results/counts_raw/{sample}.h5', sample = getSampleNames()),
-        expand('results/counts_raw/{sample}.h5.histogram_library_sizes.png', sample = getSampleNames()),
-        expand('results/counts_filtered/{sample}.genes_cells_filtered.h5.histogram_library_sizes.png', sample = getSampleNames()),
-        expand('results/counts_corrected/{sample}.genes_cells_filtered.corrected.RDS', sample = getSampleNames()),
-        expand('results/clustering/{sample}.genes_cells_filtered.corrected.clusters_phenograph.csv', sample = getSampleNames()),
-        expand('results/atypical_removed/{sample}.genes_cells_filtered.corrected.atypical_removed.RDS', sample = getSampleNames()),
-        expand('results/clustering/{sample}.genes_cells_filtered.corrected.atypical_removed.clusters_cell_count_percent.txt', sample = getSampleNames()),
-        expand('results/diff_exp/{sample}.genes_cells_filtered.corrected.atypical_removed.diffExp_success.txt', sample = getSampleNames()),
-        expand('results/gene_exp/{sample}.genes_cells_filtered.corrected.atypical_removed.gene_expression_per_cluster.tsv', sample = getSampleNames()),
-        expand('results/plotting/{sample}.genes_cells_filtered.corrected.atypical_removed.celltype_barplot.png', sample = getSampleNames()),
-        expand('results/gsva/{sample}.genes_cells_filtered.corrected.atypical_removed.gsetscore_hm.png', sample = getSampleNames()),
+        expand('results/cellranger_run/{sample}.features.tsv', sample = sample_ids),
+#        expand('results/counts_raw/{sample}.h5', sample = sample_ids),
+#        expand('results/counts_raw/{sample}.h5.histogram_library_sizes.png', sample = sample_ids),
+#        expand('results/counts_filtered/{sample}.genes_cells_filtered.h5.histogram_library_sizes.png', sample = sample_ids),
+#        expand('results/counts_corrected/{sample}.genes_cells_filtered.corrected.RDS', sample = sample_ids),
+#        expand('results/clustering/{sample}.genes_cells_filtered.corrected.clusters_phenograph.csv', sample = sample_ids),
+#        expand('results/atypical_removed/{sample}.genes_cells_filtered.corrected.atypical_removed.RDS', sample = sample_ids),
+#        expand('results/clustering/{sample}.genes_cells_filtered.corrected.atypical_removed.clusters_cell_count_percent.txt', sample = sample_ids),
+#        expand('results/diff_exp/{sample}.genes_cells_filtered.corrected.atypical_removed.diffExp_success.txt', sample = sample_ids),
+#        expand('results/gene_exp/{sample}.genes_cells_filtered.corrected.atypical_removed.gene_expression_per_cluster.tsv', sample = sample_ids),
+#        expand('results/plotting/{sample}.genes_cells_filtered.corrected.atypical_removed.celltype_barplot.png', sample = sample_ids),
+#        expand('results/gsva/{sample}.genes_cells_filtered.corrected.atypical_removed.gsetscore_hm.png', sample = sample_ids),
     output:
         'results/complete_scAmpi_basic.txt'
     params:
