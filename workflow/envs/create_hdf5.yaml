@@ -1,3 +1,4 @@
+# find env in scAmpi_single_cell_RNA/workflow/envs/create_hdf5.yaml
 name: create_hdf5
 channels:
     - conda-forge
