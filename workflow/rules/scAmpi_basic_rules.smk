@@ -53,6 +53,8 @@ rule create_hdf5:
         barcodes_file = 'results/cellranger_run/{sample}.barcodes.tsv'
     output:
         outfile = 'results/counts_raw/{sample}.h5'
+    conda:
+        '../envs/create_hdf5.yaml'
     resources:
         mem_mb = config['computingResources']['mediumRequirements']['mem'],
         time_min = config['computingResources']['mediumRequirements']['time']
