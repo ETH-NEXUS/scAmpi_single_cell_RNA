@@ -63,7 +63,10 @@ rule create_hdf5:
     benchmark:
         'results/counts_raw/{sample}.create_hd5.benchmark'
     shell:
-        'python ../scripts/create_hdf5.py -g {input.genes_file} -m {input.matrix_file} -b {input.barcodes_file} -o {output.outfile}'
+        'python workflow/scripts/create_hdf5.py '
+        '-g {input.genes_file} -m {input.matrix_file} '
+        '-b {input.barcodes_file} '
+        '-o {output.outfile}'
 
 # identify doublets with scDblFinder
 rule identify_doublets:
@@ -82,7 +85,7 @@ rule identify_doublets:
     benchmark:
         'results/counts_filtered/{sample}.identify_doublets.benchmark'
     shell:
-        "Rscript ../scripts/identify_doublets.R " +
+        "Rscript workflow/scripts/identify_doublets.R " +
         "--hdf5File {input.infile} " +
         "--sample {params.sample} " +
         "--outdir {params.outdir}"
@@ -114,7 +117,7 @@ rule filter_genes_and_cells:
     benchmark:
         'results/counts_filtered/{sample}.filter_genes_and_cells.benchmark'
     shell:
-            'Rscript ../scripts/filter_genes_and_cells.R ' +
+            'Rscript workflow/scripts/filter_genes_and_cells.R ' +
             '--hdf5File {input.infile} ' +
             '--nmads_NODG {params.nmads_NODG} ' +
             '--nmads_fractionMT {params.nmads_fractionMT} ' +
@@ -149,7 +152,7 @@ rule sctransform_preprocessing:
     benchmark:
         'results/counts_corrected/{sample}.corrected.benchmark'
     shell:
-        "Rscript ../scripts/sctransform_preprocessing.R --inHDF5 {input.hdf5_file} --sample {params.sample} --number_genes {params.number_genes} --min_var {params.min_var} --n_nn {params.n_nn} --outdir {params.outDir} "
+        "Rscript workflow/scripts/sctransform_preprocessing.R --inHDF5 {input.hdf5_file} --sample {params.sample} --number_genes {params.number_genes} --min_var {params.min_var} --n_nn {params.n_nn} --outdir {params.outDir} "
 
 
 # perform clustering with phenograph
@@ -172,7 +175,7 @@ rule phenograph:
     benchmark:
         'results/clustering/{sample}.phenograph.benchmark'
     shell:
-        'python ../scripts/apply_phenograph.py ' +
+        'python workflow/scripts/apply_phenograph.py ' +
         '--input_file {input.infile} ' +
         '--output_file {output.outfile} ' +
         '--distance_matrix {output.distance_matrix} ' +
@@ -203,7 +206,7 @@ rule prepare_celltyping:
     benchmark:
         'results/prep_celltyping/{sample}.prepare_celltyping.benchmark'
     shell:
-        "Rscript ../scripts/prepare_celltyping.R --in_sce {input.RDS_file} --phenograph_cluster {input.cluster} --outputDirec {params.outputDirec} --sampleName {params.sampleName} --distanceMatrix {input.distanceMatrix} --modularity_score {input.modularity_score} "
+        "Rscript workflow/scripts/prepare_celltyping.R --in_sce {input.RDS_file} --phenograph_cluster {input.cluster} --outputDirec {params.outputDirec} --sampleName {params.sampleName} --distanceMatrix {input.distanceMatrix} --modularity_score {input.modularity_score} "
 
 
 # perform cell type classification
@@ -227,7 +230,7 @@ rule cell_type_classification:
     benchmark:
         'results/celltype_classification/{sample}.cell_type_classification.benchmark'
     shell:
-        'Rscript ../scripts/celltyping.r ' +
+        'Rscript workflow/scripts/celltyping.r ' +
         '--SCE {input.infile} ' +
         '--celltype_lists {params.celltype_lists} ' +
         '--celltype_config {params.celltype_config} ' +
@@ -259,7 +262,7 @@ rule remove_atypical:
     benchmark:
         'results/atypical_removed/{sample}.atypical_removed.benchmark'
     shell:
-        "Rscripts ../scripts/filter_out_atypical_cells.R --sce_in {input.infile} --cluster_table {input.cluster_table} --celltype_config {params.celltype_config} --threshold_filter {params.threshold_filter} --min_threshold {params.min_threshold} --threshold_type {params.threshold_type} --outDir {params.outputDirec} --sample_name {params.sample_name} "
+        "Rscripts workflow/scripts/filter_out_atypical_cells.R --sce_in {input.infile} --cluster_table {input.cluster_table} --celltype_config {params.celltype_config} --threshold_filter {params.threshold_filter} --min_threshold {params.min_threshold} --threshold_type {params.threshold_type} --outDir {params.outputDirec} --sample_name {params.sample_name} "
 
 
 # perform gsva gene set analysis
@@ -280,7 +283,7 @@ rule gsva:
     benchmark:
         'results/gsva/{sample}.gsva.benchmark'
     shell:
-        "Rscript ../scripts/gsva.r --SCE {input.infile} --geneset {params.genesets} --outputDirec {params.outputDirec} --sampleName {params.sampleName} "
+        "Rscript workflow/scripts/gsva.r --SCE {input.infile} --geneset {params.genesets} --outputDirec {params.outputDirec} --sampleName {params.sampleName} "
 
 
 # generate plots about sample composition and gene expression
@@ -303,7 +306,7 @@ rule plotting:
     benchmark:
         'results/plotting/{sample}.plotting.benchmark'
     shell:
-        "Rscript ../scripts/scRNA_pipeline_plotting.R  --sce_in {input.infile} --genelist {params.genes_of_interest} --outDir {params.outputDirec} --sampleName {params.sampleName} --colour_config {params.colour_config} --toggle_label {params.use_alias}"
+        "Rscript workflow/scripts/scRNA_pipeline_plotting.R  --sce_in {input.infile} --genelist {params.genes_of_interest} --outDir {params.outputDirec} --sampleName {params.sampleName} --colour_config {params.colour_config} --toggle_label {params.use_alias}"
 
 
 # adapt this directory in master snake file to prevent recomputing the cohort in each analysis
@@ -372,7 +375,7 @@ rule diff_exp_genes:
     benchmark:
         'results/diff_exp/{sample}.diff_exp.benchmark'
     shell:
-        "Rscript ../scripts/apply_DE_analysis.R --sample_data {input.sce_in} " +
+        "Rscript workflow/scripts/apply_DE_analysis.R --sample_data {input.sce_in} " +
         "--sampleName {params.sampleName} " +
         "--cluster_table {input.cell_types} " +
         "--malignant_tag {params.malignant} " +
@@ -405,7 +408,7 @@ rule gene_exp:
     benchmark:
         'results/gene_exp/{sample}.gene_exp.benchmark'
     shell:
-        "Rscript ../scripts/get_cluster_gene_expression.R --sce_in {input.sce_in} --priority_genes {params.priority_genes} --filtering_threshold_sample {params.threshold_sample} --filter_type_sample {params.type_sample} --outDir {params.outpath} --sample_name {params.sampleName} "
+        "Rscript workflow/scripts/get_cluster_gene_expression.R --sce_in {input.sce_in} --priority_genes {params.priority_genes} --filtering_threshold_sample {params.threshold_sample} --filter_type_sample {params.type_sample} --outDir {params.outpath} --sample_name {params.sampleName} "
 
 
 # This rule generates general quality control plots to hdf5 expression files
@@ -422,7 +425,7 @@ rule generate_qc_plots :
     benchmark:
         '{sample}.generate_qc_plots.benchmark'
     shell:
-        'Rscript ../scripts/generate_QC_plots.R --hdf5File {input.infile} '
+        'Rscript workflow/scripts/generate_QC_plots.R --hdf5File {input.infile} '
 
 
 # This rule creates a box plot comparing cell type fractions across samples
@@ -444,7 +447,7 @@ rule generate_qc_plots :
 #    benchmark:
 #        'results/plotting/{sample}.boxplot_cell_types_cohort.benchmark'
 #    shell:
-#        'Rscript ../scripts/generate_boxplot_fractions_celltypes.R --previous_samples {input.previous_samples} --current_sample {input.sample_cell_types} --sampleName {params.sampleName} --sampleName_short {params.sampleName_short} --outDir {params.outDir}'
+#        'Rscript workflow/scripts/generate_boxplot_fractions_celltypes.R --previous_samples {input.previous_samples} --current_sample {input.sample_cell_types} --sampleName {params.sampleName} --sampleName_short {params.sampleName_short} --outDir {params.outDir}'
 
 
 
@@ -468,7 +471,7 @@ rule generate_qc_plots :
 #    benchmark:
 #        'results/plotting/{sample}.sample_integration.benchmark'
 #    shell:
-#        'Rscript ../scripts/sample_integration.R  --cohort_list {input.previous_samples} --sample_data {input.current_sample} --sampleName {params.sampleName} --sampleName_short {params.sampleName_short} --colour_config {params.colour_config} --outdir {params.outDir}'
+#        'Rscript workflow/scripts/sample_integration.R  --cohort_list {input.previous_samples} --sample_data {input.current_sample} --sampleName {params.sampleName} --sampleName_short {params.sampleName_short} --colour_config {params.colour_config} --outdir {params.outDir}'
 
 
 
@@ -489,4 +492,4 @@ rule cell_percent_in_cluster:
     benchmark:
         'results/clusterpercent/{sample}.clusterPercent.benchmark'
     shell:
-        'python ../scripts/count_cells_in_clusters.py  --inputTable {input.clusterCsv} --outFile {output.out} {params.variousParams}'
+        'python workflow/scripts/count_cells_in_clusters.py  --inputTable {input.clusterCsv} --outFile {output.out} {params.variousParams}'
