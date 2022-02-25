@@ -502,7 +502,7 @@ rule cell_percent_in_cluster:
     benchmark:
         'results/clusterpercent/benchmark/{sample}.clusterPercent.benchmark'
     shell:
-        'python workflow/scripts/count_cells_in_clusters.py '
+        'python workflow/scripts/cell_percent_in_cluster.py '
         '--inputTable {input.clusterCsv} '
         '--outFile {output.out} '
         '{params.variousParams}'
