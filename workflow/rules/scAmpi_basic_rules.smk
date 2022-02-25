@@ -22,7 +22,7 @@ rule cellranger_count:
     threads:
         config['computingResources']['highRequirements']['threads']
     benchmark:
-        'results/cellranger_run/{sample}.cellranger_count.benchmark'
+        'results/cellranger_run/benchmark/{sample}.cellranger_count.benchmark'
     # NOTE: cellranger count function cannot specify the output directory, the output is the path you call it from.
     # Therefore, a subshell is used here.
     shell:
@@ -61,7 +61,7 @@ rule create_hdf5:
     threads:
         config['computingResources']['mediumRequirements']['threads']
     benchmark:
-        'results/counts_raw/{sample}.create_hd5.benchmark'
+        'results/counts_raw/benchmark/{sample}.create_hd5.benchmark'
     shell:
         'python workflow/scripts/create_hdf5.py '
         '-g {input.genes_file} -m {input.matrix_file} '
@@ -78,13 +78,15 @@ rule identify_doublets:
     params:
         sample = '{sample}',
         outdir = 'results/counts_filtered/',
+    conda:
+        '../envs/identify_doublets.yaml'
     resources:
         mem_mb = config['computingResources']['mediumRequirements']['mem'],
         time_min = config['computingResources']['mediumRequirements']['time']
     threads:
         config['computingResources']['mediumRequirements']['threads']
     benchmark:
-        'results/counts_filtered/{sample}.identify_doublets.benchmark'
+        'results/counts_filtered/benchmark/{sample}.identify_doublets.benchmark'
     shell:
         'Rscript workflow/scripts/identify_doublets.R '
         '--hdf5File {input.infile} '
@@ -110,13 +112,15 @@ rule filter_genes_and_cells:
         outDir = 'results/counts_filtered/',
         genomeVersion = config['tools']['filter_genes_and_cells']['genomeVersion'],
         sample = '{sample}'
+    conda:
+        '../envs/filter_genes_and_cells.yaml'
     resources:
         mem_mb = config['computingResources']['mediumRequirements']['mem'],
         time_min = config['computingResources']['mediumRequirements']['time'],
     threads:
         config['computingResources']['mediumRequirements']['threads']
     benchmark:
-        'results/counts_filtered/{sample}.filter_genes_and_cells.benchmark'
+        'results/counts_filtered/benchmark/{sample}.filter_genes_and_cells.benchmark'
     shell:
             'Rscript workflow/scripts/filter_genes_and_cells.R '
             '--hdf5File {input.infile} '
@@ -144,13 +148,15 @@ rule sctransform_preprocessing:
         min_var = config['tools']['sctransform_preprocessing']['min_var'],
         n_nn = config['tools']['sctransform_preprocessing']['n_nn'],
         outDir = 'results/counts_corrected/',
+    conda:
+        '../envs/sctransform_preprocessing.yaml'
     resources:
         mem_mb = config['computingResources']['mediumRequirements']['mem'],
         time_min = config['computingResources']['mediumRequirements']['time'],
     threads:
         config['computingResources']['mediumRequirements']['threads']
     benchmark:
-        'results/counts_corrected/{sample}.corrected.benchmark'
+        'results/counts_corrected/benchmark/{sample}.corrected.benchmark'
     shell:
         'Rscript workflow/scripts/sctransform_preprocessing.R '
         '--inHDF5 {input.hdf5_file} '
@@ -173,13 +179,15 @@ rule phenograph:
         n_neighbours = config['tools']['clustering']['phenograph']['n_neighbours'],
         min_cluster_size = config['tools']['clustering']['phenograph']['min_cluster_size'],
         log_normalize = config['tools']['clustering']['phenograph']['log_normalize'],
+    conda:
+        '../envs/phenograph.yaml'
     resources:
         mem_mb = config['computingResources']['mediumRequirements']['mem'],
         time_min = config['computingResources']['mediumRequirements']['time']
     threads:
         config['computingResources']['mediumRequirements']['threads']
     benchmark:
-        'results/clustering/{sample}.phenograph.benchmark'
+        'results/clustering/benchmark/{sample}.phenograph.benchmark'
     shell:
         'python workflow/scripts/apply_phenograph.py '
         '--input_file {input.infile} '
@@ -210,7 +218,7 @@ rule prepare_celltyping:
     threads:
         config['computingResources']['mediumRequirements']['threads']
     benchmark:
-        'results/prep_celltyping/{sample}.prepare_celltyping.benchmark'
+        'results/prep_celltyping/benchmark/{sample}.prepare_celltyping.benchmark'
     shell:
         'Rscript workflow/scripts/prepare_celltyping.R '
         '--in_sce {input.RDS_file} '
@@ -240,7 +248,7 @@ rule cell_type_classification:
     threads:
         config['computingResources']['mediumRequirements']['threads']
     benchmark:
-        'results/celltype_classification/{sample}.cell_type_classification.benchmark'
+        'results/celltype_classification/benchmark/{sample}.cell_type_classification.benchmark'
     shell:
         'Rscript workflow/scripts/celltyping.r '
         '--SCE {input.infile} '
@@ -272,7 +280,7 @@ rule remove_atypical:
     threads:
         config['computingResources']['mediumRequirements']['threads']
     benchmark:
-        'results/atypical_removed/{sample}.atypical_removed.benchmark'
+        'results/atypical_removed/benchmark/{sample}.atypical_removed.benchmark'
     shell:
         'Rscripts workflow/scripts/filter_out_atypical_cells.R '
         '--sce_in {input.infile} '
@@ -301,7 +309,7 @@ rule gsva:
     threads:
         config['computingResources']['mediumRequirements']['threads']
     benchmark:
-        'results/gsva/{sample}.gsva.benchmark'
+        'results/gsva/benchmark/{sample}.gsva.benchmark'
     shell:
         'Rscript workflow/scripts/gsva.r '
         '--SCE {input.infile} '
@@ -328,7 +336,7 @@ rule plotting:
     threads:
         config['computingResources']['mediumRequirements']['threads']
     benchmark:
-        'results/plotting/{sample}.plotting.benchmark'
+        'results/plotting/benchmark/{sample}.plotting.benchmark'
     shell:
         'Rscript workflow/scripts/scRNA_pipeline_plotting.R  '
         '--sce_in {input.infile} '
@@ -362,7 +370,7 @@ rule diff_exp_genes:
     threads:
         config['computingResources']['mediumRequirements']['threads']
     benchmark:
-        'results/diff_exp/{sample}.diff_exp.benchmark'
+        'results/diff_exp/benchmark/{sample}.diff_exp.benchmark'
     shell:
         'Rscript workflow/scripts/apply_DE_analysis.R --sample_data {input.sce_in} '
         '--sampleName {params.sampleName} '
@@ -395,7 +403,7 @@ rule gene_exp:
     threads:
         config['computingResources']['mediumRequirements']['threads']
     benchmark:
-        'results/gene_exp/{sample}.gene_exp.benchmark'
+        'results/gene_exp/benchmark/{sample}.gene_exp.benchmark'
     shell:
         'Rscript workflow/scripts/get_cluster_gene_expression.R '
         '--sce_in {input.sce_in} '
@@ -412,13 +420,15 @@ rule generate_qc_plots :
         infile = '{sample}.h5'
     output:
         out = '{sample}.h5.histogram_library_sizes.png'
+    conda:
+        '../envs/generate_qc_plots.yaml'
     resources:
         mem_mb = config['computingResources']['mediumRequirements']['mem'],
         time_min = config['computingResources']['mediumRequirements']['time'],
     threads:
         config['computingResources']['mediumRequirements']['threads']
     benchmark:
-        '{sample}.generate_qc_plots.benchmark'
+        'benchmark/{sample}.generate_qc_plots.benchmark'
     shell:
         'Rscript workflow/scripts/generate_QC_plots.R '
         '--hdf5File {input.infile} '
@@ -441,7 +451,7 @@ rule generate_qc_plots :
 #    threads:
 #        config['computingResources']['mediumRequirements']['threads']
 #    benchmark:
-#        'results/plotting/{sample}.boxplot_cell_types_cohort.benchmark'
+#        'results/plotting/benchmark/{sample}.boxplot_cell_types_cohort.benchmark'
 #    shell:
 #        'Rscript workflow/scripts/generate_boxplot_fractions_celltypes.R --previous_samples {input.previous_samples} --current_sample {input.sample_cell_types} --sampleName {params.sampleName} --sampleName_short {params.sampleName_short} --outDir {params.outDir}'
 
@@ -464,7 +474,7 @@ rule generate_qc_plots :
 #    threads:
 #        config['computingResources']['mediumRequirements']['threads']
 #    benchmark:
-#        'results/plotting/{sample}.sample_integration.benchmark'
+#        'results/plotting/benchmark/{sample}.sample_integration.benchmark'
 #    shell:
 #        'Rscript workflow/scripts/sample_integration.R  --cohort_list {input.previous_samples} --sample_data {input.current_sample} --sampleName {params.sampleName} --sampleName_short {params.sampleName_short} --colour_config {params.colour_config} --outdir {params.outDir}'
 
@@ -483,7 +493,7 @@ rule cell_percent_in_cluster:
     threads:
         config['computingResources']['mediumRequirements']['threads']
     benchmark:
-        'results/clusterpercent/{sample}.clusterPercent.benchmark'
+        'results/clusterpercent/benchmark/{sample}.clusterPercent.benchmark'
     shell:
         'python workflow/scripts/count_cells_in_clusters.py '
         '--inputTable {input.clusterCsv} '
