@@ -255,7 +255,7 @@ rule celltyping:
     benchmark:
         'results/celltyping/benchmark/{sample}.celltyping.benchmark'
     shell:
-        'Rscript workflow/scripts/celltyping.r '
+        'Rscript workflow/scripts/celltyping.R '
         '--SCE {input.infile} '
         '--celltype_lists {params.celltype_lists} '
         '--celltype_config {params.celltype_config} '
@@ -318,7 +318,7 @@ rule gsva:
     benchmark:
         'results/gsva/benchmark/{sample}.gsva.benchmark'
     shell:
-        'Rscript workflow/scripts/gsva.r '
+        'Rscript workflow/scripts/gsva.R '
         '--SCE {input.infile} '
         '--geneset {params.genesets} '
         '--outputDirec {params.outputDirec} '
@@ -413,7 +413,7 @@ rule gene_exp:
     benchmark:
         'results/gene_exp/benchmark/{sample}.gene_exp.benchmark'
     shell:
-        'Rscript workflow/scripts/get_cluster_gene_expression.R '
+        'Rscript workflow/scripts/gene_exp.R '
         '--sce_in {input.sce_in} '
         '--priority_genes {params.priority_genes} '
         '--filtering_threshold_sample {params.threshold_sample} '
