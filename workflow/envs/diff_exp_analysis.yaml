@@ -1,0 +1,15 @@
+# find env in scAmpi_single_cell_RNA/workflow/envs/diff_exp_analysis.yaml
+name: diff_exp_analysis
+channels:
+    - conda-forge
+    - bioconda
+    - r
+    - defaults
+dependencies:
+    - r >= 4.0
+    - bioconductor-singlecellexperiment >= 1.12.0
+    - r-ggplot2 >= 3.3.3
+    - r-optparse >= 1.6.6
+    - r-multcomp >= 1.4_16
+    - r-broom >= 0.7.6
+    - r-reshape2 >= 1.4.4

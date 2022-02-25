@@ -371,6 +371,8 @@ rule diff_exp_analysis:
         mindiff2second = config['tools']['diff_exp_analysis']['mindiff2second'],
         minNumberNonMalignant = config['tools']['diff_exp_analysis']['minNumberNonMalignant'],
         outpath = 'results/diff_exp_analysis/'
+    conda:
+        '../envs/diff_exp_analysis.yaml'
     resources:
         mem_mb = config['computingResources']['mediumRequirements']['mem'],
         time_min = config['computingResources']['mediumRequirements']['time'],
@@ -405,6 +407,8 @@ rule gene_exp:
         threshold_sample = config['tools']['gene_exp']['threshold_sample'],
         type_sample = config['tools']['gene_exp']['type_sample'],
         priority_genes = config['resources']['priority_genes'],
+    conda:
+        '../envs/gene_exp.yaml'
     resources:
         mem_mb = config['computingResources']['mediumRequirements']['mem'],
         time_min = config['computingResources']['mediumRequirements']['time'],

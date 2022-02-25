@@ -37,7 +37,7 @@ rule scAmpi_basic:
         expand('results/atypical_removed/{sample}.genes_cells_filtered.corrected.atypical_removed.RDS', sample = sample_ids),
         expand('results/clustering/{sample}.genes_cells_filtered.corrected.atypical_removed.clusters_cell_count_percent.txt', sample = sample_ids),
         expand('results/diff_exp_analysis/{sample}.genes_cells_filtered.corrected.atypical_removed.diff_exp_analysis_success.txt', sample = sample_ids),
-#        expand('results/gene_exp/{sample}.genes_cells_filtered.corrected.atypical_removed.gene_expression_per_cluster.tsv', sample = sample_ids),
+        expand('results/gene_exp/{sample}.genes_cells_filtered.corrected.atypical_removed.gene_expression_per_cluster.tsv', sample = sample_ids),
 #        expand('results/plotting/{sample}.genes_cells_filtered.corrected.atypical_removed.celltype_barplot.png', sample = sample_ids),
 #        expand('results/gsva/{sample}.genes_cells_filtered.corrected.atypical_removed.gsetscore_hm.png', sample = sample_ids),
     output:
