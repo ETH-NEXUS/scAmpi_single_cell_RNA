@@ -494,6 +494,8 @@ rule cell_percent_in_cluster:
         out = 'results/clustering/{sample}.clusters_cell_count_percent.txt'
     params:
         variousParams = config['tools']['cell_percent_in_cluster']['variousParams']
+    conda:
+        '../envs/cell_percent_in_cluster.yaml'
     resources:
         mem_mb = config['computingResources']['mediumRequirements']['mem'],
         time_min = config['computingResources']['mediumRequirements']['time'],
