@@ -355,31 +355,32 @@ rule plotting:
 
 
 # perform the differential expression analysis using a Wilcoxon test
-rule diff_exp_genes:
+rule diff_exp_analysis:
     input:
         sce_in = 'results/atypical_removed/{sample}.RDS',
         cell_types = 'results/atypical_removed/{sample}.phenograph_celltype_association.txt'
     output:
         #outpath = dynamic('results/diff_exp/' + "{sample}.{clusterid}.DEgenes.tsv"),
-        success = 'results/diff_exp/{sample}.diffExp_success.txt'
+        success = 'results/diff_exp_analysis/{sample}.diff_exp_analysis_success.txt'
     params:
         sampleName = '{sample}',
         malignant = config['inputOutput']['malignant_cell_type'],
-        threshold_comparison = config['tools']['diff_exp']['threshold_comparison'],
-        fdr_cut = config['tools']['diff_exp']['fdr_cut'],
-        fc_cut = config['tools']['diff_exp']['fc_cut'],
-        mindiff2second = config['tools']['diff_exp']['mindiff2second'],
-        minNumberNonMalignant = config['tools']['diff_exp']['minNumberNonMalignant'],
-        outpath = 'results/diff_exp/'
+        threshold_comparison = config['tools']['diff_exp_analysis']['threshold_comparison'],
+        fdr_cut = config['tools']['diff_exp_analysis']['fdr_cut'],
+        fc_cut = config['tools']['diff_exp_analysis']['fc_cut'],
+        mindiff2second = config['tools']['diff_exp_analysis']['mindiff2second'],
+        minNumberNonMalignant = config['tools']['diff_exp_analysis']['minNumberNonMalignant'],
+        outpath = 'results/diff_exp_analysis/'
     resources:
         mem_mb = config['computingResources']['mediumRequirements']['mem'],
         time_min = config['computingResources']['mediumRequirements']['time'],
     threads:
         config['computingResources']['mediumRequirements']['threads']
     benchmark:
-        'results/diff_exp/benchmark/{sample}.diff_exp.benchmark'
+        'results/diff_exp_analysis/benchmark/{sample}.diff_exp_analysis.benchmark'
     shell:
-        'Rscript workflow/scripts/apply_DE_analysis.R --sample_data {input.sce_in} '
+        'Rscript workflow/scripts/diff_exp_analysis.R '
+        '--sample_data {input.sce_in} '
         '--sampleName {params.sampleName} '
         '--cluster_table {input.cell_types} '
         '--malignant_tag {params.malignant} '

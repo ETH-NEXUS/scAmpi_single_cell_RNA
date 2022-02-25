@@ -89,7 +89,7 @@ tools:
       # minimum number of cells to form a cluster
       min_cluster_size: 20
 
-  diff_exp:
+  diff_exp_analysis:
     # minimum number of cells to be tested in DE analysis
     threshold_comparison: "20"
     # cut-off for p-value
