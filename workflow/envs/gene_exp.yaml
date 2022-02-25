@@ -12,3 +12,4 @@ dependencies:
     - r-dplyr >= 1.0.5
     - r-ggplot2 >= 3.3.3
     - r-purrr >= 0.3.4
+    - bioconductor-singlecellexperiment >= 1.12.0
