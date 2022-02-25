@@ -92,5 +92,5 @@ print(my_sce)
 
 # Save sce object
 print("Save sce object in the following path: ")
-print(paste0(opt$outputDirec, opt$sampleName, ".RDS"))
-saveRDS(my_sce, opt$outputDirec %&% opt$sampleName %&% ".RDS")
+print(paste0(opt$outputDirec, opt$sampleName, ".prep_celltyping.RDS"))
+saveRDS(my_sce, opt$outputDirec %&% opt$sampleName %&% ".prep_celltyping.RDS")
