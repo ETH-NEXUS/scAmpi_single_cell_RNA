@@ -139,7 +139,7 @@ rule filter_genes_and_cells:
 # perform normalisation, cell cycle correction and other preprocessing using sctransform
 rule sctransform_preprocessing:
     input:
-        hdf5_file =  'results/counts_filtered/{sample}.h5',
+        hdf5_file =  'results/counts_filtered/{sample}.genes_cells_filtered.h5',
     output:
         outfile = 'results/counts_corrected/{sample}.corrected.RDS',
         highly_variable = 'results/counts_corrected/{sample}.corrected.variable_genes.h5',
@@ -171,7 +171,7 @@ rule sctransform_preprocessing:
 # perform clustering with phenograph
 rule phenograph:
     input:
-        infile = 'results/counts_corrected/{sample}.variable_genes.h5'
+        infile = 'results/counts_corrected/{sample}.corrected.variable_genes.h5'
     output:
         outfile = 'results/clustering/{sample}.clusters_phenograph.csv',
         distance_matrix = 'results/clustering/{sample}.distance_matrix.tsv',
@@ -204,12 +204,12 @@ rule phenograph:
 # prepare sce object in RDS file for cell type classification
 rule prepare_celltyping:
     input:
-        RDS_file = 'results/counts_corrected/{sample}.RDS',
+        RDS_file = 'results/counts_corrected/{sample}.corrected.RDS',
         cluster = 'results/clustering/{sample}.clusters_phenograph.csv',
         distanceMatrix = 'results/clustering/{sample}.distance_matrix.tsv',
         modularity_score = 'results/clustering/{sample}.modularity_score.txt',
     output:
-        outfile = 'results/prep_celltyping/{sample}.RDS'
+        outfile = 'results/prep_celltyping/{sample}.prep_celltyping.RDS'
     params:
         outputDirec = 'results/prep_celltyping/',
         sampleName = '{sample}',
@@ -235,10 +235,10 @@ rule prepare_celltyping:
 # perform cell type classification
 rule celltyping:
     input:
-        infile = 'results/prep_celltyping/{sample}.RDS',
+        infile = 'results/prep_celltyping/{sample}.prep_celltyping.RDS',
     output:
-        outfile = 'results/celltyping/{sample}.phenograph_celltype_association.txt',
-        out_sce = 'results/celltyping/{sample}.RDS'
+        outfile = 'results/celltyping/{sample}.celltyping.phenograph_celltype_association.txt',
+        out_sce = 'results/celltyping/{sample}.celltyping.RDS'
     params:
         min_genes = config['tools']['celltyping']['min_genes'],
         celltype_lists = config['resources']['celltype_lists'],
@@ -267,8 +267,8 @@ rule celltyping:
 # filter out atypical cells from sce object
 rule remove_atypical_cells:
     input:
-        infile = 'results/celltyping/{sample}.RDS',
-        cluster_table = 'results/celltyping/{sample}.phenograph_celltype_association.txt',
+        infile = 'results/celltyping/{sample}.celltyping.RDS',
+        cluster_table = 'results/celltyping/{sample}.celltyping.phenograph_celltype_association.txt',
     output:
         out_sce = 'results/atypical_removed/{sample}.atypical_removed.RDS',
         out_table = 'results/atypical_removed/{sample}.atypical_removed.phenograph_celltype_association.txt'
@@ -289,7 +289,7 @@ rule remove_atypical_cells:
     benchmark:
         'results/atypical_removed/benchmark/{sample}.atypical_removed.benchmark'
     shell:
-        'Rscripts workflow/scripts/remove_atypical_cells.R '
+        'Rscript workflow/scripts/remove_atypical_cells.R '
         '--sce_in {input.infile} '
         '--cluster_table {input.cluster_table} '
         '--celltype_config {params.celltype_config} '
@@ -303,13 +303,15 @@ rule remove_atypical_cells:
 # perform gsva gene set analysis
 rule gsva:
     input:
-        infile = 'results/atypical_removed/{sample}.RDS',
+        infile = 'results/atypical_removed/{sample}.atypical_removed.RDS',
     output:
         outfile = 'results/gsva/{sample}.gsetscore_hm.png',
     params:
         outputDirec = 'results/gsva/',
         sampleName = '{sample}',
         genesets = config['resources']['genesets'],
+    conda:
+        '../envs/gsva.yaml'
     resources:
         mem_mb = config['computingResources']['mediumRequirements']['mem'],
         time_min = config['computingResources']['mediumRequirements']['time'],
@@ -328,7 +330,7 @@ rule gsva:
 # generate plots about sample composition and gene expression
 rule plotting:
     input:
-        infile = 'results/atypical_removed/{sample}.RDS',
+        infile = 'results/atypical_removed/{sample}.atypical_removed.RDS',
     output:
         outfile = 'results/plotting/{sample}.celltype_barplot.png',
     params:
@@ -337,6 +339,8 @@ rule plotting:
         genes_of_interest = config['resources']['priority_genes'],
         colour_config = config['resources']['colour_config'],
         use_alias = config['tools']['plotting']['use_alias']
+    conda:
+        '../envs/plotting.yaml'
     resources:
         mem_mb = config['computingResources']['mediumRequirements']['mem'],
         time_min = config['computingResources']['mediumRequirements']['time'],
@@ -357,8 +361,8 @@ rule plotting:
 # perform the differential expression analysis using a Wilcoxon test
 rule diff_exp_analysis:
     input:
-        sce_in = 'results/atypical_removed/{sample}.RDS',
-        cell_types = 'results/atypical_removed/{sample}.phenograph_celltype_association.txt'
+        sce_in = 'results/atypical_removed/{sample}.atypical_removed.RDS',
+        cell_types = 'results/atypical_removed/{sample}.atypical_removed.phenograph_celltype_association.txt'
     output:
         #outpath = dynamic('results/diff_exp/' + "{sample}.{clusterid}.DEgenes.tsv"),
         success = 'results/diff_exp_analysis/{sample}.diff_exp_analysis_success.txt'
@@ -398,7 +402,7 @@ rule diff_exp_analysis:
 # give out gene expression values per cluster
 rule gene_exp:
     input:
-        sce_in = 'results/atypical_removed/{sample}.RDS',
+        sce_in = 'results/atypical_removed/{sample}.atypical_removed.RDS',
     output:
         out = 'results/gene_exp/{sample}.gene_expression_per_cluster.tsv'
     params:
@@ -472,7 +476,7 @@ rule generate_qc_plots :
 #rule sample_integration:
 #    input:
 #        previous_samples = config['resources']['previous_samples_counts'],
-#        current_sample = 'results/atypical_removed/{sample}.RDS'
+#        current_sample = 'results/atypical_removed/{sample}.atypical_removed.RDS'
 #    output:
 #        out = 'results/plotting/{sample}.sample_integration_highlight_current.png'
 #    params:
@@ -494,7 +498,7 @@ rule generate_qc_plots :
 # calculate for each cluster the number of cells it countains and the percentage of all cells
 rule cell_percent_in_cluster:
     input:
-        clusterCsv = 'results/atypical_removed/{sample}.phenograph_celltype_association.txt'
+        clusterCsv = 'results/atypical_removed/{sample}.atypical_removed.phenograph_celltype_association.txt'
     output:
         out = 'results/clustering/{sample}.clusters_cell_count_percent.txt'
     params:

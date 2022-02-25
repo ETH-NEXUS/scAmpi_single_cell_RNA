@@ -32,14 +32,14 @@ rule scAmpi_basic:
         expand('results/counts_filtered/{sample}.doublet_barcodes.txt', sample = sample_ids),
         expand('results/counts_raw/{sample}.h5.histogram_library_sizes.png', sample = sample_ids),
         expand('results/counts_filtered/{sample}.genes_cells_filtered.h5.histogram_library_sizes.png', sample = sample_ids),
-        expand('results/counts_corrected/{sample}.genes_cells_filtered.corrected.RDS', sample = sample_ids),
-        expand('results/clustering/{sample}.genes_cells_filtered.corrected.clusters_phenograph.csv', sample = sample_ids),
-        expand('results/atypical_removed/{sample}.genes_cells_filtered.corrected.atypical_removed.RDS', sample = sample_ids),
-        expand('results/clustering/{sample}.genes_cells_filtered.corrected.atypical_removed.clusters_cell_count_percent.txt', sample = sample_ids),
-        expand('results/diff_exp_analysis/{sample}.genes_cells_filtered.corrected.atypical_removed.diff_exp_analysis_success.txt', sample = sample_ids),
-        expand('results/gene_exp/{sample}.genes_cells_filtered.corrected.atypical_removed.gene_expression_per_cluster.tsv', sample = sample_ids),
-#        expand('results/plotting/{sample}.genes_cells_filtered.corrected.atypical_removed.celltype_barplot.png', sample = sample_ids),
-#        expand('results/gsva/{sample}.genes_cells_filtered.corrected.atypical_removed.gsetscore_hm.png', sample = sample_ids),
+        expand('results/counts_corrected/{sample}.corrected.RDS', sample = sample_ids),
+        expand('results/clustering/{sample}.clusters_phenograph.csv', sample = sample_ids),
+        expand('results/atypical_removed/{sample}.atypical_removed.RDS', sample = sample_ids),
+        expand('results/clustering/{sample}.clusters_cell_count_percent.txt', sample = sample_ids),
+        expand('results/diff_exp_analysis/{sample}.diff_exp_analysis_success.txt', sample = sample_ids),
+        expand('results/gene_exp/{sample}.gene_expression_per_cluster.tsv', sample = sample_ids),
+        expand('results/plotting/{sample}.celltype_barplot.png', sample = sample_ids),
+        expand('results/gsva/{sample}.gsetscore_hm.png', sample = sample_ids),
     output:
         'results/complete_scAmpi_basic.txt'
     params:
