@@ -345,7 +345,7 @@ rule plotting:
     benchmark:
         'results/plotting/benchmark/{sample}.plotting.benchmark'
     shell:
-        'Rscript workflow/scripts/scRNA_pipeline_plotting.R  '
+        'Rscript workflow/scripts/plotting.R  '
         '--sce_in {input.infile} '
         '--genelist {params.genes_of_interest} '
         '--outDir {params.outputDirec} '
