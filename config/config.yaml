@@ -5,7 +5,7 @@ inputOutput:
   malignant_cell_type: "Melanoma"
 
 resources:
-  # The following needs to point to the reference transcriptome that will be used by cellranger. 
+  # The following needs to point to the reference transcriptome that will be used by cellranger.
   reference_transcriptome: /cluster/work/nexus/utilities/databases/singlecell/10xGenomics/gene_expression_3_0_2/refdata-cellranger-GRCh38-3.0.0
   # celltype_lists gmx file containing a library of cell type classification gene lists
   celltype_lists: "path_to_scAmpi_git/required_files/melanoma/celltype_list_melanoma.gmx"
@@ -46,10 +46,6 @@ tools:
     variousParams:
     local_cores: 8
 
-  cellranger_count_adt:
-    call:
-    variousParams:
-
   filter_genes_and_cells:
     # cell outlier detection based on fractionMT, disabled per default ("100")
     nmads_fractionMT: "100"
@@ -72,7 +68,7 @@ tools:
     # number of nearest neighbours for UMAP calculation
     n_nn: "30"
 
-  cell_type_classification:
+  celltyping:
     # minimum number of cell-type-specific genes expressed by a cell to consider cell type, default is "5"
     min_genes: "5"
 

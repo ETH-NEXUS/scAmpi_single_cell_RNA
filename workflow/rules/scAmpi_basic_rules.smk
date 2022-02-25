@@ -64,7 +64,8 @@ rule create_hdf5:
         'results/counts_raw/benchmark/{sample}.create_hd5.benchmark'
     shell:
         'python workflow/scripts/create_hdf5.py '
-        '-g {input.genes_file} -m {input.matrix_file} '
+        '-g {input.genes_file} '
+        '-m {input.matrix_file} '
         '-b {input.barcodes_file} '
         '-o {output.outfile}'
 
@@ -230,17 +231,17 @@ rule prepare_celltyping:
 
 
 # perform cell type classification
-rule cell_type_classification:
+rule celltyping:
     input:
         infile = 'results/prep_celltyping/{sample}.RDS',
     output:
-        outfile = 'results/celltype_classification/{sample}.phenograph_celltype_association.txt',
-        out_sce = 'results/celltype_classification/{sample}.RDS'
+        outfile = 'results/celltyping/{sample}.phenograph_celltype_association.txt',
+        out_sce = 'results/celltyping/{sample}.RDS'
     params:
-        min_genes = config['tools']['cell_type_classification']['min_genes'],
+        min_genes = config['tools']['celltyping']['min_genes'],
         celltype_lists = config['resources']['celltype_lists'],
         celltype_config = config['resources']['celltype_config'],
-        outputDirec = 'results/celltype_classification/',
+        outputDirec = 'results/celltyping/',
         sampleName = '{sample}',
     resources:
         mem_mb = config['computingResources']['mediumRequirements']['mem'],
@@ -248,7 +249,7 @@ rule cell_type_classification:
     threads:
         config['computingResources']['mediumRequirements']['threads']
     benchmark:
-        'results/celltype_classification/benchmark/{sample}.cell_type_classification.benchmark'
+        'results/celltyping/benchmark/{sample}.celltyping.benchmark'
     shell:
         'Rscript workflow/scripts/celltyping.r '
         '--SCE {input.infile} '
@@ -262,8 +263,8 @@ rule cell_type_classification:
 # filter out atypical cells from sce object
 rule remove_atypical:
     input:
-        infile = 'results/celltype_classification/{sample}.RDS',
-        cluster_table = 'results/celltype_classification/{sample}.phenograph_celltype_association.txt',
+        infile = 'results/celltyping/{sample}.RDS',
+        cluster_table = 'results/celltyping/{sample}.phenograph_celltype_association.txt',
     output:
         out_sce = 'results/atypical_removed/{sample}.atypical_removed.RDS',
         out_table = 'results/atypical_removed/{sample}.atypical_removed.phenograph_celltype_association.txt'
