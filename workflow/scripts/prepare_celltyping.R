@@ -1,9 +1,9 @@
 ################################################################################
 ## Merge sce object from scRNA preprocessing with the phenograph dist. matrix, mod.-score and clusters
-## File name: merge_results_to_sce_object.R
+## File name: prepare_celltyping.R
 ## Authors: Michael Prummer, Anne Bertolini, Franziska Singer
 ## Date created: June 2019
-## R Version: 3.5.1
+## R Version: 4.0
 ################################################################################
 
 # This script merges the results of phenograph (the cluster IDs of the cells, the modularity score of the clustering and the distance matrix) into a given sce object.

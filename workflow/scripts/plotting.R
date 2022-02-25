@@ -1,11 +1,9 @@
-# #################################################
-
-#### File name: scRNA_pipeline_plotting.R
+##################################################
+#### File name: plotting.R
 #### Author: Anne Bertolini
 #### Date created: June 2019
-#### R Version: 3.5.1
-
-# #################################################
+#### R Version: 4.0
+##################################################
 
 suppressPackageStartupMessages({
   library(optparse)
@@ -19,9 +17,9 @@ suppressPackageStartupMessages({
 })
 
 ## packages
-lby = c("limma", "scater", "scran", "Rtsne", "rhdf5", "ggplot2", "pheatmap", "Hmisc",
+lby = c("limma", "scater", "scran", "Rtsne", "rhdf5", "pheatmap", "Hmisc",
         "RColorBrewer", "cowplot", "reshape2", "igraph", "org.Hs.eg.db", "GSVA","aroma.light",
-        "class","ggrepel")
+        "class", "ggrepel")
 resp = lapply(lby, require, character.only=T, warn.conflicts=F, quietly=T)
 if(!all(unlist(resp))) stop("Could not load one or more packages")
 rm(resp, lby)

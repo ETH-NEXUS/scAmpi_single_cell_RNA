@@ -1,11 +1,9 @@
-# ########################################
-
-####    File name: get_cluster_gene_expression.R
+##########################################
+####    File name: gene_exp.R
 ####    Author: Anne Bertolini
 ####    Created in March 2019
-####    R Version: 3.5.1
-
-# ########################################
+####    R Version: 4.0
+##########################################
 
 # This script takes as input:
 # 1) RDS file that contains a SCE object
@@ -28,6 +26,7 @@ library(plyr)
 library(dplyr)
 library(ggplot2)
 library(purrr)
+library(SingleCellExperiment)
 })
 
 # give out session Info

@@ -1,12 +1,11 @@
-# ########################################
-
-####    File name: filter_out_atypical_cells.R
+#################################################
+####    File name: remove_atypical_cells.R
 ####    Author: Anne Bertolini
 ####    Created June 2019
 ####    Updated December 2020
-####    R Version: 3.5.1
+####    R Version: 4.0
+################################################
 
-# ########################################
 suppressPackageStartupMessages({
   library(rhdf5)
   library(optparse)

@@ -1,10 +1,8 @@
 ########################################
-
 ####    File name: filter_genes_and_cells.R
 ####    Author: Anne Richter
 ####    Created in October 2018
-####    R Version: 3.5.1
-
+####    R Version: 4.0
 ########################################
 
 # Filtering of non-coding genes was included into this script

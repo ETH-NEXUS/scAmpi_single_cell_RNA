@@ -1,11 +1,9 @@
-# #################################################
-
+###################################################
 #### File name: generate_boxplot_fractions_celltypes.R
 #### Author: Anne Bertolini
 #### Date created: August 2019
 #### R Version: 3.5.1
-
-# #################################################
+###################################################
 
 # make boxplot with cell type fractions of all samples with the current sample highlighted
 library(optparse)

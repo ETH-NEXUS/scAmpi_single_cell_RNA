@@ -2,7 +2,7 @@
 #### File name: sctransform_preprocessing.R
 #### Author: Michael Prummer
 #### Date created: June 2019
-#### R Version: 3.5.1
+#### R Version: 4.0
 ##################################################
 
 suppressPackageStartupMessages({

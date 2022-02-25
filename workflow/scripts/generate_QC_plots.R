@@ -1,9 +1,8 @@
 ########################################
-
 ####    File name: generate_QC_plots.R
 ####    Author: Anne Richter
 ####    Created in October 2018
-####    R Version: 3.5.1
+####    R Version: 4.0
 #########################################
 
 # This script takes an hdf5 file of sc-RNA expression data and returns several QC plots

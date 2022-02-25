@@ -1,9 +1,9 @@
 ################################################################################
-#### File name: apply_DE_analysis.R
+#### File name: diff_exp_analysis.R
 #### Author: Anne Bertolini
 #### Co-author: Michael Prummer
 #### Date created: February 2020
-#### R Version: 3.5.1
+#### R Version: 4.0
 ################################################################################
 
 # Run linear model  on single TP sample,

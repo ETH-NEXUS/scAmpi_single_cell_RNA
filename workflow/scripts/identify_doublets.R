@@ -1,7 +1,7 @@
 ##################################################
 #### File name: remove_doublets.R
 #### Date created: December 2020
-#### R Version: 4.0.2
+#### R Version: 4.0
 ##################################################
 
 library(scDblFinder)
