@@ -265,7 +265,7 @@ rule celltyping:
 
 
 # filter out atypical cells from sce object
-rule remove_atypical:
+rule remove_atypical_cells:
     input:
         infile = 'results/celltyping/{sample}.RDS',
         cluster_table = 'results/celltyping/{sample}.phenograph_celltype_association.txt',
@@ -276,9 +276,9 @@ rule remove_atypical:
         celltype_config = config['resources']['celltype_config'],
         outputDirec = 'results/atypical_removed/',
         sample_name = '{sample}',
-        threshold_filter = config['tools']['remove_atypical']['threshold_filter'],
-        min_threshold = config['tools']['remove_atypical']['min_threshold'],
-        threshold_type = config['tools']['remove_atypical']['threshold_type'],
+        threshold_filter = config['tools']['remove_atypical_cells']['threshold_filter'],
+        min_threshold = config['tools']['remove_atypical_cells']['min_threshold'],
+        threshold_type = config['tools']['remove_atypical_cells']['threshold_type'],
     resources:
         mem_mb = config['computingResources']['mediumRequirements']['mem'],
         time_min = config['computingResources']['mediumRequirements']['time']
@@ -287,7 +287,7 @@ rule remove_atypical:
     benchmark:
         'results/atypical_removed/benchmark/{sample}.atypical_removed.benchmark'
     shell:
-        'Rscripts workflow/scripts/filter_out_atypical_cells.R '
+        'Rscripts workflow/scripts/remove_atypical_cells.R '
         '--sce_in {input.infile} '
         '--cluster_table {input.cluster_table} '
         '--celltype_config {params.celltype_config} '

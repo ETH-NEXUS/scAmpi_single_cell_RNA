@@ -72,7 +72,7 @@ tools:
     # minimum number of cell-type-specific genes expressed by a cell to consider cell type, default is "5"
     min_genes: "5"
 
-  remove_atypical:
+  remove_atypical_cells:
     # threshold type, either "number_cells" or "percentage_cells"
     threshold_type: "percentage_cells"
     # default is "percentage_cells" and "5":
