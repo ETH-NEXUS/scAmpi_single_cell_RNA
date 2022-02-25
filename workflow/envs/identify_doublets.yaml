@@ -1,0 +1,13 @@
+# find env in scAmpi_single_cell_RNA/workflow/envs/identify_doublets.yaml
+name: identify_doublets
+channels:
+    - conda-forge
+    - bioconda
+    - r
+    - defaults
+dependencies:
+    - r >= 4.0
+    - bioconductor-scdblfinder >= 1.4.0
+    - r-optparse >= 1.6.6
+    - bioconductor-rhdf5 >= 2.34.0
+    - bioconductor-singlecellexperiment >= 1.12.0

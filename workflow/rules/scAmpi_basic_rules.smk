@@ -213,6 +213,8 @@ rule prepare_celltyping:
     params:
         outputDirec = 'results/prep_celltyping/',
         sampleName = '{sample}',
+    conda:
+        '../envs/prepare_celltyping.yaml'
     resources:
         mem_mb = config['computingResources']['mediumRequirements']['mem'],
         time_min = config['computingResources']['mediumRequirements']['time'],
@@ -243,6 +245,8 @@ rule celltyping:
         celltype_config = config['resources']['celltype_config'],
         outputDirec = 'results/celltyping/',
         sampleName = '{sample}',
+    conda:
+        '../envs/celltyping.yaml'
     resources:
         mem_mb = config['computingResources']['mediumRequirements']['mem'],
         time_min = config['computingResources']['mediumRequirements']['time'],
