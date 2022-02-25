@@ -279,6 +279,8 @@ rule remove_atypical_cells:
         threshold_filter = config['tools']['remove_atypical_cells']['threshold_filter'],
         min_threshold = config['tools']['remove_atypical_cells']['min_threshold'],
         threshold_type = config['tools']['remove_atypical_cells']['threshold_type'],
+    conda:
+        '../envs/remove_atypical_cells.yaml'
     resources:
         mem_mb = config['computingResources']['mediumRequirements']['mem'],
         time_min = config['computingResources']['mediumRequirements']['time']
