@@ -485,7 +485,7 @@ tab.ci <- apply(tab.ci, 2, function(x) as.character(signif(x, 2)))
 tab.ci <- apply(tab.ci, 1, function(x) sprintf("%s (%s;%s)", x[1], x[2], x[3]))
 clu.pu[nrow(clu.pu), 1 + seq(length(tab.ci))] <- tab.ci
 # to remove confidence intervals, comment out the previous 4 lines.
-write.table(clu.pu, file = path %&% ".phenograph_celltype_association.txt", sep = "\t", row.names = F)
+write.table(clu.pu, file = path %&% ".celltyping.phenograph_celltype_association.txt", sep = "\t", row.names = F)
 ## end new cluster purity calculations
 
 
@@ -513,6 +513,6 @@ print(dom_types)
 
 ################################################################################
 ## save sce object for later use
-saveRDS(sce_data, path %&% ".RDS")
+saveRDS(sce_data, path %&% ".celltyping.RDS")
 # also save sce_data object that including the cells that are in cluster 0
-saveRDS(sce_data_incl_cluster0, path %&% ".all_cells.RDS")
+saveRDS(sce_data_incl_cluster0, path %&% ".celltyping.all_cells.RDS")
