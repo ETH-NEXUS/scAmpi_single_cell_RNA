@@ -358,45 +358,6 @@ rule plotting:
         '--toggle_label {params.use_alias}'
 
 
-# perform the differential expression analysis using a Wilcoxon test
-rule diff_exp_analysis:
-    input:
-        sce_in = 'results/atypical_removed/{sample}.atypical_removed.RDS',
-        cell_types = 'results/atypical_removed/{sample}.atypical_removed.phenograph_celltype_association.txt'
-    output:
-        #outpath = dynamic('results/diff_exp/' + "{sample}.{clusterid}.DEgenes.tsv"),
-        success = 'results/diff_exp_analysis/{sample}.diff_exp_analysis_success.txt'
-    params:
-        sampleName = '{sample}',
-        malignant = config['inputOutput']['malignant_cell_type'],
-        threshold_comparison = config['tools']['diff_exp_analysis']['threshold_comparison'],
-        fdr_cut = config['tools']['diff_exp_analysis']['fdr_cut'],
-        fc_cut = config['tools']['diff_exp_analysis']['fc_cut'],
-        mindiff2second = config['tools']['diff_exp_analysis']['mindiff2second'],
-        minNumberNonMalignant = config['tools']['diff_exp_analysis']['minNumberNonMalignant'],
-        outpath = 'results/diff_exp_analysis/'
-    conda:
-        '../envs/diff_exp_analysis.yaml'
-    resources:
-        mem_mb = config['computingResources']['mediumRequirements']['mem'],
-        time_min = config['computingResources']['mediumRequirements']['time'],
-    threads:
-        config['computingResources']['mediumRequirements']['threads']
-    benchmark:
-        'results/diff_exp_analysis/benchmark/{sample}.diff_exp_analysis.benchmark'
-    shell:
-        'Rscript workflow/scripts/diff_exp_analysis.R '
-        '--sample_data {input.sce_in} '
-        '--sampleName {params.sampleName} '
-        '--cluster_table {input.cell_types} '
-        '--malignant_tag {params.malignant} '
-        '--fdr_cut {params.fdr_cut} '
-        '--fc_cut {params.fc_cut} '
-        '--mindiff2second {params.mindiff2second} '
-        '--threshold_comparison {params.threshold_comparison} '
-        '--minNumberNonMalignant {params.minNumberNonMalignant} '
-        '--outdir {params.outpath} ; '
-        'date > {output.success} '
 
 
 # give out gene expression values per cluster
@@ -517,3 +478,130 @@ rule cell_percent_in_cluster:
         '--inputTable {input.clusterCsv} '
         '--outFile {output.out} '
         '{params.variousParams}'
+
+# perform the differential expression analysis using a Wilcoxon test
+checkpoint diff_exp_analysis:
+    input:
+        sce_in = 'results/atypical_removed/{sample}.atypical_removed.RDS',
+        cell_types = 'results/atypical_removed/{sample}.atypical_removed.phenograph_celltype_association.txt'
+    output:
+        #outpath = dynamic('results/diff_exp/' + "{sample}.{clusterid}.DEgenes.tsv"),
+#        output = directory('results/diff_exp_analysis/'),
+#        success = 'results/diff_exp_analysis/{sample}/{sample}.diff_exp_analysis_success.txt',
+        clusters=directory("results/diff_exp_analysis/{sample}")
+    params:
+        sampleName = '{sample}',
+        malignant = config['inputOutput']['malignant_cell_type'],
+        threshold_comparison = config['tools']['diff_exp_analysis']['threshold_comparison'],
+        fdr_cut = config['tools']['diff_exp_analysis']['fdr_cut'],
+        fc_cut = config['tools']['diff_exp_analysis']['fc_cut'],
+        mindiff2second = config['tools']['diff_exp_analysis']['mindiff2second'],
+        minNumberNonMalignant = config['tools']['diff_exp_analysis']['minNumberNonMalignant'],
+        outpath = 'results/diff_exp_analysis/'
+    conda:
+        '../envs/diff_exp_analysis.yaml'
+    resources:
+        mem_mb = config['computingResources']['mediumRequirements']['mem'],
+        time_min = config['computingResources']['mediumRequirements']['time'],
+    threads:
+        config['computingResources']['mediumRequirements']['threads']
+    benchmark:
+        'results/diff_exp_analysis/benchmark/{sample}.diff_exp_analysis.benchmark'
+    shell:
+        'Rscript workflow/scripts/diff_exp_analysis.R '
+        '--sample_data {input.sce_in} '
+        '--sampleName {params.sampleName} '
+        '--cluster_table {input.cell_types} '
+        '--malignant_tag {params.malignant} '
+        '--fdr_cut {params.fdr_cut} '
+        '--fc_cut {params.fc_cut} '
+        '--mindiff2second {params.mindiff2second} '
+        '--threshold_comparison {params.threshold_comparison} '
+        '--minNumberNonMalignant {params.minNumberNonMalignant} '
+        '--outdir {params.outpath} ; '
+#        'date > {output.success} '
+#def get_file_names(wildcards):
+#    checkpoint_output = checkpoints.diff_exp_analysis.get(**wildcards).output[0]
+#    print(checkpoint_output)
+#    return(checkpoint_output)
+
+#get_file_names
+
+rule intermediate:
+    input:
+        'results/diff_exp_analysis/{sample}/{sample}.{i}.DEgenes.tsv'
+    output:
+        'results/intermediate/{sample}/{i}.txt'
+    shell:
+        'cp {input} {output}'
+
+def aggregate_input(wildcards):
+    checkpoint_output = checkpoints.diff_exp_analysis.get(**wildcards).output[0]
+    return expand("results/intermediate/{sample}/{i}.txt",
+           sample=wildcards.sample,
+           i=glob_wildcards(os.path.join(checkpoint_output, "{i}.txt")).i)
+
+
+rule aggregate:
+    input:
+        aggregate_input
+    output:
+        'results/aggregated/{sample}.txt'
+    shell:
+        'touch {output}'
+
+# Parse csv file with expression levels and extract differentially expressed genes based on filter criteria
+rule parseAndFilter_DEgenes:
+    input:
+        success = 'results/diff_exp_analysis/{sample}.diff_exp_analysis_success.txt'
+#        tsv = PROCESSDE_IN + '{sample}.{clusterid}.DEgenes.tsv',
+    output:
+        out = 'results/parse_diff_exp/{sample}.{clusterid}.txt'
+    params:
+        variousParams = config['tools']['parseAndFilter_DEgenes']['variousParams']
+    #conda:
+    resources:
+        mem_mb = config['computingResources']['mediumRequirements']['mem'],
+        time_min = config['computingResources']['mediumRequirements']['time'],
+    threads:
+        config['computingResources']['mediumRequirements']['threads']
+    benchmark:
+        'results/parse_diff_exp/benchmark/{sample}.{clusterid}.parse.benchmark'
+    shell:
+        'python workflow/scripts/parseAndFilter_DEgenes.py} '
+        '{input.tsv} '
+        '{output.out} '
+        '{params.variousParams}'
+
+
+#def aggregate_input(wildcards):
+#    checkpoint_output = checkpoints.clustering.get(**wildcards).output[0]
+#    return expand("post/{sample}/{i}.txt",
+#           sample=wildcards.sample,
+#          i=glob_wildcards(os.path.join(checkpoint_output, "{i}.txt")).i)
+
+# query identified variants at dgidb
+rule dgidbQuery:
+    input:
+        infile = 'parse_diff_exp/{sample}.{clusterid}.txt'
+    output:
+        outfile = 'databaseQuery/{sample}.{clusterid}.dgidb.txt',
+        outfileCompleteTable = 'databaseQuery/{sample}.{clusterid}.dgidb.txt.CompleteTable.txt',
+        outfileGeneCategory = 'databaseQuery/{sample}.{clusterid}.dgidb.txt.GeneCategories.txt'
+    params:
+        minDatabaseNum = config['tools']['queryDGIDB']['minDatabaseNum'],
+        colName_genes = config['tools']['queryDGIDB']['colName_genes']
+    # conda:
+    resources:
+        mem_mb = config['computingResources']['mediumRequirements']['mem'],
+        time_min = config['computingResources']['mediumRequirements']['time'],
+    threads:
+        config['computingResources']['mediumRequirements']['threads']
+    benchmark:
+        'databaseQuery/benchmark/{sample}.{clusterid}.dgidbQuery.benchmark'
+    shell:
+         'Rscript workflow/scripts/query_dgidb.r '
+         '{input.infile} '
+         '{output.outfile} '
+         '{params.minDatabaseNum} '
+         '{params.colName_genes}'
