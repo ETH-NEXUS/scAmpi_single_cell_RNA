@@ -488,7 +488,7 @@ checkpoint diff_exp_analysis:
         #outpath = dynamic('results/diff_exp/' + "{sample}.{clusterid}.DEgenes.tsv"),
 #        output = directory('results/diff_exp_analysis/'),
 #        success = 'results/diff_exp_analysis/{sample}/{sample}.diff_exp_analysis_success.txt',
-        clusters=directory("results/diff_exp_analysis/{sample}")
+        output = directory("results/diff_exp_analysis/{sample}")
     params:
         sampleName = '{sample}',
         malignant = config['inputOutput']['malignant_cell_type'],
@@ -497,7 +497,7 @@ checkpoint diff_exp_analysis:
         fc_cut = config['tools']['diff_exp_analysis']['fc_cut'],
         mindiff2second = config['tools']['diff_exp_analysis']['mindiff2second'],
         minNumberNonMalignant = config['tools']['diff_exp_analysis']['minNumberNonMalignant'],
-        outpath = 'results/diff_exp_analysis/'
+        outpath = 'results/diff_exp_analysis/{sample}/'
     conda:
         '../envs/diff_exp_analysis.yaml'
     resources:
@@ -508,6 +508,7 @@ checkpoint diff_exp_analysis:
     benchmark:
         'results/diff_exp_analysis/benchmark/{sample}.diff_exp_analysis.benchmark'
     shell:
+        'mkdir {params.outpath} ; '
         'Rscript workflow/scripts/diff_exp_analysis.R '
         '--sample_data {input.sce_in} '
         '--sampleName {params.sampleName} '
@@ -518,18 +519,19 @@ checkpoint diff_exp_analysis:
         '--mindiff2second {params.mindiff2second} '
         '--threshold_comparison {params.threshold_comparison} '
         '--minNumberNonMalignant {params.minNumberNonMalignant} '
-        '--outdir {params.outpath} ; '
+        '--outdir {params.outpath} '
 #        'date > {output.success} '
-#def get_file_names(wildcards):
-#    checkpoint_output = checkpoints.diff_exp_analysis.get(**wildcards).output[0]
-#    print(checkpoint_output)
-#    return(checkpoint_output)
 
-#get_file_names
-
+def intermediate_input(wildcards):
+    checkpoint_output = checkpoints.diff_exp_analysis.get(**wildcards).output[0]
+    return expand(checkpoint_output + "{sample}/{sample}.{i}.DEgenes.tsv",
+           sample = wildcards.sample,
+           i = glob_wildcards(os.path.join(checkpoint_output, "{sample}.{i}.DEgenes.tsv")).i)
+# dummy rule for testing checkpoints
 rule intermediate:
     input:
-        'results/diff_exp_analysis/{sample}/{sample}.{i}.DEgenes.tsv'
+#        intermediate_input
+        'results/diff_exp_analysis/{sample}/{i}.DEgenes.tsv'
     output:
         'results/intermediate/{sample}/{i}.txt'
     shell:
@@ -538,8 +540,8 @@ rule intermediate:
 def aggregate_input(wildcards):
     checkpoint_output = checkpoints.diff_exp_analysis.get(**wildcards).output[0]
     return expand("results/intermediate/{sample}/{i}.txt",
-           sample=wildcards.sample,
-           i=glob_wildcards(os.path.join(checkpoint_output, "{i}.txt")).i)
+           sample = wildcards.sample,
+           i = glob_wildcards(os.path.join(checkpoint_output, "{i}.DEgenes.tsv")).i)
 
 
 rule aggregate:
@@ -548,15 +550,33 @@ rule aggregate:
     output:
         'results/aggregated/{sample}.txt'
     shell:
+        'echo {input} ; '
         'touch {output}'
+
+
+
+
+def parse_and_filter_input(wildcards):
+    checkpoint_output = checkpoints.diff_exp_analysis.get(**wildcards).output[0]
+    return expand(checkpoint_output + "{sample}/{i}.DEgenes.tsv",
+           sample = wildcards.sample,
+           i = glob_wildcards(os.path.join(checkpoint_output, "{i}.DEgenes.tsv")).i)
+
+#def parse_and_filter_output(wildcards):
+#    checkpoint_output = checkpoints.diff_exp_analysis.get(**wildcards).output[0]
+#    return expand("results/parse_diff_exp/{sample}.{i}.txt",
+#           sample = wildcards.sample,
+#           i = glob_wildcards(os.path.join(checkpoint_output, "{i}.DEgenes.tsv")).i)
 
 # Parse csv file with expression levels and extract differentially expressed genes based on filter criteria
 rule parseAndFilter_DEgenes:
     input:
-        success = 'results/diff_exp_analysis/{sample}.diff_exp_analysis_success.txt'
-#        tsv = PROCESSDE_IN + '{sample}.{clusterid}.DEgenes.tsv',
+#        success = 'results/diff_exp_analysis/{sample}/{sample}.diff_exp_analysis_success.txt',
+        tsv = 'results/diff_exp_analysis/{sample}/{i}.DEgenes.tsv',
+#         parse_and_filter_input
     output:
-        out = 'results/parse_diff_exp/{sample}.{clusterid}.txt'
+        out = 'results/parse_diff_exp/{sample}.{i}.txt'
+#         parse_and_filter_output
     params:
         variousParams = config['tools']['parseAndFilter_DEgenes']['variousParams']
     #conda:
@@ -566,19 +586,13 @@ rule parseAndFilter_DEgenes:
     threads:
         config['computingResources']['mediumRequirements']['threads']
     benchmark:
-        'results/parse_diff_exp/benchmark/{sample}.{clusterid}.parse.benchmark'
+        'results/parse_diff_exp/benchmark/{sample}.{i}.parse.benchmark'
     shell:
         'python workflow/scripts/parseAndFilter_DEgenes.py} '
         '{input.tsv} '
         '{output.out} '
         '{params.variousParams}'
 
-
-#def aggregate_input(wildcards):
-#    checkpoint_output = checkpoints.clustering.get(**wildcards).output[0]
-#    return expand("post/{sample}/{i}.txt",
-#           sample=wildcards.sample,
-#          i=glob_wildcards(os.path.join(checkpoint_output, "{i}.txt")).i)
 
 # query identified variants at dgidb
 rule dgidbQuery:
