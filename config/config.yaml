@@ -116,3 +116,34 @@ tools:
   cell_percent_in_cluster:
     variousParams: "--malignant Melanoma"
 
+  parse_filter_DE_genes:
+          # parameters are
+    # pvalue-threshold
+    # columnName_geneNames
+    # columnName_pvalues
+    # columnName_diff
+    # columnName_testStatistic
+    # colName_nonmalMax
+    # colName_nonmalMin
+    # colName_maligMean
+    # diffThreshold
+    # diff2secondThreshold
+    # optionalColumn1
+    # ...
+    variousParams: "0.01
+                    gene_names
+                    padj
+                    diff
+                    test_statistic
+                    nonmal_max
+                    nonmal_min
+                    malig_mean
+                    1
+                    1
+                    pct_nonzero"
+
+  query_dgidb:
+      # column header containing gene names
+      colName_genes: "gene_names"
+      # minimum number of data base support to report drug-gene interaction
+      minDatabaseNum: "4"

@@ -1,0 +1,8 @@
+# find env in scAmpi_single_cell_RNA/workflow/envs/parse_filter_DE_genes.yaml
+name: parse_filter_DE_genes
+channels:
+    - conda-forge
+    - bioconda
+    - defaults
+dependencies:
+    - python >= 3.9
