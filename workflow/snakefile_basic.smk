@@ -19,14 +19,9 @@ configfile: "config/config.yaml"
 # This file includes common functions used in the pipeline
 include: "rules/misc_snake.smk"
 
-#config["inputOutput"]["sample_map"]
-
-# old framework
-#SAMPLEMAPPING = config['inputOutput']['sample_map']
-
-
-# Include the rules
+# Include rules
 include: "rules/scAmpi_basic_rules.smk"
+include: "rules/scAmpi_clinical_rules.smk"
 
 #outdir = checkpoints.diff_exp_analysis.get(sample = sample_ids).output[0]
 #print(outdir)

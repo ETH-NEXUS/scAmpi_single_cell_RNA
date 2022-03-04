@@ -17,6 +17,8 @@ resources:
   priority_genes: "required_files/melanoma/selected_genes_melanoma.txt"
   # genesets for GSVA analysis (scAmpi_basic) and geneSetEnrichment (scAmpi_clinical)
   genesets: "required_files/hallmark_pathways_example.gmt"
+  # pathwayDB for clinical annotation in rule `annotate_DE_clinical_info` (scAmpi_clinical)
+  pathwayDB: "required_files/hallmark_pathways_converted_example.gmt"
 
 
 # The tools in this pipeline use a broad range of resources and have been assigned to the following three categories.
@@ -142,14 +144,42 @@ tools:
                     1
                     pct_nonzero"
 
+  # annotate DE genes with clinical information
   query_dgidb:
       # column header containing gene names
       colName_genes: "gene_names"
       # minimum number of data base support to report drug-gene interaction
       minDatabaseNum: "4"
+
+  download_clinical_trials:
+    # terms of interest downloading data base
+    cancerType: "cancer"
+
+  # query clinical trials data base
+  query_clinical_trials:
+    call: "python /path_to_scAmpi_git/scripts/queryClinicalTrials.py "
+    scratch: "3000"
+    mem: "500"
+    time: "200"
+    threads: 8
+    # white and black list to determine if study is disease-specific or not
+    # comma separated lists, no spaces
+    whiteList: "melanoma,solid tumor"
+    blackList: ""
+
+  # annotate DE genes with clinical information
+  annotate_DE_clinical_info:
+    # column header containing gene names
+    variousParams: "--colName_gene gene_names"
+
+
+
+
+
+  # aggregate all results from the clinical part of the scAmpi pipeline
   aggregate:
       # the two variables `suffix` and `result_outdir` define the end point of the clinical part of scampi.
       # suffix and result_outdir must match and correspond to the output of the last rule
       # that should be performed.
-      suffix: "dgidb"
-      result_outdir: "query_dgidb"
+      suffix: "clinicalAnnotation"
+      result_outdir: "clinical_annotation"
