@@ -45,6 +45,8 @@ rule scAmpi_basic:
         expand('results/diff_exp_analysis/{sample}/', sample = sample_ids),
         # trigger clinical part of the pipeline
         expand('results/aggregated/{sample}.aggregated.txt', sample = sample_ids),
+        # plot_drug_prediction is also aggregation rule (as is aggregate)
+        expand('results/plot_drug_prediction/{sample}.drug_prediction_umap.png', sample = sample_ids)
     output:
         'results/complete_scAmpi_basic.txt'
     params:

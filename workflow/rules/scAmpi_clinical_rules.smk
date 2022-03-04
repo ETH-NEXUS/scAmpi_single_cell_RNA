@@ -137,37 +137,40 @@ rule annotate_DE_clinical_info:
         '{params.variousParams} '
 
 
-#if not 'CIVIC_IN' in globals():
-#    CIVIC_IN = ANNOTATECLINICAL_OUT
-#if not 'CIVIC_OUT' in globals():
-#    CIVIC_OUT = ANNOTATECLINICAL_OUT
-#
-## query identified expression in civic
-#rule queryCIVIC:
-#    input:
-#        infile = CIVIC_IN +  '{sample}.{clusterid}.clinicalAnnotation.txt'
-#    output:
-#        outfile = CIVIC_OUT + '{sample}.{clusterid}.clinicalAnnotation.civic.txt'
-#    params:
-#        lsfoutfile = CIVIC_OUT + '{sample}.{clusterid}.queryCIVIC.lsfout.log',
-#        lsferrfile = CIVIC_OUT + '{sample}.{clusterid}.queryCIVIC.lsferr.log',
-#        scratch = config['tools']['queryCIVIC']['scratch'],
-#        mem = config['tools']['queryCIVIC']['mem'],
-#        time = config['tools']['queryCIVIC']['time'],
-#        cancerType = config['tools']['queryCIVIC']['cancerType'],
-#        blackList = config['tools']['queryCIVIC']['blackList'],
-#        highLevel = config['tools']['queryCIVIC']['highLevel'],
-#        colName_gene = config['tools']['queryCIVIC']['colName_gene'],
-#        colName_logFC = config['tools']['queryCIVIC']['colName_logFC'],
-#        strictExpression = config['tools']['queryCIVIC']['strictExpression']
-#    threads:
-#        config['tools']['queryCIVIC']['threads']
-#    benchmark:
-#        CIVIC_OUT + '{sample}.{clusterid}.queryCIVIC.benchmark'
-#    shell:
-#        '{config[tools][queryCIVIC][call]} --inputTable {input.infile} --outFile {output.outfile} --cancerTypeList "{params.cancerType}" --blackList "{params.blackList}" --highLevelList "{params.highLevel}" --colName_gene {params.colName_gene} --colName_logFC {params.colName_logFC} --strictExpression {params.strictExpression}'
-#
-#
+# query identified expression in civic
+rule query_civic:
+    input:
+        infile = 'results/clinical_annotation/{sample}.{i}.clinicalAnnotation.txt'
+    output:
+        outfile = 'results/query_civic/{sample}.{i}.clinicalAnnotation.civic.txt'
+    params:
+        cancerType = config['tools']['query_civic']['cancerType'],
+        blackList = config['tools']['query_civic']['blackList'],
+        highLevel = config['tools']['query_civic']['highLevel'],
+        colName_gene = config['tools']['query_civic']['colName_gene'],
+        colName_logFC = config['tools']['query_civic']['colName_logFC'],
+        strictExpression = config['tools']['query_civic']['strictExpression']
+    conda:
+        '../envs/query_civic.yaml'
+    resources:
+        mem_mb = config['computingResources']['mediumRequirements']['mem'],
+        time_min = config['computingResources']['mediumRequirements']['time'],
+    threads:
+        config['computingResources']['mediumRequirements']['threads']
+    benchmark:
+        'results/query_civic/benchmark/{sample}.{i}.query_civic.benchmark'
+    shell:
+        'python workflow/scripts/query_civic_expr.py '
+        '--inputTable {input.infile} '
+        '--outFile {output.outfile} '
+        '--cancerTypeList "{params.cancerType}" '
+        '--blackList "{params.blackList}" '
+        '--highLevelList "{params.highLevel}" '
+        '--colName_gene {params.colName_gene} '
+        '--colName_logFC {params.colName_logFC} '
+        '--strictExpression {params.strictExpression}'
+
+
 #if not 'GENESETANALYSIS_IN' in globals():
 #    GENESETANALYSIS_IN = DIFF_EXP_OUT
 #if not 'GENESETANALYSIS_OUT' in globals():
@@ -394,42 +397,50 @@ rule annotate_DE_clinical_info:
 #        '{config[tools][get_full_druglist_to_subclones][call]} --in_drugToCluster {input.infile} --in_drugList {params.drugList} --outFile {output.out} '
 #
 #
-#if not 'PLOT_DRUGS_IN' in globals():
-#    PLOT_DRUGS_IN = CIVIC_OUT
-#if not 'PLOT_DRUGS_OUT' in globals():
-#    PLOT_DRUGS_OUT = DRUGCOMBINATION
-#
-## check whether all civic queries are finished
-#def getCivicQueryResults(wildcards):
-#    return expand(PLOT_DRUGS_IN + wildcards.sample + '.{clusterid}.clinicalAnnotation.civic.txt', clusterid = CLUSTER_IDS)
-#
-## this rule generates a UMAP plot that shows drug prediction on the tumor clones
-#rule plot_drug_prediction:
-#    input:
-#        rdsFile = REMOVE_ATYPICAL_OUT + '{sample}.RDS',
-#        inFiles = getCivicQueryResults,
-#        drugList = config['resources']['drugList'],
-#        drugCombis = config['resources']['drugCombinations'],
-#        civicDict = config['resources']['civicDict']
-#    output:
-#        out = PLOT_DRUGS_OUT + '{sample}.drug_prediction_umap.png'
-#    params:
-#        lsfoutfile = PLOT_DRUGS_OUT + '{sample}.drug_prediction_umap.lsfout.log',
-#        lsferrfile = PLOT_DRUGS_OUT + '{sample}.drug_prediction_umap.lsferr.log',
-#        scratch = config['tools']['show_drugPrediction_on_clones']['scratch'],
-#        sampleName = '{sample}',
-#        inputDir = PLOT_DRUGS_IN,
-#        outputDirec = PLOT_DRUGS_OUT,
-#        mem = config['tools']['show_drugPrediction_on_clones']['mem'],
-#        time = config['tools']['show_drugPrediction_on_clones']['time'],
-#        variousParams = config['tools']['show_drugPrediction_on_clones']['variousParams']
-#    threads:
-#        config['tools']['show_drugPrediction_on_clones']['threads']
-#    benchmark:
-#        PLOT_DRUGS_OUT + '{sample}.drug_prediction_umap.benchmark'
-#    shell:
-#        '{config[tools][show_drugPrediction_on_clones][call]} --SCE {input.rdsFile} --drugPredDir {params.inputDir} --outputDirec {params.outputDirec} --drugList {input.drugList} --combiList {input.drugCombis} --civicDict {input.civicDict} --sampleName {params.sampleName} {params.variousParams}'
-#
+# check whether all civic queries are finished
+def getCivicQueryResults(wildcards):
+    checkpoint_output = checkpoints.diff_exp_analysis.get(**wildcards).output[0]
+#    return expand(PLOT_DRUGS_IN + wildcards.sample + '.{i}.clinicalAnnotation.civic.txt',
+    return expand('results/query_civic/{sample}.{i}.clinicalAnnotation.civic.txt',
+        sample = wildcards.sample,
+        i = glob_wildcards(os.path.join(checkpoint_output, "{sample,[^/]+}.{i,[^/]+}.DEgenes.tsv")).i)
+
+
+# this rule generates a UMAP plot that shows drug prediction on the tumor clones
+rule plot_drug_prediction:
+    input:
+        rdsFile = 'results/atypical_removed/{sample}.atypical_removed.RDS',
+        inFiles = getCivicQueryResults,
+        drugList = config['resources']['drugList'],
+        drugCombis = config['resources']['drugCombinations'],
+        civicDict = config['resources']['civicDict']
+    output:
+        out = 'results/plot_drug_prediction/{sample}.drug_prediction_umap.png'
+    params:
+        sampleName = '{sample}',
+        inputDir = 'results/query_civic/',
+        outputDirec = 'results/plot_drug_prediction/',
+        variousParams = config['tools']['plot_drug_prediction']['variousParams']
+    conda:
+        '../envs/plot_drug_prediction.yaml'
+    resources:
+        mem_mb = config['computingResources']['mediumRequirements']['mem'],
+        time_min = config['computingResources']['mediumRequirements']['time'],
+    threads:
+        config['computingResources']['mediumRequirements']['threads']
+    benchmark:
+        'results/plot_drug_prediction/benchmark/{sample}.plot_drug_prediction.benchmark'
+    shell:
+        'Rscript workflow/scripts/show_drugPrediction_on_clones.R'
+        '--SCE {input.rdsFile} '
+        '--drugPredDir {params.inputDir} '
+        '--outputDirec {params.outputDirec} '
+        '--drugList {input.drugList} '
+        '--combiList {input.drugCombis} '
+        '--civicDict {input.civicDict} '
+        '--sampleName {params.sampleName} '
+        '{params.variousParams} '
+
 
 
 # define input for aggregate rule

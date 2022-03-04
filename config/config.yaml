@@ -19,6 +19,11 @@ resources:
   genesets: "required_files/hallmark_pathways_example.gmt"
   # pathwayDB for clinical annotation in rule `annotate_DE_clinical_info` (scAmpi_clinical)
   pathwayDB: "required_files/hallmark_pathways_converted_example.gmt"
+  # drugList for prioritizing drugs in scAmpi_clinical
+  drugList: "required_files/melanoma/melanoma_drug_list.txt"
+  # drugCombinations and civicDict for rule `plot_drug_prediction` (scAmpi_clinical)
+  drugCombinations: "required_files/melanoma/drug_combinations_melanoma.txt"
+  civicDict: "required_files/drug_synonyms_civic.txt"
 
 
 # The tools in this pipeline use a broad range of resources and have been assigned to the following three categories.
@@ -172,6 +177,29 @@ tools:
     # column header containing gene names
     variousParams: "--colName_gene gene_names"
 
+  # query CIViC database for DE genes
+  query_civic:
+    # comma separated list (no spaces) of disease types of interest
+    cancerType: "melanoma"
+    # comma separated list (no spaces) of terms where entry will be filtered out
+    blackList: ""
+    # comma separated list (no spaces) of high-level disease types of interest
+    highLevel: "solid tumor"
+    # column header of gene names
+    colName_gene: "gene_names"
+    # column header of logFC
+    colName_logFC: "diff"
+    # can be "y" or "n", specify whether stricter CIViC evidence interpretation should be applied for term "EXPRESSION".
+    # requires "pct_nonzero > 0" in DE analysis to assume "expression"
+    strictExpression: "y"
+
+  # show drug support on UMAP plot
+  plot_drug_prediction:
+    variousParams: "--drugPredEnd \"clinicalAnnotation.civic.txt\"
+                    --name_DGIDB \"DGIDB-drugs(Score,Type)\"
+                    --name_CIVIC \"CIViC_Drug_Support\""
+
+
 
 
 
@@ -181,5 +209,5 @@ tools:
       # the two variables `suffix` and `result_outdir` define the end point of the clinical part of scampi.
       # suffix and result_outdir must match and correspond to the output of the last rule
       # that should be performed.
-      suffix: "clinicalAnnotation"
-      result_outdir: "clinical_annotation"
+      suffix: "clinicalAnnotation.civic"
+      result_outdir: "query_civic"
