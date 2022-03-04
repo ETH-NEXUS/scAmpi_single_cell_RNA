@@ -147,3 +147,9 @@ tools:
       colName_genes: "gene_names"
       # minimum number of data base support to report drug-gene interaction
       minDatabaseNum: "4"
+  aggregate:
+      # the two variables `suffix` and `result_outdir` define the end point of the clinical part of scampi.
+      # suffix and result_outdir must match and correspond to the output of the last rule
+      # that should be performed.
+      suffix: "dgidb"
+      result_outdir: "query_dgidb"

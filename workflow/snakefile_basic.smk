@@ -47,13 +47,9 @@ rule scAmpi_basic:
         expand('results/gene_exp/{sample}.gene_expression_per_cluster.tsv', sample = sample_ids),
         expand('results/plotting/{sample}.celltype_barplot.png', sample = sample_ids),
         expand('results/gsva/{sample}.gsetscore_hm.png', sample = sample_ids),
-#        expand('results/diff_exp_analysis/{sample}/{sample}.diff_exp_analysis_success.txt', sample = sample_ids),
         expand('results/diff_exp_analysis/{sample}/', sample = sample_ids),
-#        expand('results/databaseQuery/{sample}.{clusterid}.dgidb.txt', sample = sample_ids, clusterid = cluster_id),
-#        expand('results/intermediate/{sample}.txt', sample = sample_ids),
-        expand('results/query_dgidb/{sample}.aggregated.txt', sample = sample_ids),
-#        expand('results/parse_diff_exp/{sample}.{i}.txt', sample = sample_ids, i = get_cluster_ids),
-#        expand('results/intermediate/{sample}/{i}.txt', sample = sample_ids),
+        # trigger clinical part of the pipeline
+        expand('results/aggregated/{sample}.aggregated.txt', sample = sample_ids),
     output:
         'results/complete_scAmpi_basic.txt'
     params:
@@ -67,7 +63,3 @@ rule scAmpi_basic:
     shell:
         'date > {output}'
 
-
-#def check_checkpoint(wildcards):
-#    checkpoints.diff_exp_analysis.get(**wildcards).output[0]
-#print(TEST)

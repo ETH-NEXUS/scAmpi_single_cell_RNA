@@ -574,34 +574,30 @@ rule query_dgidb:
          '{params.colName_genes}'
 
 
-# dummy rule for testing checkpoints
-#rule intermediate:
-#    input:
-#        'results/diff_exp_analysis/{sample}/{sample}.{i}.DEgenes.tsv'
-#    output:
-#        'results/intermediate/{sample}/{sample}.{i}.txt'
-#    shell:
-#        'cp {input} {output}'
-
-
 # define input for aggregate rule
 # restrain the wildcards (the global restraint alone does not work)
-def aggregate_input(wildcards):
-    checkpoint_output = checkpoints.diff_exp_analysis.get(**wildcards).output[0]
-    return expand("results/{outdir}/{sample}.{i}.dgidb.txt",
-           outdir = wildcards.outdir,
-           sample = wildcards.sample,
-           # restrain wildcards to not consider subdirectories
-           i = glob_wildcards(os.path.join(checkpoint_output, "{sample,[^/]+}.{i,[^/]+}.DEgenes.tsv")).i)
+def aggregate_input(suffix, result_outdir):
+    """Define a checkpoint compatible function that generates filenames."""
+    def tmp(wildcards):
+        checkpoint_output = checkpoints.diff_exp_analysis.get(**wildcards).output[0]
+        return expand("results/{result_outdir}/{sample}.{i}.{suffix}.txt",
+            result_outdir = result_outdir,
+            suffix = suffix,
+            sample = wildcards.sample,
+            # restrain wildcards to not consider subdirectories
+            # do this here because `glob_wildcards` does not
+            # respect the global wildcard_constraints directive
+            i = glob_wildcards(os.path.join(checkpoint_output, "{sample,[^/]+}.{i,[^/]+}.DEgenes.tsv")).i)
+    return tmp
 
 
 # define what rules after the checkpoint differential expression should be performed.
 # the aggregate rule is triggered by the final scampi rule
 rule aggregate:
     input:
-        aggregate_input
+        aggregate_input(config['tools']['aggregate']['suffix'],
+        config['tools']['aggregate']['result_outdir'])
     output:
         'results/{outdir}/{sample}.aggregated.txt'
     shell:
-        'echo {input} ; '
         'touch {output}'
