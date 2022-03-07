@@ -49,7 +49,13 @@ rule scAmpi_basic:
         expand('results/plot_drug_prediction/{sample}.drug_prediction_umap.png', sample = sample_ids),
         # plot gene set enrichment heatmap (is also aggregation rule)
         expand('results/gene_set_enrichment/{sample}.heatmap_enrichment.png', sample = sample_ids),
-        expand('results/gene_set_enrichment/vs_other_malignant/{sample}.DEmalignant.heatmap_enrichment.png', sample = sample_ids)
+        expand('results/gene_set_enrichment/vs_other_malignant/{sample}.DEmalignant.heatmap_enrichment.png', sample = sample_ids),
+        # parse_for_minSetCover (is also aggregation rule)
+        expand('results/drug_combination/{sample}.drugToCluster.allDrugs.txt', sample = sample_ids),
+        expand('results/drug_combination/{sample}.drugToCluster.filteredDrugs.txt', sample = sample_ids),
+        # preprocess for upsetR plot
+        expand('results/upsetr_plot/{sample}.drugToCluster.allDrugs.processedForUpSetR.txt', sample = sample_ids),
+        expand('results/upsetr_plot/{sample}.drugToCluster.filteredDrugs.processedForUpSetR.txt', sample = sample_ids),
     output:
         'results/complete_scAmpi_basic.txt'
     params:

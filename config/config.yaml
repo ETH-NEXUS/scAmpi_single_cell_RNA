@@ -204,6 +204,10 @@ tools:
     # column name of test statistic
     variousParams: "test_statistic"
 
+  # extract per drug the clusters with DE genes where interaction was found, and weight of DGIdb results
+  parse_for_minSetCover:
+    colName_DGIDB_score: "Score"
+    colName_clinTrial: "ClinicalTrials"
 
 
 
@@ -211,8 +215,9 @@ tools:
 
   # aggregate all results from the clinical part of the scAmpi pipeline
   aggregate:
-      # the two variables `suffix` and `result_outdir` define the end point of the clinical part of scampi.
+      # the two variables `suffix` and `result_outdir` define the end point of the clinical part of scampi for cases where none of the "aggregating" rules is triggered.
+      # This is interesting for debugging.
       # suffix and result_outdir must match and correspond to the output of the last rule
       # that should be performed.
-      suffix: "enrichedGeneSets"
-      result_outdir: "gene_set_enrichment"
+      suffix: "dgidb.txt.CompleteTable.ClinicalTrials.filteredDrugs"
+      result_outdir: "clinical_trials"

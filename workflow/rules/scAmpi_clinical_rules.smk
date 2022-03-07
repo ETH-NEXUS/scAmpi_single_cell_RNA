@@ -302,39 +302,42 @@ rule plot_gene_set_enrichment_mal_vs_mal:
         'fi'
 
 
-#if not 'DRUGCOMBINATION' in globals():
-#    DRUGCOMBINATION = OUTDIR + 'drugCombination/'
-#
-#if not 'PARSETRIALSTABLE_IN' in globals():
-#    PARSETRIALSTABLE_IN = CLINICALTRIALS_OUT
-#if not 'PARSETRIALSTABLE_OUT' in globals():
-#    PARSETRIALSTABLE_OUT = DRUGCOMBINATION
-#
-## parse the *.dgidb.txt.CompleteTable.ClinicalTrials.txt files of all clusters
-## and generate a table that shows for each Drug the clusters that can be targeted by this drug
-## and the weight of the drug for calculating minimum set cover
-#
-#rule parseDgidbTrialsTable_for_minSetCover:
-#    input:
-#        infiles = expand(PARSETRIALSTABLE_IN + '{{sample}}.{clusterid}.dgidb.txt.CompleteTable.ClinicalTrials.{{type}}.txt', clusterid = CLUSTER_IDS),
-#        drugList = config['resources']['drugList']
-#    output:
-#        out = PARSETRIALSTABLE_OUT + '{sample}.drugToCluster.{type}.txt'
-#    params:
-#        colName_clinTrial = config['tools']['parseDgidbTrialsTable_for_minSetCover']['colName_clinTrial'],
-#        colName_DGIDB_score = config['tools']['parseDgidbTrialsTable_for_minSetCover']['colName_DGIDB_score'],
-#        lsfoutfile = PARSETRIALSTABLE_OUT + '{sample}.drugToCluster.{type}.lsfout.log',
-#        lsferrfile = PARSETRIALSTABLE_OUT + '{sample}.drugToCluster.{type}.lsferr.log',
-#        scratch = config['tools']['parseDgidbTrialsTable_for_minSetCover']['scratch'],
-#        mem = config['tools']['parseDgidbTrialsTable_for_minSetCover']['mem'],
-#        time = config['tools']['parseDgidbTrialsTable_for_minSetCover']['time']
-#    threads:
-#        config['tools']['parseDgidbTrialsTable_for_minSetCover']['threads']
-#    benchmark:
-#        PARSETRIALSTABLE_OUT + '{sample}.drugToCluster.{type}.benchmark'
-#    shell:
-#        '{config[tools][parseDgidbTrialsTable_for_minSetCover][call]} --inFiles {input.infiles} --outFile {output.out} --colName_clinTrial {params.colName_clinTrial} --colName_DGIDB_Score {params.colName_DGIDB_score} --drug_list {input.drugList}'
-#
+# parse the *.dgidb.txt.CompleteTable.ClinicalTrials.txt files of all clusters
+# and generate a table that shows for each Drug the clusters that can be targeted by this drug
+# and the weight of the drug for calculating minimum set cover
+def get_parse_for_minSetCover_input(wildcards):
+    checkpoint_output = checkpoints.diff_exp_analysis.get(**wildcards).output[0]
+    return expand('results/clinical_trials/{sample}.{i}.dgidb.txt.CompleteTable.ClinicalTrials.{{type}}.txt',
+            i = glob_wildcards(os.path.join(checkpoint_output, "{sample,[^/]+}.{i,[^/]+}.DEgenes.tsv")).i,
+            sample = wildcards.sample)
+
+rule parse_for_minSetCover:
+    input:
+#        infiles = expand(PARSETRIALSTABLE_IN + '{{sample}}.{i}.dgidb.txt.CompleteTable.ClinicalTrials.{{type}}.txt', clusterid = CLUSTER_IDS),
+        infiles = get_parse_for_minSetCover_input,
+        drugList = config['resources']['drugList']
+    output:
+        out = 'results/drug_combination/{sample}.drugToCluster.{type}.txt'
+    params:
+        colName_clinTrial = config['tools']['parse_for_minSetCover']['colName_clinTrial'],
+        colName_DGIDB_score = config['tools']['parse_for_minSetCover']['colName_DGIDB_score'],
+    conda:
+        '../envs/parse_for_minSetCover.yaml'
+    resources:
+        mem_mb = config['computingResources']['mediumRequirements']['mem'],
+        time_min = config['computingResources']['mediumRequirements']['time'],
+    threads:
+        config['computingResources']['mediumRequirements']['threads']
+    benchmark:
+        'results/drug_combination/benchmark/{sample}.{type}parse_for_minSetCover.benchmark'
+    shell:
+        'python workflow/scripts/parse_for_minSetCover.py '
+        '--inFiles {input.infiles} '
+        '--outFile {output.out} '
+        '--colName_clinTrial {params.colName_clinTrial} '
+        '--colName_DGIDB_Score {params.colName_DGIDB_score} '
+        '--drug_list {input.drugList}'
+
 #if not 'MINSETCOVER_IN' in globals():
 #    MINSETCOVER_IN = PARSETRIALSTABLE_OUT
 #if not 'MINSETCOVER_OUT' in globals():
@@ -361,59 +364,54 @@ rule plot_gene_set_enrichment_mal_vs_mal:
 #        MINSETCOVER_OUT + '{sample}.drugCombination.{type}.benchmark'
 #    shell:
 #        '{config[tools][findminSetCover][call]} --input {input.infile} --outFile {output.out} --percentageTable {input.percTable} {params.variousParams}'
-#
-#
-#if not 'FILTERDRUGS_IN' in globals():
-#    FILTERDRUGS_IN = CLINICALTRIALS_OUT
-#if not 'FILTERDRUGS_OUT' in globals():
-#    FILTERDRUGS_OUT = CLINICALTRIALS_OUT
-## filter the drug-gene interaction results for drugs that are included in TP melanoma clinical list of drugs
-#rule filterDrugs:
-#    input:
-#        infile = FILTERDRUGS_IN + '{sample}.{clusterid}.dgidb.txt.CompleteTable.ClinicalTrials.allDrugs.txt',
-#        drugList = config['resources']['drugList']
-#    output:
-#        out = FILTERDRUGS_OUT + '{sample}.{clusterid}.dgidb.txt.CompleteTable.ClinicalTrials.filteredDrugs.txt'
-#    params:
-#        lsfoutfile = FILTERDRUGS_OUT + '{sample}.{clusterid}.filterDrugs.lsfout.log',
-#        lsferrfile = FILTERDRUGS_OUT + '{sample}.{clusterid}.filterDrugs.lsferr.log',
-#        scratch = config['tools']['filterDrugs']['scratch'],
-#        mem = config['tools']['filterDrugs']['mem'],
-#        time = config['tools']['filterDrugs']['time'],
-#    threads:
-#        config['tools']['filterDrugs']['threads']
-#    benchmark:
-#        FILTERDRUGS_OUT + '{sample}.{clusterid}.filterDrugs.benchmark'
-#    shell:
-#        '{config[tools][filterDrugs][call]} --inFile {input.infile} --outFile {output.out} --drugList {input.drugList}'
-#
-#
-#if not 'PREPROCESSUPSETR_IN' in globals():
-#    PREPROCESSUPSETR_IN = DRUGCOMBINATION
-#if not 'PREPROCESSUPSETR_OUT' in globals():
-#    PREPROCESSUPSETR_OUT = DRUGCOMBINATION
-#
-## this rule is to preprocess the output of the rule parseDgidbTrialsTable_for_minSetCover of type drug,clusters,weight (tab separated)
-## to have the necessary input format for the UpSetR package, which is drug,cluster1,cluster2..clustern (tab separated) with 1 or 0 indicating if a drug targets a DE of a cluster
-#rule preprocessForUpSetR_venn:
-#    input:
-#        infile = PREPROCESSUPSETR_IN + '{sample}.drugToCluster.{type}.txt'
-#    output:
-#        out = PREPROCESSUPSETR_OUT + '{sample}.drugToCluster.{type}.processedForUpSetR.txt'
-#    params:
-#        lsfoutfile = PREPROCESSUPSETR_OUT + '{sample}.drugToCluster.{type}.processedForUpSetR.lsfout.log',
-#        lsferrfile = PREPROCESSUPSETR_OUT + '{sample}.drugToCluster.{type}.processedForUpSetR.lsferr.log',
-#        scratch = config['tools']['preprocessForUpSetR']['scratch'],
-#        mem = config['tools']['preprocessForUpSetR']['mem'],
-#        time = config['tools']['preprocessForUpSetR']['time']
-#    threads:
-#        config['tools']['preprocessForUpSetR']['threads']
-#    benchmark:
-#        PREPROCESSUPSETR_OUT + '{sample}.drugToCluster.{type}.processedForUpSetR.benchmark'
-#    shell:
-#        '{config[tools][preprocessForUpSetR][call]} --inFile {input.infile} --outFile {output.out}'
-#
-#
+
+
+# filter the drug-gene interaction results for drugs that are included in TP melanoma clinical list of drugs
+rule filter_drugs:
+    input:
+        infile = 'results/clinical_trials/{sample}.{i}.dgidb.txt.CompleteTable.ClinicalTrials.allDrugs.txt',
+        drugList = config['resources']['drugList']
+    output:
+        out = 'results/clinical_trials/{sample}.{i}.dgidb.txt.CompleteTable.ClinicalTrials.filteredDrugs.txt'
+    conda:
+        '../envs/filter_drugs.yaml'
+    resources:
+        mem_mb = config['computingResources']['mediumRequirements']['mem'],
+        time_min = config['computingResources']['mediumRequirements']['time'],
+    threads:
+        config['computingResources']['mediumRequirements']['threads']
+    benchmark:
+        'results/clinical_trials/benchmark/{sample}.{i}.filter_drugs.benchmark'
+    shell:
+        'python workflow/scripts/filter_drugs.py '
+        '--inFile {input.infile} '
+        '--outFile {output.out} '
+        '--drugList {input.drugList}'
+
+
+# this rule is to preprocess the output of the rule parse_for_minSetCover of type drug,clusters,weight (tab separated)
+# to have the necessary input format for the UpSetR package.
+# That is drug,cluster1,cluster2..clustern (tab separated) with 1 or 0 indicating if a drug targets a DE of a cluster
+rule preprocess_upsetr_plot:
+    input:
+        infile = 'results/drug_combination/{sample}.drugToCluster.{type}.txt'
+    output:
+        out = 'results/upsetr_plot/{sample}.drugToCluster.{type}.processedForUpSetR.txt'
+    conda:
+        '../envs/preprocess_upsetr_plot.yaml'
+    resources:
+        mem_mb = config['computingResources']['mediumRequirements']['mem'],
+        time_min = config['computingResources']['mediumRequirements']['time'],
+    threads:
+        config['computingResources']['mediumRequirements']['threads']
+    benchmark:
+        'results/upsetr_plot/benchmark/{sample}.{type}.upsetr_plot.benchmark'
+    shell:
+        'python workflow/scripts/preprocess_upsetr_plot.py '
+        '--inFile {input.infile} '
+        '--outFile {output.out}'
+
+
 #if not 'PLOTUPSETR_IN' in globals():
 #    PLOTUPSETR_IN = DRUGCOMBINATION
 #if not 'PLOTUPSETR_OUT' in globals():
@@ -543,33 +541,3 @@ rule aggregate:
         'results/{outdir}/{sample}.aggregated.txt'
     shell:
         'touch {output}'
-
-
-###   TODO
-
-# define input for aggregate rule
-# restrain the wildcards (the global restraint alone does not work)
-#def aggregate_malignant_vs_malignant(suffix, result_outdir):
-#    """Define a checkpoint compatible function that generates filenames."""
-#    def tmp(wildcards):
-#        checkpoint_output = checkpoints.diff_exp_analysis.get(**wildcards).output[0]
-#        return expand("results/{result_outdir}/{sample}.{i}.{suffix}.txt",
-#            result_outdir = result_outdir,
-#            suffix = suffix,
-#            sample = wildcards.sample,
-#            # restrain wildcards to not consider subdirectories
-#            # do this here because `glob_wildcards` does not
-#            # respect the global wildcard_constraints directive
-#            i = glob_wildcards(os.path.join(checkpoint_output, "{sample,[^/]+}.{i,[^/]+}.DEgenes.tsv")).i)
-#    return tmp
-
-# define aggregated malignant vs. malignant gene set enrichment
-# the aggregate rule is triggered by the final scampi rule
-#rule aggregate:
-#    input:
-#        aggregate_input(config['tools']['aggregate']['suffix'],
-#        config['tools']['aggregate']['result_outdir'])
-#    output:
-#        'results/{outdir}/{sample}.aggregated.txt'
-#    shell:
-#        'touch {output}'
