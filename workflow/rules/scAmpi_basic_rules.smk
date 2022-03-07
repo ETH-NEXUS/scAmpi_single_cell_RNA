@@ -472,7 +472,7 @@ rule cell_percent_in_cluster:
     threads:
         config['computingResources']['mediumRequirements']['threads']
     benchmark:
-        'results/clusterpercent/benchmark/{sample}.clusterPercent.benchmark'
+        'results/clustering/benchmark/{sample}.clusterPercent.benchmark'
     shell:
         'python workflow/scripts/cell_percent_in_cluster.py '
         '--inputTable {input.clusterCsv} '

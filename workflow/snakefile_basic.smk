@@ -56,6 +56,14 @@ rule scAmpi_basic:
         # preprocess for upsetR plot
         expand('results/upsetr_plot/{sample}.drugToCluster.allDrugs.processedForUpSetR.txt', sample = sample_ids),
         expand('results/upsetr_plot/{sample}.drugToCluster.filteredDrugs.processedForUpSetR.txt', sample = sample_ids),
+        # plot upset plot
+        expand('results/upsetr_plot/{sample}.drugToCluster.allDrugs.vennplot.png', sample = sample_ids),
+        expand('results/upsetr_plot/{sample}.drugToCluster.filteredDrugs.vennplot.png', sample = sample_ids),
+        # find minSetCover
+        expand('results/drug_combination/{sample}.drugCombination.allDrugs.txt', sample = sample_ids),
+        expand('results/drug_combination/{sample}.drugCombination.filteredDrugs.txt', sample = sample_ids),
+        # druglist_to_subclones
+        expand('results/drug_combination/{sample}.full_druglist_to_subclones.txt', sample = sample_ids),
     output:
         'results/complete_scAmpi_basic.txt'
     params:

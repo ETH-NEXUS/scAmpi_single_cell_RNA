@@ -209,6 +209,14 @@ tools:
     colName_DGIDB_score: "Score"
     colName_clinTrial: "ClinicalTrials"
 
+  # create upset plot with drug-cluster associations
+  plot_upsetr:
+    variousParams: "--nintersects 20 --nsets 100"
+
+  # find drug-gene interactions covering most of the tumor cells
+  find_minSetCover:
+    # considerClusterSize "yes" or "no"
+    variousParams: "--considerClusterSize no"
 
 
 

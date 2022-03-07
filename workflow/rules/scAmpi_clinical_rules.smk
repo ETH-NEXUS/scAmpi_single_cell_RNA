@@ -329,7 +329,7 @@ rule parse_for_minSetCover:
     threads:
         config['computingResources']['mediumRequirements']['threads']
     benchmark:
-        'results/drug_combination/benchmark/{sample}.{type}parse_for_minSetCover.benchmark'
+        'results/drug_combination/benchmark/{sample}.{type}.parse_for_minSetCover.benchmark'
     shell:
         'python workflow/scripts/parse_for_minSetCover.py '
         '--inFiles {input.infiles} '
@@ -338,32 +338,31 @@ rule parse_for_minSetCover:
         '--colName_DGIDB_Score {params.colName_DGIDB_score} '
         '--drug_list {input.drugList}'
 
-#if not 'MINSETCOVER_IN' in globals():
-#    MINSETCOVER_IN = PARSETRIALSTABLE_OUT
-#if not 'MINSETCOVER_OUT' in globals():
-#    MINSETCOVER_OUT = DRUGCOMBINATION
-#
-## deduce minimum set cover to find drug (combination) that targets all clusters via interaction with DE gene of this cluster
-#
-#rule findminSetCover:
-#    input:
-#        infile = MINSETCOVER_IN + '{sample}.drugToCluster.{type}.txt',
-#        percTable = PERCENTAGE_OUT + '{sample}.clusters_cell_count_percent.txt'
-#    output:
-#        out = MINSETCOVER_OUT + '{sample}.drugCombination.{type}.txt'
-#    params:
-#        lsfoutfile = MINSETCOVER_OUT + '{sample}.drugCombination.{type}.lsfout.log',
-#        lsferrfile = MINSETCOVER_OUT + '{sample}.drugCombination.{type}.lsferr.log',
-#        scratch = config['tools']['findminSetCover']['scratch'],
-#        mem = config['tools']['findminSetCover']['mem'],
-#        time = config['tools']['findminSetCover']['time'],
-#        variousParams = config['tools']['findminSetCover']['variousParams']
-#    threads:
-#        config['tools']['findminSetCover']['threads']
-#    benchmark:
-#        MINSETCOVER_OUT + '{sample}.drugCombination.{type}.benchmark'
-#    shell:
-#        '{config[tools][findminSetCover][call]} --input {input.infile} --outFile {output.out} --percentageTable {input.percTable} {params.variousParams}'
+
+# deduce minimum set cover to find drug (combination) that targets all clusters via interaction with DE gene of this cluster
+rule find_minSetCover:
+    input:
+        infile = 'results/drug_combination/{sample}.drugToCluster.{type}.txt',
+        percTable = 'results/clustering/{sample}.clusters_cell_count_percent.txt'
+    output:
+        out = 'results/drug_combination/{sample}.drugCombination.{type}.txt'
+    params:
+        variousParams = config['tools']['find_minSetCover']['variousParams']
+    conda:
+        '../envs/find_minSetCover.yaml'
+    resources:
+        mem_mb = config['computingResources']['mediumRequirements']['mem'],
+        time_min = config['computingResources']['mediumRequirements']['time'],
+    threads:
+        config['computingResources']['mediumRequirements']['threads']
+    benchmark:
+        'results/drug_combination/benchmark/{sample}.{type}.find_minSetCover.benchmark'
+    shell:
+        'python workflow/scripts/find_minSetCover.py '
+        '--input {input.infile} '
+        '--outFile {output.out} '
+        '--percentageTable {input.percTable} '
+        '{params.variousParams}'
 
 
 # filter the drug-gene interaction results for drugs that are included in TP melanoma clinical list of drugs
@@ -412,62 +411,57 @@ rule preprocess_upsetr_plot:
         '--outFile {output.out}'
 
 
-#if not 'PLOTUPSETR_IN' in globals():
-#    PLOTUPSETR_IN = DRUGCOMBINATION
-#if not 'PLOTUPSETR_OUT' in globals():
-#    PLOTUPSETR_OUT = DRUGCOMBINATION
-#
-## this rule generates a plot with UpSetR (comparably to venn diagramm)
-## The plot displays intersections of the drug sets that target DE genes in the clusters
-#rule plotUpSetR_venn:
-#    input:
-#        infile = PLOTUPSETR_IN + '{sample}.drugToCluster.{type}.processedForUpSetR.txt'
-#    output:
-#        out = PLOTUPSETR_OUT + '{sample}.drugToCluster.{type}.vennplot.png'
-#    params:
-#        lsfoutfile = PLOTUPSETR_OUT + '{sample}.drugToCluster.{type}.vennplot.lsfout.log',
-#        lsferrfile = PLOTUPSETR_OUT + '{sample}.drugToCluster.{type}.vennplot.lsferr.log',
-#        scratch = config['tools']['plotUpSetR']['scratch'],
-#        mem = config['tools']['plotUpSetR']['mem'],
-#        time = config['tools']['plotUpSetR']['time'],
-#        variousParams = config['tools']['plotUpSetR']['variousParams']
-#    threads:
-#        config['tools']['plotUpSetR']['threads']
-#    benchmark:
-#        PLOTUPSETR_OUT + '{sample}.drugToCluster.{type}.vennplot.benchmark'
-#    shell:
-#        '{config[tools][plotUpSetR][call]} --inFile {input.infile} --outFile {output.out} {params.variousParams}'
-#
-#
-#if not 'FULL_DRUGLIST_TO_SUBCLONES_IN' in globals():
-#    FULL_DRUGLIST_TO_SUBCLONES_IN = PARSETRIALSTABLE_OUT
-#if not 'FULL_DRUGLIST_TO_SUBCLONES_OUT' in globals():
-#    FULL_DRUGLIST_TO_SUBCLONES_OUT = PARSETRIALSTABLE_OUT
-#
-## This rule generates a table with a full list of all clinically relevant drugs and the information
-## for each cluster if a drug gene interaction was found in dgidb between the respective drug and 
-## any differentially expressed gene of the cluster.
-#
-#rule get_full_druglist_to_subclones:
-#    input:
-#        infile = FULL_DRUGLIST_TO_SUBCLONES_IN + '{sample}.drugToCluster.allDrugs.txt',
-#    output:
-#        out = FULL_DRUGLIST_TO_SUBCLONES_OUT + '{sample}.full_druglist_to_subclones.txt'
-#    params:
-#        lsfoutfile = FULL_DRUGLIST_TO_SUBCLONES_OUT + '{sample}.full_druglist_to_subclones.lsfout.log',
-#        lsferrfile = FULL_DRUGLIST_TO_SUBCLONES_OUT + '{sample}.full_druglist_to_subclones.lsferr.log',
-#        scratch = config['tools']['get_full_druglist_to_subclones']['scratch'],
-#        mem = config['tools']['get_full_druglist_to_subclones']['mem'],
-#        time = config['tools']['get_full_druglist_to_subclones']['time'],
-#        drugList = config['resources']['drugList']
-#    threads:
-#        config['tools']['get_full_druglist_to_subclones']['threads']
-#    benchmark:
-#        FULL_DRUGLIST_TO_SUBCLONES_OUT + '{sample}.full_druglist_to_subclones.benchmark'
-#    shell:
-#        '{config[tools][get_full_druglist_to_subclones][call]} --in_drugToCluster {input.infile} --in_drugList {params.drugList} --outFile {output.out} '
-#
-#
+# this rule generates a plot with UpSetR (comparably to venn diagramm)
+# The plot displays intersections of the drug sets that target DE genes in the clusters
+rule plot_upsetr:
+    input:
+        infile = 'results/upsetr_plot/{sample}.drugToCluster.{type}.processedForUpSetR.txt'
+    output:
+        out = 'results/upsetr_plot/{sample}.drugToCluster.{type}.vennplot.png'
+    params:
+        variousParams = config['tools']['plot_upsetr']['variousParams']
+    conda:
+        '../envs/plot_upsetr.yaml'
+    resources:
+        mem_mb = config['computingResources']['mediumRequirements']['mem'],
+        time_min = config['computingResources']['mediumRequirements']['time'],
+    threads:
+        config['computingResources']['mediumRequirements']['threads']
+    benchmark:
+        'results/upsetr_plot/benchmark/{sample}.{type}.plot_upsetr.benchmark'
+    shell:
+        'Rscript workflow/scripts/plot_upsetr.R '
+        '--inFile {input.infile} '
+        '--outFile {output.out} '
+        '{params.variousParams}'
+
+
+# This rule generates a table with a full list of all clinically relevant drugs and the information
+# for each cluster if a drug-gene interaction was found in dgidb between the respective drug and
+# any differentially expressed gene of the cluster.
+rule get_full_druglist_to_subclones:
+    input:
+        infile = 'results/drug_combination/{sample}.drugToCluster.allDrugs.txt',
+    output:
+        out = 'results/drug_combination/{sample}.full_druglist_to_subclones.txt'
+    params:
+        drugList = config['resources']['drugList']
+    conda:
+        '../envs/get_full_druglist_to_subclones.yaml'
+    resources:
+        mem_mb = config['computingResources']['mediumRequirements']['mem'],
+        time_min = config['computingResources']['mediumRequirements']['time'],
+    threads:
+        config['computingResources']['mediumRequirements']['threads']
+    benchmark:
+        'results/drug_combination/benchmark/{sample}.full_druglist_to_subclones.benchmark'
+    shell:
+        'python get_full_druglist_to_subclones_assignm.py '
+        '--in_drugToCluster {input.infile} '
+        '--in_drugList {params.drugList} '
+        '--outFile {output.out} '
+
+
 # check whether all civic queries are finished
 def getCivicQueryResults(wildcards):
     checkpoint_output = checkpoints.diff_exp_analysis.get(**wildcards).output[0]
