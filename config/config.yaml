@@ -199,6 +199,11 @@ tools:
                     --name_DGIDB \"DGIDB-drugs(Score,Type)\"
                     --name_CIVIC \"CIViC_Drug_Support\""
 
+  # perform gene set enrichment analysis on DE genes
+  gene_set_enrichment:
+    # column name of test statistic
+    variousParams: "test_statistic"
+
 
 
 
@@ -209,5 +214,5 @@ tools:
       # the two variables `suffix` and `result_outdir` define the end point of the clinical part of scampi.
       # suffix and result_outdir must match and correspond to the output of the last rule
       # that should be performed.
-      suffix: "clinicalAnnotation.civic"
-      result_outdir: "query_civic"
+      suffix: "enrichedGeneSets"
+      result_outdir: "gene_set_enrichment"

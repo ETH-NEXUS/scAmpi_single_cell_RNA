@@ -46,7 +46,10 @@ rule scAmpi_basic:
         # trigger clinical part of the pipeline
         expand('results/aggregated/{sample}.aggregated.txt', sample = sample_ids),
         # plot_drug_prediction is also aggregation rule (as is aggregate)
-        expand('results/plot_drug_prediction/{sample}.drug_prediction_umap.png', sample = sample_ids)
+        expand('results/plot_drug_prediction/{sample}.drug_prediction_umap.png', sample = sample_ids),
+        # plot gene set enrichment heatmap (is also aggregation rule)
+        expand('results/gene_set_enrichment/{sample}.heatmap_enrichment.png', sample = sample_ids),
+        expand('results/gene_set_enrichment/vs_other_malignant/{sample}.DEmalignant.heatmap_enrichment.png', sample = sample_ids)
     output:
         'results/complete_scAmpi_basic.txt'
     params:

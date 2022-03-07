@@ -171,64 +171,137 @@ rule query_civic:
         '--strictExpression {params.strictExpression}'
 
 
-#if not 'GENESETANALYSIS_IN' in globals():
-#    GENESETANALYSIS_IN = DIFF_EXP_OUT
-#if not 'GENESETANALYSIS_OUT' in globals():
-#    GENESETANALYSIS_OUT = OUTDIR + 'geneSetAnalysis/'
-#
-## clnical trials query
-#rule geneSetEnrichment:
-#    input:
-#        infile = GENESETANALYSIS_IN + '{sample}.{clusterid}.DEgenes.tsv'
-#    output:
-#        outfile = GENESETANALYSIS_OUT + '{sample}.{clusterid}.enrichedGeneSets.txt'
-#    params:
-#        lsfoutfile = GENESETANALYSIS_OUT + '{sample}.{clusterid}.geneSetAnalysis.lsfout.log',
-#        lsferrfile = GENESETANALYSIS_OUT + '{sample}.{clusterid}.geneSetAnalysis.lsferr.log',
-#        scratch = config['tools']['geneSetEnrichment']['scratch'],
-#        mem = config['tools']['geneSetEnrichment']['mem'],
-#        time = config['tools']['geneSetEnrichment']['time'],
-#        geneSetDB = config['resources']['genesets'],
-#        variousParams = config['tools']['geneSetEnrichment']['variousParams']
-#    threads:
-#        config['tools']['geneSetEnrichment']['threads']
-#    benchmark:
-#        GENESETANALYSIS_OUT + '{sample}.{clusterid}.geneSetAnalysis.benchmark'
-#    shell:
-#        '{config[tools][geneSetEnrichment][call]} {input.infile} {output.outfile} {params.geneSetDB} {params.variousParams}'
-#
-#def getGeneSetHeatmapFiles(wildcards):
+# gene set enrichment on the DE results
+rule gene_set_enrichment:
+    input:
+        infile = 'results/diff_exp_analysis/{sample}/{sample}.{i}.DEgenes.tsv'
+    output:
+        outfile = 'results/gene_set_enrichment/{sample}.{i}.enrichedGeneSets.txt'
+    params:
+        geneSetDB = config['resources']['genesets'],
+        variousParams = config['tools']['gene_set_enrichment']['variousParams']
+    conda:
+        '../envs/gene_set_enrichment.yaml'
+    resources:
+        mem_mb = config['computingResources']['mediumRequirements']['mem'],
+        time_min = config['computingResources']['mediumRequirements']['time'],
+    threads:
+        config['computingResources']['mediumRequirements']['threads']
+    benchmark:
+        'results/gene_set_enrichment/benchmark/{sample}.{i}.gene_set_enrichment.benchmark'
+    shell:
+        'Rscript workflow/scripts/gene_set_enrichment.R '
+        '{input.infile} '
+        '{output.outfile} '
+        '{params.geneSetDB} '
+        '{params.variousParams}'
+
+
+# gene set enrichment on the DE results malignant vs. malignant
+rule gene_set_enrichment_mal_vs_mal:
+    input:
+        infile = 'results/diff_exp_analysis/{sample}/vs_other_malignant/{sample}.DEmalignant.{i}.DEgenes.tsv'
+    output:
+        outfile = 'results/gene_set_enrichment/vs_other_malignant/{sample}.DEmalignant.{i}.enrichedGeneSets.txt'
+    params:
+        geneSetDB = config['resources']['genesets'],
+        variousParams = config['tools']['gene_set_enrichment']['variousParams']
+    conda:
+        '../envs/gene_set_enrichment.yaml'
+    resources:
+        mem_mb = config['computingResources']['mediumRequirements']['mem'],
+        time_min = config['computingResources']['mediumRequirements']['time'],
+    threads:
+        config['computingResources']['mediumRequirements']['threads']
+    benchmark:
+        'results/gene_set_enrichment/vs_other_malignant/benchmark/{sample}.DEmalignant.{i}.gene_set_enrichment.benchmark'
+    shell:
+        'Rscript workflow/scripts/gene_set_enrichment.R '
+        '{input.infile} '
+        '{output.outfile} '
+        '{params.geneSetDB} '
+        '{params.variousParams}'
+
+
+def getGeneSetHeatmapFiles(wildcards):
 #    if "DEmalignant" in wildcards.sample:
 #        if len(CLUSTER_IDS_MALIGNANT) == 0:
 #            return [GENESETANALYSIS_OUT]
 #        return expand(GENESETANALYSIS_OUT + wildcards.sample + '.{clusterid}.enrichedGeneSets.txt', clusterid = CLUSTER_IDS_MALIGNANT)
-#    return expand(GENESETANALYSIS_OUT + wildcards.sample + '.{clusterid}.enrichedGeneSets.txt', clusterid = CLUSTER_IDS)
-#
-#
+    checkpoint_output = checkpoints.diff_exp_analysis.get(**wildcards).output[0]
+    return expand('results/gene_set_enrichment/{sample}.{i}.enrichedGeneSets.txt',
+#        return expand("results/{result_outdir}/{sample}.{i}.{suffix}.txt",
+            i = glob_wildcards(os.path.join(checkpoint_output, "{sample,[^/]+}.{i,[^/]+}.DEgenes.tsv")).i,
+            sample = wildcards.sample)
+
+def getGeneSetHeatmapFilesMalignant(wildcards):
+#    if "DEmalignant" in wildcards.sample:
+#        if len(CLUSTER_IDS_MALIGNANT) == 0:
+#            return [GENESETANALYSIS_OUT]
+#        return expand(GENESETANALYSIS_OUT + wildcards.sample + '.{clusterid}.enrichedGeneSets.txt', clusterid = CLUSTER_IDS_MALIGNANT)
+    checkpoint_output = checkpoints.diff_exp_analysis.get(**wildcards).output[0]
+    return expand('results/gene_set_enrichment/vs_other_malignant/{sample}.DEmalignant.{i}.enrichedGeneSets.txt',
+#        return expand("results/{result_outdir}/{sample}.{i}.{suffix}.txt",
+            i = glob_wildcards(os.path.join(checkpoint_output, "{sample,[^/]+}.{i,[^/]+}.DEgenes.tsv")).i,
+            sample = wildcards.sample)
+
+
 ## plot heat map for gene set enrichment
-## NOTE: empty inputs cause snakemake to crash, thus we implemented the workaround that returns GENESETANALYSIS_OUT in case of an empty list of enrichment analyses comparing tumor sub clones
-#rule plot_gene_set_enrichment:
-#    input:
-#        inDir = getGeneSetHeatmapFiles
-#        #inDir = expand(GENESETANALYSIS_OUT + '{{sample}}.{clusterid}.enrichedGeneSets.txt', clusterid = CLUSTER_IDS)
-#    output:
-#        outfile = GENESETANALYSIS_OUT + '{sample}.heatmap_enrichment.png'
-#    params:
-#        lsfoutfile = GENESETANALYSIS_OUT + '{sample}.heatmap_enrichment.lsfout.log',
-#        lsferrfile = GENESETANALYSIS_OUT + '{sample}.heatmap_enrichment.lsferr.log',
-#        scratch = config['tools']['plotGeneSetEnrichment']['scratch'],
-#        mem = config['tools']['plotGeneSetEnrichment']['mem'],
-#        time = config['tools']['plotGeneSetEnrichment']['time'],
-#        variousParams = config['tools']['plotGeneSetEnrichment']['variousParams'],
-#        comparison_direc = GENESETANALYSIS_OUT
-#    threads:
-#        config['tools']['plotGeneSetEnrichment']['threads']
-#    benchmark:
-#        GENESETANALYSIS_OUT + '{sample}.heatmap_enrichment.benchmark'
-#    shell:
-#        'if [ "{input.inDir}" != "{params.comparison_direc}" ] ; then echo "test1" ; {config[tools][plotGeneSetEnrichment][call]} {output.outfile} {input.inDir} ; else touch {output.outfile} ; fi'
-#
-#
+## NOTE: empty inputs cause snakemake to crash, thus we implemented the workaround
+## that returns GENESETANALYSIS_OUT in case of an empty list of enrichment analyses comparing tumor sub-clones
+rule plot_gene_set_enrichment:
+    input:
+        inDir = getGeneSetHeatmapFiles
+        #inDir = expand(GENESETANALYSIS_OUT + '{{sample}}.{clusterid}.enrichedGeneSets.txt', clusterid = CLUSTER_IDS)
+    output:
+        outfile = 'results/gene_set_enrichment/{sample}.heatmap_enrichment.png'
+    params:
+        comparison_direc = 'results/gene_set_enrichment/'
+    conda:
+        '../envs/plot_gene_set_enrichment.yaml'
+    resources:
+        mem_mb = config['computingResources']['mediumRequirements']['mem'],
+        time_min = config['computingResources']['mediumRequirements']['time'],
+    threads:
+        config['computingResources']['mediumRequirements']['threads']
+    benchmark:
+        'results/gene_set_enrichment/benchmark/{sample}.plot_gene_set_enrichment.benchmark'
+    shell:
+        'if [ "{input.inDir}" != "{params.comparison_direc}" ] ; '
+        'then echo "test1" ; '
+        'Rscript workflow/scripts/plot_genesets_heatmap.R {output.outfile} {input.inDir} ; '
+        'else touch {output.outfile} ; '
+        'fi'
+
+
+## plot heat map for gene set enrichment
+## NOTE: empty inputs cause snakemake to crash, thus we implemented the workaround
+## that returns GENESETANALYSIS_OUT in case of an empty list of enrichment analyses comparing tumor sub-clones
+rule plot_gene_set_enrichment_mal_vs_mal:
+    input:
+        inDir = getGeneSetHeatmapFilesMalignant
+        #inDir = expand(GENESETANALYSIS_OUT + '{{sample}}.{clusterid}.enrichedGeneSets.txt', clusterid = CLUSTER_IDS)
+    output:
+        outfile = 'results/gene_set_enrichment/vs_other_malignant/{sample}.DEmalignant.heatmap_enrichment.png'
+    params:
+        comparison_direc = 'results/gene_set_enrichment/vs_other_malignant/'
+    conda:
+        '../envs/plot_gene_set_enrichment.yaml'
+    resources:
+        mem_mb = config['computingResources']['mediumRequirements']['mem'],
+        time_min = config['computingResources']['mediumRequirements']['time'],
+    threads:
+        config['computingResources']['mediumRequirements']['threads']
+    benchmark:
+        'results/gene_set_enrichment/vs_other_malignant/benchmark/{sample}.DEmalignant.plot_gene_set_enrichment.benchmark'
+    shell:
+        'if [ "{input.inDir}" != "{params.comparison_direc}" ] ; '
+        'then echo "test1" ; '
+        'Rscript workflow/scripts/plot_genesets_heatmap.R {output.outfile} {input.inDir} ; '
+        'else touch {output.outfile} ; '
+        'fi'
+
+
 #if not 'DRUGCOMBINATION' in globals():
 #    DRUGCOMBINATION = OUTDIR + 'drugCombination/'
 #
@@ -431,7 +504,7 @@ rule plot_drug_prediction:
     benchmark:
         'results/plot_drug_prediction/benchmark/{sample}.plot_drug_prediction.benchmark'
     shell:
-        'Rscript workflow/scripts/show_drugPrediction_on_clones.R'
+        'Rscript workflow/scripts/show_drugPrediction_on_clones.R '
         '--SCE {input.rdsFile} '
         '--drugPredDir {params.inputDir} '
         '--outputDirec {params.outputDirec} '
@@ -465,8 +538,38 @@ def aggregate_input(suffix, result_outdir):
 rule aggregate:
     input:
         aggregate_input(config['tools']['aggregate']['suffix'],
-        config['tools']['aggregate']['result_outdir'])
+                        config['tools']['aggregate']['result_outdir'])
     output:
         'results/{outdir}/{sample}.aggregated.txt'
     shell:
         'touch {output}'
+
+
+###   TODO
+
+# define input for aggregate rule
+# restrain the wildcards (the global restraint alone does not work)
+#def aggregate_malignant_vs_malignant(suffix, result_outdir):
+#    """Define a checkpoint compatible function that generates filenames."""
+#    def tmp(wildcards):
+#        checkpoint_output = checkpoints.diff_exp_analysis.get(**wildcards).output[0]
+#        return expand("results/{result_outdir}/{sample}.{i}.{suffix}.txt",
+#            result_outdir = result_outdir,
+#            suffix = suffix,
+#            sample = wildcards.sample,
+#            # restrain wildcards to not consider subdirectories
+#            # do this here because `glob_wildcards` does not
+#            # respect the global wildcard_constraints directive
+#            i = glob_wildcards(os.path.join(checkpoint_output, "{sample,[^/]+}.{i,[^/]+}.DEgenes.tsv")).i)
+#    return tmp
+
+# define aggregated malignant vs. malignant gene set enrichment
+# the aggregate rule is triggered by the final scampi rule
+#rule aggregate:
+#    input:
+#        aggregate_input(config['tools']['aggregate']['suffix'],
+#        config['tools']['aggregate']['result_outdir'])
+#    output:
+#        'results/{outdir}/{sample}.aggregated.txt'
+#    shell:
+#        'touch {output}'
