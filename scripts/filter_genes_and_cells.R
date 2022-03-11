@@ -25,7 +25,7 @@ library(RColorBrewer)
 library(biomaRt)
 suppressMessages(library(scater))
 library(glue)
-library(tidyverse)
+#library(tidyverse)
 
 # give out session Info
 cat("\n\n\nPrint sessionInfo:\n\n")
@@ -185,7 +185,7 @@ p_rank_nodg <- ggplot(cell_info, aes(x = rank_nodg, y = NODG)) +
   theme(legend.position = c(0.8, 0.9))
 
 filename <- paste0(outdir, file_name, ".cell_ranking_nodgs.png")
-ggsave(filename = filename,plot = p_rank_nodg, width = 2300, height = 1800, units = "px", dpi = 300)
+ggsave(filename = filename, plot = p_rank_nodg, width = 23, height = 18, units = "cm", dpi = 300)
 
 
 # check if any cells are left after filtering
@@ -411,9 +411,9 @@ plot_cells_filtered <- ggplot(cell_info, aes(x = log2_nodg, y = fractionMTreads,
            linetype = c(rep(0, 6), 1, 1),
            size = c(rep(3, 6), 1.3, 1.3)
            )),
-         size = "legend",
+         size = "none",
          alpha = "none") +
-  theme_bw(base_size = ) +
+  theme_bw(base_size = 10) +
   theme(legend.position = c(0.8, 0.86),
         legend.margin = margin(t = 0, r = 0, b = 0, l = 0, unit = "pt"),
         legend.key.size = unit(.4, 'cm'),
@@ -422,7 +422,7 @@ plot_cells_filtered <- ggplot(cell_info, aes(x = log2_nodg, y = fractionMTreads,
         axis.text = element_text(size = 10),
         axis.title = element_text(size = 10)
         )
-plot_cells_filtered
+#plot_cells_filtered
 
 plotname <- paste0(outdir, file_name, ".visualize_filtered_cells.png")
-ggsave(filename = plotname,plot = plot_cells_filtered, width = 2400, height = 1700, units = "px", dpi = 300)
+ggsave(filename = plotname, plot = plot_cells_filtered, width = 24, height = 17, units = "cm", dpi = 300)
