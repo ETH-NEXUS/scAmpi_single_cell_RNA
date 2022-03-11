@@ -258,12 +258,15 @@ gene_info$encodes_ribo_protein <- grepl(x = gene_info$hgnc_symbol,
 # apply gene filters
 if (opt$protein_coding_only) {
   gene_info$remove_gene <- rowSums(gene_info[, c("is_mt",
+                                                 "too_few_cells_express",
+                                                 "encodes_ribo_protein",
                                                   "non_protein_coding",
                                                   "biomart_NA",
-                                                  "encodes_ribo_protein")]) > 0
+                                                  )]) > 0
 } else if (!opt$protein_coding_only) {
   gene_info$remove_gene <- rowSums(gene_info[, c("is_mt",
-                                                  "encodes_ribo_protein")]) > 0
+                                                 "too_few_cells_express",
+                                                 "encodes_ribo_protein")]) > 0
 }
 
 # filter cells again if no counts in any of remaining genes
@@ -298,15 +301,15 @@ write.table(cell_info, txtname, sep = "\t", row.names = F, col.names = F, quote 
 
 # give out info about removed genes
 glue("\n\n\n###   Total number of genes: ", {length(gene_info$ensembl_gene_id)})
-glue("\n###   Number genes removed: ", {sum(gene_info$remove_genes)})
+glue("\n###   Number genes removed: ", {sum(gene_info$remove_gene)})
 
 glue("\n\n###   MT genes: ", {sum(gene_info$is_mt)})
 glue("\n###   Genes expressed in too few cells: ", {sum(gene_info$too_few_cells_express)})
 glue("\n###   Genes encoding ribosomal proteins: ", {sum(gene_info$encodes_ribo_protein)})
 # only relevant if protein-coding filter was applied
 if (opt$protein_coding_only) {
-  glue("\n###   Non-protein-coding: ", {sum(gene_info$non_protein_coding)})
-  glue("\n###   NA in biomart table: ", {sum(gene_info$biomart_NA)})
+  cat("\n###   Non-protein-coding: ", sum(gene_info$non_protein_coding), "\n")
+  cat("\n###   NA in biomart table: ", sum(gene_info$biomart_NA), "\n\n")
 }
 
 
@@ -413,7 +416,7 @@ plot_cells_filtered <- ggplot(cell_info, aes(x = log2_nodg, y = fractionMTreads,
            )),
          size = "none",
          alpha = "none") +
-  theme_bw(base_size = 10) +
+  theme_bw(base_size = 11.5) +
   theme(legend.position = c(0.8, 0.86),
         legend.margin = margin(t = 0, r = 0, b = 0, l = 0, unit = "pt"),
         legend.key.size = unit(.4, 'cm'),
@@ -425,4 +428,4 @@ plot_cells_filtered <- ggplot(cell_info, aes(x = log2_nodg, y = fractionMTreads,
 #plot_cells_filtered
 
 plotname <- paste0(outdir, file_name, ".visualize_filtered_cells.png")
-ggsave(filename = plotname, plot = plot_cells_filtered, width = 24, height = 17, units = "cm", dpi = 300)
+ggsave(filename = plotname, plot = plot_cells_filtered, width = 19, height = 14, units = "cm", dpi = 300)
