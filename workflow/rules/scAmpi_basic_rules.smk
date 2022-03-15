@@ -394,9 +394,9 @@ rule gene_exp:
 # This rule generates general quality control plots to hdf5 expression files
 rule generate_qc_plots :
     input:
-        infile = '{sample}.h5'
+        infile = '{my_path}.h5'
     output:
-        out = '{sample}.h5.histogram_library_sizes.png'
+        out = '{my_path}.h5.histogram_library_sizes.png'
     conda:
         '../envs/generate_qc_plots.yaml'
     resources:
@@ -405,7 +405,7 @@ rule generate_qc_plots :
     threads:
         config['computingResources']['mediumRequirements']['threads']
     benchmark:
-        'benchmark/{sample}.generate_qc_plots.benchmark'
+        'benchmark/{my_path}.generate_qc_plots.benchmark'
     shell:
         'Rscript workflow/scripts/generate_QC_plots.R '
         '--hdf5File {input.infile} '

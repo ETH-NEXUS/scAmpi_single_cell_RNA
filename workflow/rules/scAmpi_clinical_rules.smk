@@ -456,7 +456,7 @@ rule get_full_druglist_to_subclones:
     benchmark:
         'results/drug_combination/benchmark/{sample}.full_druglist_to_subclones.benchmark'
     shell:
-        'python get_full_druglist_to_subclones_assignm.py '
+        'python workflow/scripts/get_full_druglist_to_subclones_assignm.py '
         '--in_drugToCluster {input.infile} '
         '--in_drugList {params.drugList} '
         '--outFile {output.out} '
