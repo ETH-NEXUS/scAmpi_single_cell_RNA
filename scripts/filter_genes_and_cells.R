@@ -25,7 +25,6 @@ library(RColorBrewer)
 library(biomaRt)
 suppressMessages(library(scater))
 library(glue)
-#library(tidyverse)
 
 # give out session Info
 cat("\n\n\nPrint sessionInfo:\n\n")
@@ -205,36 +204,36 @@ stopifnot(is.logical(opt$protein_coding_only))
 if (opt$protein_coding_only) {
   ### Filtering so that only protein-coding genes are kept
   cat("\n\n\n###   Filter non-protein-coding genes\n")
-  
+
   # Download ensembl data
   genomeVersion <- opt$genomeVersion
   mart_obj <- biomaRt::useEnsembl(biomart = "ensembl", host = "www.ensembl.org", dataset = "hsapiens_gene_ensembl")
-  
+
   if (genomeVersion == "hg19") {
     print("Use genome version hg19.")
     mart_obj <- biomaRt::useEnsembl(biomart = "ensembl", host = "www.ensembl.org", dataset = "hsapiens_gene_ensembl", GRCh = 37)
   }
   print(mart_obj)
-  
+
   # get table with biomart info of only protein-coding genes
   biomart_protein_coding <- biomaRt::getBM(attributes = c("ensembl_gene_id", "entrezgene_id", "hgnc_symbol", "description"),
                                            filters = c("ensembl_gene_id", "biotype"),
                                            values = list(rownames(umi_matrix), "protein_coding"),
                                            mart = mart_obj,
                                            uniqueRows = T)
-  
+
   # get mask if non-protein coding filter was applied for each gene, for exporting the information on filtered genes
   gene_info$non_protein_coding <- !(gene_info$ensembl_gene_id %in% biomart_protein_coding$ensembl_gene_id)
-  
+
   # some ensembl_gene_ids are not unique in the mart object
-  cat("\n###   All gene IDs:", length(biomart_protein_coding$ensembl_gene_id), "\n")
+  cat("\n\n###   All gene IDs:", length(biomart_protein_coding$ensembl_gene_id), "\n")
   cat("\n###   Unique gene IDs:", length(unique(biomart_protein_coding$ensembl_gene_id)))
-  
+
   # filter out genes where the mart table contains NA
   biomart_no_NA <- na.omit(biomart_protein_coding)
   # genes found in biomart table but contain NA
   gene_info$biomart_NA <- gene_info$ensembl_gene_id %!in% biomart_no_NA$ensembl_gene_id & gene_info$ensembl_gene_id %in% biomart_protein_coding$ensembl_gene_id
-  
+
   number_genes_filtered_biomart <- sum(rowSums(gene_info[, c("is_mt", "non_protein_coding", "biomart_NA")]) > 0)
   number_genes_accepted_biomart <- sum(rowSums(gene_info[, c("is_mt", "non_protein_coding", "biomart_NA")]) == 0)
   cat("\n\n###   Genes filtered with biomart:", number_genes_filtered_biomart)
@@ -251,7 +250,7 @@ gene_info$too_few_cells_express <- rowSums(matrix_cells_removed > 0) < minNumber
 
 
 ### Filter genes that encode for ribosomal proteins
-cat("\n\n###   Filter out genes encoding for ribosomal proteins\n\n")
+cat("\n\n###   Filter genes encoding for ribosomal proteins\n\n")
 gene_info$encodes_ribo_protein <- grepl(x = gene_info$hgnc_symbol,
                                         pattern = "^(RPL|MRPL|RPS|MRPS)")
 
@@ -260,9 +259,8 @@ if (opt$protein_coding_only) {
   gene_info$remove_gene <- rowSums(gene_info[, c("is_mt",
                                                  "too_few_cells_express",
                                                  "encodes_ribo_protein",
-                                                  "non_protein_coding",
-                                                  "biomart_NA",
-                                                  )]) > 0
+                                                 "non_protein_coding",
+                                                 "biomart_NA")]) > 0
 } else if (!opt$protein_coding_only) {
   gene_info$remove_gene <- rowSums(gene_info[, c("is_mt",
                                                  "too_few_cells_express",
@@ -270,7 +268,7 @@ if (opt$protein_coding_only) {
 }
 
 # filter cells again if no counts in any of remaining genes
-cat("\n\n###   Filter out cells that express none of remaining genes\n\n")
+cat("\n\n###   Filter cells that express none of remaining genes\n\n")
 cell_info$cell_filter_second <- colSums(umi_matrix[!gene_info$remove_gene, ]) == 0
 
 # final selection of removed cells
@@ -303,12 +301,12 @@ write.table(cell_info, txtname, sep = "\t", row.names = F, col.names = F, quote 
 glue("\n\n\n###   Total number of genes: ", {length(gene_info$ensembl_gene_id)})
 glue("\n###   Number genes removed: ", {sum(gene_info$remove_gene)})
 
-glue("\n\n###   MT genes: ", {sum(gene_info$is_mt)})
-glue("\n###   Genes expressed in too few cells: ", {sum(gene_info$too_few_cells_express)})
-glue("\n###   Genes encoding ribosomal proteins: ", {sum(gene_info$encodes_ribo_protein)})
+cat("\n\n###   MT genes: ", sum(gene_info$is_mt))
+cat("\n###   Genes expressed in too few cells: ", sum(gene_info$too_few_cells_express))
+cat("\n###   Genes encoding ribosomal proteins: ", sum(gene_info$encodes_ribo_protein))
 # only relevant if protein-coding filter was applied
 if (opt$protein_coding_only) {
-  cat("\n###   Non-protein-coding: ", sum(gene_info$non_protein_coding), "\n")
+  cat("\n###   Non-protein-coding: ", sum(gene_info$non_protein_coding))
   cat("\n###   NA in biomart table: ", sum(gene_info$biomart_NA), "\n\n")
 }
 
@@ -378,6 +376,7 @@ cell_info$col[cell_info$is_doublet] <- "green"
 cell_info$col <- as.factor(cell_info$col)
 levels(cell_info$col) <- c("black", "cyan", "green", "orange", "red", "magenta")
 
+# for manual colour scale
 my_cols <- c("black" = "black",
              "cyan" = "cyan",
              "green" = "green",
@@ -387,7 +386,7 @@ my_cols <- c("black" = "black",
              "test" = "tomato3",
              "test2" = "turquoise3")
 
-my_cols
+# have size of point that represents cell be dependent on library size of the cell
 point_size <-  0.4 + (cell_info$log_library_size - min(cell_info$log_library_size)) / diff(range(cell_info$log_library_size))
 
 plot_cells_filtered <- ggplot(cell_info, aes(x = log2_nodg, y = fractionMTreads, alpha = 0.5)) +
@@ -425,7 +424,6 @@ plot_cells_filtered <- ggplot(cell_info, aes(x = log2_nodg, y = fractionMTreads,
         axis.text = element_text(size = 10),
         axis.title = element_text(size = 10)
         )
-#plot_cells_filtered
 
 plotname <- paste0(outdir, file_name, ".visualize_filtered_cells.png")
 ggsave(filename = plotname, plot = plot_cells_filtered, width = 19, height = 14, units = "cm", dpi = 300)
