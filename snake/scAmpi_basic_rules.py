@@ -105,6 +105,8 @@ rule filter_genes_and_cells:
         threshold_fractionMT = config['tools']['filter_genes_and_cells']['threshold_fractionMT'],
         threshold_NODG = config['tools']['filter_genes_and_cells']['threshold_NODG'],
         remove_doublets = config['tools']['filter_genes_and_cells']['remove_doublets'],
+        minNumberCells = config['tools']['filter_genes_and_cells']['minNumberCells'],
+        protein_coding_only = config['tools']['filter_genes_and_cells']['protein_coding_only'],
         outDir = FILTER_GENES_CELLS_OUT,
         lsfoutfile = FILTER_GENES_CELLS_OUT + '{sample}.filter_genes_and_cells.lsfout.log',
         lsferrfile = FILTER_GENES_CELLS_OUT + '{sample}.filter_genes_and_cells.lsferr.log',
@@ -128,6 +130,8 @@ rule filter_genes_and_cells:
             '--doublet_barcodes {input.doublets} ' +
             '--remove_doublets {params.remove_doublets} ' +
             '--sample {params.sample} ' +
+            '--minNumberCells {params.minNumberCells} '
+            '--protein_coding_only {params.protein_coding_only} '
             '--outDir {params.outDir}'
 
 
