@@ -4,7 +4,7 @@
 
 This scAmpi workflow is organized into two main parts: the `scAmpi_basic` part and the `scAmpi_clinical` part, which can be run independently. scAmpi_basic includes general scRNA processing steps, such as mapping, QC, normalisation, unsupervised clustering, cell type classification, and DE analysis.
 
-scAmpi_clinial includes the search for disease relevant drug targets for differentially expressed genes. Note that the clinical part is only applied if at least one cluster identified in your sample is indicated as a diseased ("malignant") cell type.
+scAmpi_clinical includes the search for disease relevant drug targets for differentially expressed genes. Note that the clinical part is only applied if at least one cluster identified in your sample is indicated as a diseased ("malignant") cell type.
 
 
 ![scAmpi_both_rulegraphs](https://user-images.githubusercontent.com/38692323/140029020-6292b989-722d-4c93-909d-1d65c8aacddd.png)
@@ -17,8 +17,7 @@ scAmpi provides a yml file to enable installing most software used in the defaul
 
 Example (This will install the conda environment in your home. Note that the conda may take a while to install all software packages):
 ```
->> conda env create -f scAmpi_scRNA_conda_env.yml --name scAmpi_scRNA![Slide1](https://user-images.githubusercontent.com/38692323/140026143-18ff1054-c488-42ab-9f81-89b6737feaf6.png)
-
+>> conda env create -f scAmpi_scRNA_conda_env.yml --name scAmpi_scRNA
 ```
 
 To activate the environment, type:
@@ -27,31 +26,8 @@ To activate the environment, type:
 ```
 
 Additionally required installations that are not available via conda:
-- [Phenograph](https://github.com/dpeerlab/phenograph):
-To install, first activate the conda environment and then use pip install:
-
-```
->> pip install PhenoGraph
-```
-
-- [CIViCpy](https://github.com/griffithlab/civicpy): 
-To install, first activate the conda environment and then use pip install:
-
-```
->> pip install civicpy
-```
-
 - [Cellranger](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/what-is-cell-ranger): Follow the instructions on the 10xGenomics installation support page to install cellranger and to include the cellranger binary to your path.
 Webpage: [https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/installation](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/installation)
-
-
-*Temporary*  
-For the normalisation step the R package `sctransform` is used. As there is a known bug in the latest release (`0.3.2` - 2020-12-16), at the moment it is recommended to use the development version. For more information please have a look at the github repository of [sctransform](https://github.com/ChristophH/sctransform).
-To install, activate the scAmpi environment, open an R session, and type:
-
-```
->> remotes::install_github("ChristophH/sctransform@develop")
-```
 
 #### Example data
 
@@ -80,12 +56,10 @@ Example:
 Example call:
 
 ```
-snakemake -s snake_scAmpi_basic_master.snake --configfile config_scAmpi.json --cluster 'bsub -M {params.mem}  
--n {threads} -W {params.time} -R "rusage[mem={params.mem},scratch={params.scratch}]"  
--eo {params.lsferrfile} -oo {params.lsfoutfile}' -j 100 -p -k
+snakemake -s snake_scAmpi_basic_master.snake --configfile config_scAmpi.yaml -j 1 -p -k
 ```
 
-Note that the section that follows parameter `--cluster` denotes the cluster specific notation to indicate memory and timr ressources for a job. Please adapt according to the respective job scheduling system used.
+Note that if the pipeline is run on a compute cluster with a job scheduling system the parameter `--cluster` can be added to the snakemake command, indicating memory and time resources for a job (e.g. `--cluster 'bsub -M {params.mem} -n {threads} -W {params.time} -R "rusage[mem={params.mem},scratch={params.scratch}]" -eo {params.lsferrfile} -oo {params.lsfoutfile}'` for lsf).
 
 
 #### scAmpi_clinical part
@@ -93,12 +67,8 @@ Note that the section that follows parameter `--cluster` denotes the cluster spe
 Example call:
 
 ```
-snakemake -s snake_scAmpi_clinical_master.snake --configfile config_scTranscriptomics.json --cluster 'bsub  
--M {params.mem} -n {threads} -W {params.time} -R "rusage[mem={params.mem},scratch={params.scratch}]"  
--eo {params.lsferrfile} -oo {params.lsfoutfile}' -j 100 -p -k
+snakemake -s snake_scAmpi_clinical_master.snake --configfile config_scAmpi.yaml -j 1 -p -k
 ```
-
-Note that the section that follows parameter `--cluster` denotes the cluster specific notation to indicate memory and timr ressources for a job. Please adapt according to the respective job scheduling system used.
 
 #### A note on using CIViC
 
