@@ -6,11 +6,12 @@ channels:
     - r
     - defaults
 dependencies:
-    - r >= 4.0
-    - bioconductor-rhdf5 >= 2.34.0
-    - r-optparse >= 1.6.6
-    - r-plyr >= 1.8.6
-    - r-ggplot2 >= 3.3.3
-    - r-rcolorbrewer >= 1
-    - bioconductor-biomart >= 2.46.3
-    - bioconductor-scater >= 1.18.6
+    - "r >= 4.1"
+    - "bioconductor-rhdf5 >= 2.38.0"
+    - "r-optparse >= 1.7.1"
+    - "r-plyr >= 1.8.6"
+    - "r-ggplot2 >= 3.3.5"
+    - "r-rcolorbrewer >= 1"
+    - "bioconductor-biomart >= 2.46.3"
+    - "bioconductor-scater >= 1.22.0"
+    - "r-glue >= 1.6.1"

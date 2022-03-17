@@ -1,5 +1,5 @@
-# find env in scAmpi_single_cell_RNA/workflow/envs/create_hdf5.yaml
-name: create_hdf5
+# find env in scAmpi_single_cell_RNA/workflow/envs/annotate_DE_clinical_info.yaml
+name: annotate_DE_clinical_info
 channels:
     - conda-forge
     - bioconda
@@ -7,6 +7,4 @@ channels:
 dependencies:
     - "python >= 3.9"
     - "numpy >= 1.20.2"
-    - "scipy >= 1.6.2"
-    - "h5py >= 3.1.0"
     - "configargparse >= 1.4"

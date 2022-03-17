@@ -1,5 +1,5 @@
-# find env in scAmpi_single_cell_RNA/workflow/envs/cell_percent_in_cluster.yaml
-name: cell_percent_in_cluster
+# find env in scAmpi_single_cell_RNA/workflow/envs/get_full_druglist_to_subclones.yaml
+name: get_full_druglist_to_subclones
 channels:
     - conda-forge
     - bioconda

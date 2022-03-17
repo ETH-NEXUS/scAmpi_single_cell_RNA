@@ -6,5 +6,5 @@ channels:
     - r
     - defaults
 dependencies:
-    - r >= 4.0
-    - bioconductor-rdgidb >= 1.16.0
+    - "r >= 4.0"
+    - "bioconductor-rdgidb >= 1.16.0"
