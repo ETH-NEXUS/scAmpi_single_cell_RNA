@@ -3,7 +3,7 @@ inputOutput:
   input_fastqs_adt:
   sample_map: config/sample_map.tsv
   malignant_cell_type: "Melanoma"
-  basic_only: FALSE
+  basic_only: TRUE
 
 resources:
   # The following needs to point to the reference transcriptome that will be used by cellranger.
@@ -30,29 +30,29 @@ resources:
 # The tools in this pipeline use a broad range of resources and have been assigned to the following three categories.
 # If there aren't enough resources specified it can be adapted in the tools corresponding section.
 computingResources:
-  lowRequirements:
-    mem: 400
-    time: 100
-    threads: 1
+    mem:
+        low: 400
+        medium: 4000
+        high: 10000
+    time:
+        low: 60
+        medium: 500
+        high: 800
+    threads:
+        low: 1
+        medium: 4
+        high: 8
 
-  mediumRequirements:
-    mem: 4000
-    time: 700
-    threads: 8
-
-  highRequirements:
-    mem: 10000
-    time: 500
-    threads: 8
 
 tools:
   # Cellranger cannot be installed through Conda currently.
   # It needs to be installed manually & the call in both cellranger rules needs to be adapted.
-  # variousParams can be set as described in the Cellranger documentation 
+  # variousParams can be set as described in the Cellranger documentation
   cellranger_count:
     call: /cluster/work/nexus/utilities/sharedPrograms/cellranger/cellranger-6.1.1/bin/cellranger
-    variousParams:
-    local_cores: 8
+    local_cores: 12
+    mem: 6000
+    time: 1440
 
   filter_genes_and_cells:
     # cell outlier detection based on fractionMT, disabled per default ("100")

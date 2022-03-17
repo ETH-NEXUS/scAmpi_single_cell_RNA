@@ -111,7 +111,6 @@ rule clinical_mode:
 
 
 # defines output of a full clinical run
-rule scAmpi_basic:
 rule clinical_full:
     input:
         # trigger clinical part of the pipeline

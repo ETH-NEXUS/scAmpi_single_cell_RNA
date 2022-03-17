@@ -11,10 +11,10 @@ rule parse_filter_DE_genes:
     conda:
         '../envs/parse_filter_DE_genes.yaml'
     resources:
-        mem_mb = config['computingResources']['mediumRequirements']['mem'],
-        time_min = config['computingResources']['mediumRequirements']['time'],
+        mem_mb = config['computingResources']['mem']['low'],
+        time_min = config['computingResources']['time']['low'],
     threads:
-        config['computingResources']['mediumRequirements']['threads']
+        config['computingResources']['threads']['low']
     benchmark:
         'results/parse_diff_exp/benchmark/{sample}.{i}.parse.benchmark'
     shell:
@@ -38,10 +38,10 @@ rule query_dgidb:
     conda:
         '../envs/query_dgidb.yaml'
     resources:
-        mem_mb = config['computingResources']['mediumRequirements']['mem'],
-        time_min = config['computingResources']['mediumRequirements']['time'],
+        mem_mb = config['computingResources']['mem']['medium'],
+        time_min = config['computingResources']['time']['low'],
     threads:
-        config['computingResources']['mediumRequirements']['threads']
+        config['computingResources']['threads']['medium']
     benchmark:
         'databaseQuery/benchmark/{sample}.{i}.dgidbQuery.benchmark'
     shell:
@@ -67,10 +67,10 @@ rule query_clinical_trials:
     conda:
         '../envs/query_clinical_trials.yaml'
     resources:
-        mem_mb = config['computingResources']['mediumRequirements']['mem'],
-        time_min = config['computingResources']['mediumRequirements']['time'],
+        mem_mb = config['computingResources']['mem']['low'],
+        time_min = config['computingResources']['time']['medium'],
     threads:
-        config['computingResources']['mediumRequirements']['threads']
+        config['computingResources']['threads']['medium']
     benchmark:
         'results/clinical_trials/benchmark/{sample}.{i}.clinicalTrialsQuery.benchmark'
     shell:
@@ -92,10 +92,10 @@ rule download_clinical_trials:
 #    conda:
 #        '../envs/query_dgidb.yaml'
     resources:
-        mem_mb = config['computingResources']['mediumRequirements']['mem'],
-        time_min = config['computingResources']['mediumRequirements']['time'],
+        mem_mb = config['computingResources']['mem']['low'],
+        time_min = config['computingResources']['time']['medium'],
     threads:
-        config['computingResources']['mediumRequirements']['threads']
+        config['computingResources']['threads']['medium']
     benchmark:
         'results/clinical_trials/benchmark/downloadClinicalTrials.benchmark'
     shell:
@@ -121,10 +121,10 @@ rule annotate_DE_clinical_info:
     conda:
         '../envs/annotate_DE_clinical_info.yaml'
     resources:
-        mem_mb = config['computingResources']['mediumRequirements']['mem'],
-        time_min = config['computingResources']['mediumRequirements']['time'],
+        mem_mb = config['computingResources']['mem']['low'],
+        time_min = config['computingResources']['time']['low'],
     threads:
-        config['computingResources']['mediumRequirements']['threads']
+        config['computingResources']['threads']['low']
     benchmark:
         'results/clinical_annotation/benchmark/{sample}.{i}.annotate_DE_clinical_info.benchmark'
     shell:
@@ -153,10 +153,10 @@ rule query_civic:
     conda:
         '../envs/query_civic.yaml'
     resources:
-        mem_mb = config['computingResources']['mediumRequirements']['mem'],
-        time_min = config['computingResources']['mediumRequirements']['time'],
+        mem_mb = config['computingResources']['mem']['low'],
+        time_min = config['computingResources']['time']['low'],
     threads:
-        config['computingResources']['mediumRequirements']['threads']
+        config['computingResources']['threads']['low']
     benchmark:
         'results/query_civic/benchmark/{sample}.{i}.query_civic.benchmark'
     shell:
@@ -183,10 +183,10 @@ rule gene_set_enrichment:
     conda:
         '../envs/gene_set_enrichment.yaml'
     resources:
-        mem_mb = config['computingResources']['mediumRequirements']['mem'],
-        time_min = config['computingResources']['mediumRequirements']['time'],
+        mem_mb = config['computingResources']['mem']['low'],
+        time_min = config['computingResources']['time']['low'],
     threads:
-        config['computingResources']['mediumRequirements']['threads']
+        config['computingResources']['threads']['low']
     benchmark:
         'results/gene_set_enrichment/benchmark/{sample}.{i}.gene_set_enrichment.benchmark'
     shell:
@@ -209,10 +209,10 @@ rule gene_set_enrichment_mal_vs_mal:
     conda:
         '../envs/gene_set_enrichment.yaml'
     resources:
-        mem_mb = config['computingResources']['mediumRequirements']['mem'],
-        time_min = config['computingResources']['mediumRequirements']['time'],
+        mem_mb = config['computingResources']['mem']['low'],
+        time_min = config['computingResources']['time']['low'],
     threads:
-        config['computingResources']['mediumRequirements']['threads']
+        config['computingResources']['threads']['low']
     benchmark:
         'results/gene_set_enrichment/vs_other_malignant/benchmark/{sample}.DEmalignant.{i}.gene_set_enrichment.benchmark'
     shell:
@@ -260,10 +260,10 @@ rule plot_gene_set_enrichment:
     conda:
         '../envs/plot_gene_set_enrichment.yaml'
     resources:
-        mem_mb = config['computingResources']['mediumRequirements']['mem'],
-        time_min = config['computingResources']['mediumRequirements']['time'],
+        mem_mb = config['computingResources']['mem']['low'],
+        time_min = config['computingResources']['time']['low'],
     threads:
-        config['computingResources']['mediumRequirements']['threads']
+        config['computingResources']['threads']['low']
     benchmark:
         'results/gene_set_enrichment/benchmark/{sample}.plot_gene_set_enrichment.benchmark'
     shell:
@@ -288,10 +288,10 @@ rule plot_gene_set_enrichment_mal_vs_mal:
     conda:
         '../envs/plot_gene_set_enrichment.yaml'
     resources:
-        mem_mb = config['computingResources']['mediumRequirements']['mem'],
-        time_min = config['computingResources']['mediumRequirements']['time'],
+        mem_mb = config['computingResources']['mem']['low'],
+        time_min = config['computingResources']['time']['low'],
     threads:
-        config['computingResources']['mediumRequirements']['threads']
+        config['computingResources']['threads']['low']
     benchmark:
         'results/gene_set_enrichment/vs_other_malignant/benchmark/{sample}.DEmalignant.plot_gene_set_enrichment.benchmark'
     shell:
@@ -324,10 +324,10 @@ rule parse_for_minSetCover:
     conda:
         '../envs/parse_for_minSetCover.yaml'
     resources:
-        mem_mb = config['computingResources']['mediumRequirements']['mem'],
-        time_min = config['computingResources']['mediumRequirements']['time'],
+        mem_mb = config['computingResources']['mem']['low'],
+        time_min = config['computingResources']['time']['low'],
     threads:
-        config['computingResources']['mediumRequirements']['threads']
+        config['computingResources']['threads']['low']
     benchmark:
         'results/drug_combination/benchmark/{sample}.{type}.parse_for_minSetCover.benchmark'
     shell:
@@ -351,10 +351,10 @@ rule find_minSetCover:
     conda:
         '../envs/find_minSetCover.yaml'
     resources:
-        mem_mb = config['computingResources']['mediumRequirements']['mem'],
-        time_min = config['computingResources']['mediumRequirements']['time'],
+        mem_mb = config['computingResources']['mem']['low'],
+        time_min = config['computingResources']['time']['low'],
     threads:
-        config['computingResources']['mediumRequirements']['threads']
+        config['computingResources']['threads']['low']
     benchmark:
         'results/drug_combination/benchmark/{sample}.{type}.find_minSetCover.benchmark'
     shell:
@@ -375,10 +375,10 @@ rule filter_drugs:
     conda:
         '../envs/filter_drugs.yaml'
     resources:
-        mem_mb = config['computingResources']['mediumRequirements']['mem'],
-        time_min = config['computingResources']['mediumRequirements']['time'],
+        mem_mb = config['computingResources']['mem']['low'],
+        time_min = config['computingResources']['time']['low'],
     threads:
-        config['computingResources']['mediumRequirements']['threads']
+        config['computingResources']['threads']['low']
     benchmark:
         'results/clinical_trials/benchmark/{sample}.{i}.filter_drugs.benchmark'
     shell:
@@ -399,10 +399,10 @@ rule preprocess_upsetr_plot:
     conda:
         '../envs/preprocess_upsetr_plot.yaml'
     resources:
-        mem_mb = config['computingResources']['mediumRequirements']['mem'],
-        time_min = config['computingResources']['mediumRequirements']['time'],
+        mem_mb = config['computingResources']['mem']['low'],
+        time_min = config['computingResources']['time']['low'],
     threads:
-        config['computingResources']['mediumRequirements']['threads']
+        config['computingResources']['threads']['low']
     benchmark:
         'results/upsetr_plot/benchmark/{sample}.{type}.upsetr_plot.benchmark'
     shell:
@@ -423,10 +423,10 @@ rule plot_upsetr:
     conda:
         '../envs/plot_upsetr.yaml'
     resources:
-        mem_mb = config['computingResources']['mediumRequirements']['mem'],
-        time_min = config['computingResources']['mediumRequirements']['time'],
+        mem_mb = config['computingResources']['mem']['low'],
+        time_min = config['computingResources']['time']['low'],
     threads:
-        config['computingResources']['mediumRequirements']['threads']
+        config['computingResources']['threads']['low']
     benchmark:
         'results/upsetr_plot/benchmark/{sample}.{type}.plot_upsetr.benchmark'
     shell:
@@ -449,10 +449,10 @@ rule get_full_druglist_to_subclones:
     conda:
         '../envs/get_full_druglist_to_subclones.yaml'
     resources:
-        mem_mb = config['computingResources']['mediumRequirements']['mem'],
-        time_min = config['computingResources']['mediumRequirements']['time'],
+        mem_mb = config['computingResources']['mem']['low'],
+        time_min = config['computingResources']['time']['low'],
     threads:
-        config['computingResources']['mediumRequirements']['threads']
+        config['computingResources']['threads']['low']
     benchmark:
         'results/drug_combination/benchmark/{sample}.full_druglist_to_subclones.benchmark'
     shell:
@@ -489,10 +489,10 @@ rule plot_drug_prediction:
     conda:
         '../envs/plot_drug_prediction.yaml'
     resources:
-        mem_mb = config['computingResources']['mediumRequirements']['mem'],
-        time_min = config['computingResources']['mediumRequirements']['time'],
+        mem_mb = config['computingResources']['mem']['medium'],
+        time_min = config['computingResources']['time']['low'],
     threads:
-        config['computingResources']['mediumRequirements']['threads']
+        config['computingResources']['threads']['medium']
     benchmark:
         'results/plot_drug_prediction/benchmark/{sample}.plot_drug_prediction.benchmark'
     shell:

@@ -10,17 +10,16 @@ rule cellranger_count:
     params:
         cr_out = 'results/cellranger_run/',
         local_cores = config['tools']['cellranger_count']['local_cores'],
-        variousParams = config['tools']['cellranger_count']['variousParams'],
         metrics_summary = 'results/cellranger_run/{sample}.metrics_summary.csv',
         web_summary = 'results/cellranger_run/{sample}.web_summary.html',
         # {sample} needs to be the prefix of all fastq files that belong to this sample.
         # NOTE: no dots are allowed in sample names!
         mySample = '{sample}'
     resources:
-        mem_mb = config['computingResources']['highRequirements']['mem'],
-        time_min = config['computingResources']['highRequirements']['time']
+        mem_mb = config['tools']['cellranger_count']['mem'],
+        time_min = config['tools']['cellranger_count']['time']
     threads:
-        config['computingResources']['highRequirements']['threads']
+        config['tools']['cellranger_count']['local_cores']
     benchmark:
         'results/cellranger_run/benchmark/{sample}.cellranger_count.benchmark'
     # NOTE: cellranger count function cannot specify the output directory, the output is the path you call it from.
@@ -56,10 +55,10 @@ rule create_hdf5:
     conda:
         '../envs/create_hdf5.yaml'
     resources:
-        mem_mb = config['computingResources']['mediumRequirements']['mem'],
-        time_min = config['computingResources']['mediumRequirements']['time']
+        mem_mb = config['computingResources']['mem']['medium'],
+        time_min = config['computingResources']['time']['low']
     threads:
-        config['computingResources']['mediumRequirements']['threads']
+        config['computingResources']['threads']['medium']
     benchmark:
         'results/counts_raw/benchmark/{sample}.create_hd5.benchmark'
     shell:
@@ -82,10 +81,10 @@ rule identify_doublets:
     conda:
         '../envs/identify_doublets.yaml'
     resources:
-        mem_mb = config['computingResources']['mediumRequirements']['mem'],
-        time_min = config['computingResources']['mediumRequirements']['time']
+        mem_mb = config['computingResources']['mem']['medium'],
+        time_min = config['computingResources']['time']['low']
     threads:
-        config['computingResources']['mediumRequirements']['threads']
+        config['computingResources']['threads']['medium']
     benchmark:
         'results/counts_filtered/benchmark/{sample}.identify_doublets.benchmark'
     shell:
@@ -116,10 +115,10 @@ rule filter_genes_and_cells:
     conda:
         '../envs/filter_genes_and_cells.yaml'
     resources:
-        mem_mb = config['computingResources']['mediumRequirements']['mem'],
-        time_min = config['computingResources']['mediumRequirements']['time'],
+        mem_mb = config['computingResources']['mem']['medium'],
+        time_min = config['computingResources']['time']['low'],
     threads:
-        config['computingResources']['mediumRequirements']['threads']
+        config['computingResources']['threads']['medium']
     benchmark:
         'results/counts_filtered/benchmark/{sample}.filter_genes_and_cells.benchmark'
     shell:
@@ -152,10 +151,10 @@ rule sctransform_preprocessing:
     conda:
         '../envs/sctransform_preprocessing.yaml'
     resources:
-        mem_mb = config['computingResources']['mediumRequirements']['mem'],
-        time_min = config['computingResources']['mediumRequirements']['time'],
+        mem_mb = config['computingResources']['mem']['medium'],
+        time_min = config['computingResources']['time']['medium'],
     threads:
-        config['computingResources']['mediumRequirements']['threads']
+        config['computingResources']['threads']['medium']
     benchmark:
         'results/counts_corrected/benchmark/{sample}.corrected.benchmark'
     shell:
@@ -183,10 +182,10 @@ rule phenograph:
     conda:
         '../envs/phenograph.yaml'
     resources:
-        mem_mb = config['computingResources']['mediumRequirements']['mem'],
-        time_min = config['computingResources']['mediumRequirements']['time']
+        mem_mb = config['computingResources']['mem']['medium'],
+        time_min = config['computingResources']['time']['low']
     threads:
-        config['computingResources']['mediumRequirements']['threads']
+        config['computingResources']['threads']['medium']
     benchmark:
         'results/clustering/benchmark/{sample}.phenograph.benchmark'
     shell:
@@ -216,10 +215,10 @@ rule prepare_celltyping:
     conda:
         '../envs/prepare_celltyping.yaml'
     resources:
-        mem_mb = config['computingResources']['mediumRequirements']['mem'],
-        time_min = config['computingResources']['mediumRequirements']['time'],
+        mem_mb = config['computingResources']['mem']['medium'],
+        time_min = config['computingResources']['time']['low'],
     threads:
-        config['computingResources']['mediumRequirements']['threads']
+        config['computingResources']['threads']['medium']
     benchmark:
         'results/prep_celltyping/benchmark/{sample}.prepare_celltyping.benchmark'
     shell:
@@ -248,10 +247,10 @@ rule celltyping:
     conda:
         '../envs/celltyping.yaml'
     resources:
-        mem_mb = config['computingResources']['mediumRequirements']['mem'],
-        time_min = config['computingResources']['mediumRequirements']['time'],
+        mem_mb = config['computingResources']['mem']['medium'],
+        time_min = config['computingResources']['time']['medium'],
     threads:
-        config['computingResources']['mediumRequirements']['threads']
+        config['computingResources']['threads']['medium']
     benchmark:
         'results/celltyping/benchmark/{sample}.celltyping.benchmark'
     shell:
@@ -282,10 +281,10 @@ rule remove_atypical_cells:
     conda:
         '../envs/remove_atypical_cells.yaml'
     resources:
-        mem_mb = config['computingResources']['mediumRequirements']['mem'],
-        time_min = config['computingResources']['mediumRequirements']['time']
+        mem_mb = config['computingResources']['mem']['medium'],
+        time_min = config['computingResources']['time']['low']
     threads:
-        config['computingResources']['mediumRequirements']['threads']
+        config['computingResources']['threads']['medium']
     benchmark:
         'results/atypical_removed/benchmark/{sample}.atypical_removed.benchmark'
     shell:
@@ -313,10 +312,10 @@ rule gsva:
     conda:
         '../envs/gsva.yaml'
     resources:
-        mem_mb = config['computingResources']['mediumRequirements']['mem'],
-        time_min = config['computingResources']['mediumRequirements']['time'],
+        mem_mb = config['computingResources']['mem']['medium'],
+        time_min = config['computingResources']['time']['medium'],
     threads:
-        config['computingResources']['mediumRequirements']['threads']
+        config['computingResources']['threads']['medium']
     benchmark:
         'results/gsva/benchmark/{sample}.gsva.benchmark'
     shell:
@@ -342,10 +341,10 @@ rule plotting:
     conda:
         '../envs/plotting.yaml'
     resources:
-        mem_mb = config['computingResources']['mediumRequirements']['mem'],
-        time_min = config['computingResources']['mediumRequirements']['time'],
+        mem_mb = config['computingResources']['mem']['medium'],
+        time_min = config['computingResources']['time']['medium'],
     threads:
-        config['computingResources']['mediumRequirements']['threads']
+        config['computingResources']['threads']['medium']
     benchmark:
         'results/plotting/benchmark/{sample}.plotting.benchmark'
     shell:
@@ -375,10 +374,10 @@ rule gene_exp:
     conda:
         '../envs/gene_exp.yaml'
     resources:
-        mem_mb = config['computingResources']['mediumRequirements']['mem'],
-        time_min = config['computingResources']['mediumRequirements']['time'],
+        mem_mb = config['computingResources']['mem']['medium'],
+        time_min = config['computingResources']['time']['low'],
     threads:
-        config['computingResources']['mediumRequirements']['threads']
+        config['computingResources']['threads']['medium']
     benchmark:
         'results/gene_exp/benchmark/{sample}.gene_exp.benchmark'
     shell:
@@ -400,10 +399,10 @@ rule generate_qc_plots :
     conda:
         '../envs/generate_qc_plots.yaml'
     resources:
-        mem_mb = config['computingResources']['mediumRequirements']['mem'],
-        time_min = config['computingResources']['mediumRequirements']['time'],
+        mem_mb = config['computingResources']['mem']['medium'],
+        time_min = config['computingResources']['time']['low'],
     threads:
-        config['computingResources']['mediumRequirements']['threads']
+        config['computingResources']['threads']['medium']
     benchmark:
         'benchmark/{my_path}.generate_qc_plots.benchmark'
     shell:
@@ -423,10 +422,10 @@ rule generate_qc_plots :
 #        sampleName_short = config['tools']['cellranger_count']['cellranger_sampleName'],
 #        outDir = 'results/plotting/',
 #    resources:
-#        mem_mb = config['computingResources']['mediumRequirements']['mem'],
-#        time_min = config['computingResources']['mediumRequirements']['time'],
+#        mem_mb = config['computingResources']['mem']['medium'],
+#        time_min = config['computingResources']['time']['medium'],
 #    threads:
-#        config['computingResources']['mediumRequirements']['threads']
+#        config['computingResources']['threads']['medium']
 #    benchmark:
 #        'results/plotting/benchmark/{sample}.boxplot_cell_types_cohort.benchmark'
 #    shell:
@@ -446,10 +445,10 @@ rule generate_qc_plots :
 #        sampleName_short = config['tools']['cellranger_count']['cellranger_sampleName'],
 #        colour_config = config['resources']['colour_config']
 #    resources:
-#        mem_mb = config['computingResources']['mediumRequirements']['mem'],
-#        time_min = config['computingResources']['mediumRequirements']['time'],
+#        mem_mb = config['computingResources']['mem']['medium'],
+#        time_min = config['computingResources']['time']['medium'],
 #    threads:
-#        config['computingResources']['mediumRequirements']['threads']
+#        config['computingResources']['threads']['medium']
 #    benchmark:
 #        'results/plotting/benchmark/{sample}.sample_integration.benchmark'
 #    shell:
@@ -467,10 +466,10 @@ rule cell_percent_in_cluster:
     conda:
         '../envs/cell_percent_in_cluster.yaml'
     resources:
-        mem_mb = config['computingResources']['mediumRequirements']['mem'],
-        time_min = config['computingResources']['mediumRequirements']['time'],
+        mem_mb = config['computingResources']['mem']['medium'],
+        time_min = config['computingResources']['time']['low'],
     threads:
-        config['computingResources']['mediumRequirements']['threads']
+        config['computingResources']['threads']['medium']
     benchmark:
         'results/clustering/benchmark/{sample}.clusterPercent.benchmark'
     shell:
@@ -499,10 +498,10 @@ checkpoint diff_exp_analysis:
     conda:
         '../envs/diff_exp_analysis.yaml'
     resources:
-        mem_mb = config['computingResources']['mediumRequirements']['mem'],
-        time_min = config['computingResources']['mediumRequirements']['time'],
+        mem_mb = config['computingResources']['mem']['medium'],
+        time_min = config['computingResources']['time']['high'],
     threads:
-        config['computingResources']['mediumRequirements']['threads']
+        config['computingResources']['threads']['medium']
     benchmark:
         'results/diff_exp_analysis/benchmark/{sample}.diff_exp_analysis.benchmark'
     shell:
