@@ -3,7 +3,7 @@ inputOutput:
   input_fastqs: "dir/fastqs/"
   # fastqc files, if already available
   input_fastqc: ""
-  analysis_output_dir: "dir/output/"
+  analysis_output_dir: "dir/analysis/"
   analysis_temp_dir: "dir/snake_temp/"
   # sample map with information on the samples of this analysis
   # see the general README for the required format
