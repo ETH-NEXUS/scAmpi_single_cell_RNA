@@ -7,7 +7,7 @@ inputOutput:
   analysis_temp_dir: "testdir/snake_temp/"
   # sample map with information on the samples of this analysis
   # see the general README for the required format
-  sample_map: "testdir/snake_files/sample_map.tsv"
+  sample_map: "testdir/snake_files/sample_map_testdata.tsv"
   # cell type name of malignant/diseased cell types - relevant to select clusters that will be analysed in the clinical part of scAmpi.
   # note that cell types are selected via non-strict pattern matching, so also parts of diseased cell type labels can be used.
   malignant_cell_type: "none"

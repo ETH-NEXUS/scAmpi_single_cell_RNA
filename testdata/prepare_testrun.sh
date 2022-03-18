@@ -31,10 +31,12 @@ mkdir -p snake_files
 cp ${scAmpi_path}/testdata/config_scAmpi_testdata.yaml snake_files/
 cp ${scAmpi_path}/testdata/sample_map_testdata.tsv snake_files/
 
-# replace test directory path
+# Adapt paths in config files to match the testdata directory
 # temporarily adapt IFS to preserve leading whitespaces
 OLD_IFS="$IFS"
 IFS=
+
+# replace test directory path
 while read -r line; do
     echo ${line//testdir/${testrun_dir}}
     done < snake_files/config_scAmpi_testdata.yaml > snake_files/config_scAmpi_testdata_temp.yaml
