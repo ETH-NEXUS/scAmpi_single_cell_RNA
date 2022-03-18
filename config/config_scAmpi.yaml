@@ -1,13 +1,13 @@
 ---
 inputOutput:
-  input_fastqs: "/dir/fastqs/"
+  input_fastqs: "dir/fastqs/"
   # fastqc files, if already available
   input_fastqc: ""
-  analysis_output_dir: "/dir/output/"
-  analysis_temp_dir: "/dir/snake_temp/"
+  analysis_output_dir: "dir/output/"
+  analysis_temp_dir: "dir/snake_temp/"
   # sample map with information on the samples of this analysis
   # see the general README for the required format
-  sample_map: "/dir/sample_map.tsv"
+  sample_map: "dir/sample_map.tsv"
   # cell type name of malignant/diseased cell types - relevant to select clusters that will be analysed in the clinical part of scAmpi.
   # note that cell types are selected via non-strict pattern matching, so also parts of diseased cell type labels can be used.
   malignant_cell_type: "melanoma"
@@ -20,7 +20,7 @@ resources:
   drugCombinations: "path_to_scAmpi_git/required_files/melanoma/drug_combinations_melanoma.txt"
   civicDict: "path_to_scAmpi_git/required_files/drug_synonyms_civic.txt"
   # reference for cellranger, e.g. from 10x Genomics resource
-  reference_transcriptome: "/resources/refdata-gex-GRCh38-2020-A/"
+  reference_transcriptome: "resources/refdata-gex-GRCh38-2020-A/"
   transcriptome_code: "GRCh38"
   # celltype_lists gmx file containing a library of cell type classification gene lists
   celltype_lists: "path_to_scAmpi_git/required_files/melanoma/celltype_list_melanoma.gmx"
@@ -44,21 +44,21 @@ tools:
     variousParams: ""
   # create hdf5 file from cellranger output
   create_hd5:
-    call: "python /path_to_scAmpi_git/scripts/create_hdf5.py "
+    call: "python path_to_scAmpi_git/scripts/create_hdf5.py "
     scratch: "2000"
     mem: "2000"
     time: "100"
     threads: 4
   # identify doublets with `scDblFinder`
   identify_doublets:
-    call: "Rscript /path_to_scAmpi_git/scripts/identify_doublets.R "
+    call: "Rscript path_to_scAmpi_git/scripts/identify_doublets.R "
     scratch: "1000"
     mem: "8000"
     time: "400"
     threads: 4
   # filter out low quality genes and cells
   filter_genes_and_cells:
-    call: "Rscript  /path_to_scAmpi_git/scripts/filter_genes_and_cells.R "
+    call: "Rscript  path_to_scAmpi_git/scripts/filter_genes_and_cells.R "
     # cell outlier detection based on fractionMT, disabled per default ("100")
     nmads_fractionMT: "100"
     # cell outlier detection based on number of detected genes, disabled per default ("100")
@@ -77,14 +77,14 @@ tools:
     threads: 4
   # generate qc plots on hdf5 file input
   generate_qc_plots:
-    call: "Rscript /path_to_scAmpi_git/scripts/generate_QC_plots.R "
+    call: "Rscript path_to_scAmpi_git/scripts/generate_QC_plots.R "
     scratch: "2000"
     mem: "8000"
     time: "100"
     threads: 4
   # normalise data using `sctransform` R package
   sctransform_preprocessing:
-    call: "Rscript /path_to_scAmpi_git/scripts/sctransform_preprocessing.R "
+    call: "Rscript path_to_scAmpi_git/scripts/sctransform_preprocessing.R "
     scratch: "2000"
     mem: "4000"
     time: "200"
@@ -98,7 +98,7 @@ tools:
   # cluster cells using phenograph implementation of louvain algorithm
   clustering:
     phenograph:
-      call: "python /path_to_scAmpi_git/scripts/apply_phenograph.py "
+      call: "python path_to_scAmpi_git/scripts/apply_phenograph.py "
       # number of nearest neighbours
       n_neighbours: 30
       log_normalize: false
@@ -110,14 +110,14 @@ tools:
       threads: 1
   # intermediate step to integrate clustering results into SCE object
   prepare_celltyping:
-    call: "Rscript /path_to_scAmpi_git/scripts/prepare_celltyping.R "
+    call: "Rscript path_to_scAmpi_git/scripts/prepare_celltyping.R "
     scratch: "2000"
     mem: "4000"
     time: "200"
     threads: 4
   # assign cell type to each cell
   cell_type_classification:
-    call: "Rscript /path_to_scAmpi_git/scripts/celltyping.r "
+    call: "Rscript path_to_scAmpi_git/scripts/celltyping.r "
     # minimum number of cell-type-specific genes expressed by a cell to consider cell type, default is "5"
     min_genes: "5"
     scratch: "2000"
@@ -126,7 +126,7 @@ tools:
     threads: 4
   # remove cells where cell type differs from most cells in the cluster
   remove_atypical:
-    call: "Rscript /path_to_scAmpi_git/scripts/filter_out_atypical_cells.R "
+    call: "Rscript path_to_scAmpi_git/scripts/filter_out_atypical_cells.R "
     scratch: "2000"
     mem: "4000"
     time: "100"
@@ -140,14 +140,14 @@ tools:
     min_threshold: "5"
   # perform GSVA analysis
   gsva:
-    call: "Rscript /path_to_scAmpi_git/scripts/gsva.r "
+    call: "Rscript path_to_scAmpi_git/scripts/gsva.r "
     scratch: "2000"
     mem: "4000"
     time: "200"
     threads: 4
   # plot qc and expression
   plotting:
-    call: "Rscript /path_to_scAmpi_git/scripts/scRNA_pipeline_plotting.R "
+    call: "Rscript path_to_scAmpi_git/scripts/scRNA_pipeline_plotting.R "
     # annotate with user-defined gene aliases
     use_alias: "TRUE"
     scratch: "2000"
@@ -156,7 +156,7 @@ tools:
     threads: 4
   # perform DE analysis
   diff_exp:
-    call: "Rscript /path_to_scAmpi_git/scripts/apply_DE_analysis.R"
+    call: "Rscript path_to_scAmpi_git/scripts/apply_DE_analysis.R"
     # minimum number of cells to be tested in DE analysis
     threshold_comparison: "20"
     # cut-off for p-value
@@ -173,7 +173,7 @@ tools:
     threads: 4
   # calculate mean expression per cluster
   gene_exp:
-    call: "Rscript /path_to_scAmpi_git/scripts/get_cluster_gene_expression.R "
+    call: "Rscript path_to_scAmpi_git/scripts/get_cluster_gene_expression.R "
     scratch: "2000"
     mem: "8000"
     time: "100"
@@ -186,7 +186,7 @@ tools:
     threshold_sample: "0"
   # parse table with differentially expressed genes
   parseAndFilter_DEgenes:
-    call: "python /path_to_scAmpi_git/scripts/parseAndFilter_DEgenes.py "
+    call: "python path_to_scAmpi_git/scripts/parseAndFilter_DEgenes.py "
     scratch: "2000"
     mem: "300"
     time: "100"
@@ -217,7 +217,7 @@ tools:
                     pct_nonzero"
   # annotate DE genes with clinical information
   annotateClinical:
-    call: "python /path_to_scAmpi_git/scripts/annotateWithClinicalInfo.py "
+    call: "python path_to_scAmpi_git/scripts/annotateWithClinicalInfo.py "
     scratch: "2000"
     mem: "200"
     time: "100"
@@ -226,7 +226,7 @@ tools:
     variousParams: "--colName_gene gene_names"
   # query DGIdb for DE genes
   queryDGIDB:
-    call: "Rscript /path_to_scAmpi_git/scripts/query_dgidb.r "
+    call: "Rscript path_to_scAmpi_git/scripts/query_dgidb.r "
     scratch: "2000"
     mem: "200"
     time: "239"
@@ -237,7 +237,7 @@ tools:
     minDatabaseNum: "4"
   # query CIViC database for DE genes
   queryCIVIC:
-    call: "python /path_to_scAmpi_git/scripts/Query_CIViC_expr.py "
+    call: "python path_to_scAmpi_git/scripts/Query_CIViC_expr.py "
     scratch: "2000"
     mem: "2000"
     time: "200"
@@ -257,7 +257,7 @@ tools:
     strictExpression: "y"
   # perform gene set enrichment analysis on DE genes
   geneSetEnrichment:
-    call: "Rscript /path_to_scAmpi_git/scripts/GeneSetEnrichmentAnalysis.R "
+    call: "Rscript path_to_scAmpi_git/scripts/GeneSetEnrichmentAnalysis.R "
     scratch: "2000"
     mem: "200"
     time: "200"
@@ -266,7 +266,7 @@ tools:
     variousParams: "test_statistic"
   # plot heatmap of geneset enrichment analysis
   plotGeneSetEnrichment:
-    call: "Rscript /path_to_scAmpi_git/scripts/plot_genesets_heatmap.R "
+    call: "Rscript path_to_scAmpi_git/scripts/plot_genesets_heatmap.R "
     scratch: "2000"
     mem: "200"
     time: "100"
@@ -274,7 +274,7 @@ tools:
     variousParams: ""
   # query clinical trials data base
   queryClinicalTrials:
-    call: "python /path_to_scAmpi_git/scripts/queryClinicalTrials.py "
+    call: "python path_to_scAmpi_git/scripts/queryClinicalTrials.py "
     scratch: "3000"
     mem: "500"
     time: "200"
@@ -293,7 +293,7 @@ tools:
     cancerType: "cancer"
   # get percentage of malignant cells per malignant cluster
   cellPercentInCluster:
-    call: "python /path_to_scAmpi_git/scripts/count_cells_in_clusters.py "
+    call: "python path_to_scAmpi_git/scripts/count_cells_in_clusters.py "
     scratch: "2000"
     mem: "200"
     time: "100"
@@ -302,7 +302,7 @@ tools:
     variousParams: "--malignant Melanoma"
   # extract per drug the clusters with DE genes where interaction was found, and weight of DGIdb results
   parseDgidbTrialsTable_for_minSetCover:
-    call: "python /path_to_scAmpi_git/scripts/parseDgidbTrialsTable_for_minSetCover.py "
+    call: "python path_to_scAmpi_git/scripts/parseDgidbTrialsTable_for_minSetCover.py "
     scratch: "2000"
     mem: "200"
     time: "100"
@@ -311,7 +311,7 @@ tools:
     colName_clinTrial: "ClinicalTrials"
   # find drug-gene interactions covering most of the tumor cells
   findminSetCover:
-    call: "python /path_to_scAmpi_git/scripts/minSetCover.py "
+    call: "python path_to_scAmpi_git/scripts/minSetCover.py "
     scratch: "2000"
     mem: "200"
     time: "100"
@@ -320,21 +320,21 @@ tools:
     variousParams: "--considerClusterSize no"
   # filter table with drug-gene interactions with a drug list of interest
   filterDrugs:
-    call: "python /path_to_scAmpi_git/scripts/filter_by_drug_list.py "
+    call: "python path_to_scAmpi_git/scripts/filter_by_drug_list.py "
     scratch: "2000"
     mem: "200"
     time: "200"
     threads: 1
   # reformat drug-cluster association table for upset plot
   preprocessForUpSetR:
-    call: "python /path_to_scAmpi_git/scripts/preprocess_parsedTrialsTable_forUpsetplot.py "
+    call: "python path_to_scAmpi_git/scripts/preprocess_parsedTrialsTable_forUpsetplot.py "
     scratch: "2000"
     mem: "200"
     time: "200"
     threads: 1
   # create upset plot with drug-cluster associations
   plotUpSetR:
-    call: "Rscript /path_to_scAmpi_git/scripts/generate_upsetplot_drugs_targeting_clusters.R "
+    call: "Rscript path_to_scAmpi_git/scripts/generate_upsetplot_drugs_targeting_clusters.R "
     scratch: "2000"
     mem: "200"
     time: "200"
@@ -342,7 +342,7 @@ tools:
     variousParams: "--nintersects 20 --nsets 100"
   # show drug support on UMAP plot
   show_drugPrediction_on_clones:
-    call: "Rscript /path_to_scAmpi_git/scripts/show_drugPrediction_on_clones.R "
+    call: "Rscript path_to_scAmpi_git/scripts/show_drugPrediction_on_clones.R "
     scratch: "2000"
     mem: "4000"
     time: "200"
@@ -352,21 +352,21 @@ tools:
                     --name_CIVIC \"CIViC_Drug_Support\""
   # get info per drug: to which cell clusters is association available
   get_full_druglist_to_subclones:
-    call: "python /path_to_scAmpi_git/scripts/get_full_druglist_to_subclones_assignm.py "
+    call: "python path_to_scAmpi_git/scripts/get_full_druglist_to_subclones_assignm.py "
     scratch: 2000
     mem: 1000
     time: 400
     threads: 4
   # generate boxplot with fractions of cell types over cohort or samples
   generate_cell_type_boxplot:
-    call: "Rscript /path_to_scAmpi_git/scripts/generate_boxplot_fractions_celltypes.R "
+    call: "Rscript path_to_scAmpi_git/scripts/generate_boxplot_fractions_celltypes.R "
     scratch: "2000"
     mem: "4000"
     time: "100"
     threads: 4
   # perform seurat integration of cohort of samples
   sample_integration:
-    call: "Rscript /path_to_scAmpi_git/scripts/sample_integration.R "
+    call: "Rscript path_to_scAmpi_git/scripts/sample_integration.R "
     scratch: "2000"
     mem: "10000"
     time: "200"
