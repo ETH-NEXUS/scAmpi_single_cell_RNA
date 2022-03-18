@@ -71,6 +71,10 @@ tools:
     genomeVersion: "GRCh38"
     # remove doublets detected in previous step
     remove_doublets: "TRUE"
+    # keep only protein-coding genes
+    protein_coding_only: "FALSE"
+    # minimum number of cells expressing a gene for the gene to be kept
+    minNumberCells: "20"
     scratch: "2000"
     mem: "8000"
     time: "100"
