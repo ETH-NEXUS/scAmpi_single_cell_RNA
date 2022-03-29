@@ -51,7 +51,9 @@ rule create_hdf5:
         matrix_file = 'results/cellranger_run/{sample}.matrix.mtx',
         barcodes_file = 'results/cellranger_run/{sample}.barcodes.tsv'
     output:
-        outfile = 'results/counts_raw/{sample}.h5'
+        outfile = 'results/counts_raw/{sample}.h5',
+    params:
+        custom_script = workflow.source_path("../scripts/create_hdf5.py"),
     conda:
         '../envs/create_hdf5.yaml'
     resources:
@@ -62,7 +64,7 @@ rule create_hdf5:
     benchmark:
         'results/counts_raw/benchmark/{sample}.create_hd5.benchmark'
     shell:
-        'python workflow/scripts/create_hdf5.py '
+        'python {params.custom_script} '
         '-g {input.genes_file} '
         '-m {input.matrix_file} '
         '-b {input.barcodes_file} '
