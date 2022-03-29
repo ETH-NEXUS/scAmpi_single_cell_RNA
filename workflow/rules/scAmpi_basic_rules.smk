@@ -80,6 +80,7 @@ rule identify_doublets:
     params:
         sample = '{sample}',
         outdir = 'results/counts_filtered/',
+        custom_script = workflow.source_path("../scripts/identify_doublets.R"),
     conda:
         '../envs/identify_doublets.yaml'
     resources:
@@ -90,7 +91,7 @@ rule identify_doublets:
     benchmark:
         'results/counts_filtered/benchmark/{sample}.identify_doublets.benchmark'
     shell:
-        'Rscript workflow/scripts/identify_doublets.R '
+        'Rscript {params.custom_script} '
         '--hdf5File {input.infile} '
         '--sample {params.sample} '
         '--outdir {params.outdir}'
@@ -113,7 +114,8 @@ rule filter_genes_and_cells:
         remove_doublets = config['tools']['filter_genes_and_cells']['remove_doublets'],
         outDir = 'results/counts_filtered/',
         genomeVersion = config['tools']['filter_genes_and_cells']['genomeVersion'],
-        sample = '{sample}'
+        sample = '{sample}',
+        custom_script = workflow.source_path("../scripts/filter_genes_and_cells.R"),
     conda:
         '../envs/filter_genes_and_cells.yaml'
     resources:
@@ -124,7 +126,7 @@ rule filter_genes_and_cells:
     benchmark:
         'results/counts_filtered/benchmark/{sample}.filter_genes_and_cells.benchmark'
     shell:
-            'Rscript workflow/scripts/filter_genes_and_cells.R '
+            'Rscript {params.custom_script} '
             '--hdf5File {input.infile} '
             '--nmads_NODG {params.nmads_NODG} '
             '--nmads_fractionMT {params.nmads_fractionMT} '
@@ -150,6 +152,7 @@ rule sctransform_preprocessing:
         min_var = config['tools']['sctransform_preprocessing']['min_var'],
         n_nn = config['tools']['sctransform_preprocessing']['n_nn'],
         outDir = 'results/counts_corrected/',
+        custom_script = workflow.source_path("../scripts/sctransform_preprocessing.R"),
     conda:
         '../envs/sctransform_preprocessing.yaml'
     resources:
@@ -160,7 +163,7 @@ rule sctransform_preprocessing:
     benchmark:
         'results/counts_corrected/benchmark/{sample}.corrected.benchmark'
     shell:
-        'Rscript workflow/scripts/sctransform_preprocessing.R '
+        'Rscript {params.custom_script} '
         '--inHDF5 {input.hdf5_file} '
         '--sample {params.sample} '
         '--number_genes {params.number_genes} '
@@ -181,6 +184,7 @@ rule phenograph:
         n_neighbours = config['tools']['clustering']['phenograph']['n_neighbours'],
         min_cluster_size = config['tools']['clustering']['phenograph']['min_cluster_size'],
         log_normalize = config['tools']['clustering']['phenograph']['log_normalize'],
+        custom_script = workflow.source_path("../scripts/apply_phenograph.py"),
     conda:
         '../envs/phenograph.yaml'
     resources:
@@ -191,7 +195,7 @@ rule phenograph:
     benchmark:
         'results/clustering/benchmark/{sample}.phenograph.benchmark'
     shell:
-        'python workflow/scripts/apply_phenograph.py '
+        'python {params.custom_script} '
         '--input_file {input.infile} '
         '--output_file {output.outfile} '
         '--distance_matrix {output.distance_matrix} '
@@ -214,6 +218,7 @@ rule prepare_celltyping:
     params:
         outputDirec = 'results/prep_celltyping/',
         sampleName = '{sample}',
+        custom_script = workflow.source_path("../scripts/prepare_celltyping.R"),
     conda:
         '../envs/prepare_celltyping.yaml'
     resources:
@@ -224,7 +229,7 @@ rule prepare_celltyping:
     benchmark:
         'results/prep_celltyping/benchmark/{sample}.prepare_celltyping.benchmark'
     shell:
-        'Rscript workflow/scripts/prepare_celltyping.R '
+        'Rscript {params.custom_script} '
         '--in_sce {input.RDS_file} '
         '--phenograph_cluster {input.cluster} '
         '--outputDirec {params.outputDirec} '
@@ -246,6 +251,7 @@ rule celltyping:
         celltype_config = config['resources']['celltype_config'],
         outputDirec = 'results/celltyping/',
         sampleName = '{sample}',
+        custom_script = workflow.source_path("../scripts/celltyping.R"),
     conda:
         '../envs/celltyping.yaml'
     resources:
@@ -256,7 +262,7 @@ rule celltyping:
     benchmark:
         'results/celltyping/benchmark/{sample}.celltyping.benchmark'
     shell:
-        'Rscript workflow/scripts/celltyping.R '
+        'Rscript {params.custom_script} '
         '--SCE {input.infile} '
         '--celltype_lists {params.celltype_lists} '
         '--celltype_config {params.celltype_config} '
@@ -280,6 +286,7 @@ rule remove_atypical_cells:
         threshold_filter = config['tools']['remove_atypical_cells']['threshold_filter'],
         min_threshold = config['tools']['remove_atypical_cells']['min_threshold'],
         threshold_type = config['tools']['remove_atypical_cells']['threshold_type'],
+        custom_script = workflow.source_path("../scripts/remove_atypical_cells.R"),
     conda:
         '../envs/remove_atypical_cells.yaml'
     resources:
@@ -290,7 +297,7 @@ rule remove_atypical_cells:
     benchmark:
         'results/atypical_removed/benchmark/{sample}.atypical_removed.benchmark'
     shell:
-        'Rscript workflow/scripts/remove_atypical_cells.R '
+        'Rscript {params.custom_script} '
         '--sce_in {input.infile} '
         '--cluster_table {input.cluster_table} '
         '--celltype_config {params.celltype_config} '
@@ -311,6 +318,7 @@ rule gsva:
         outputDirec = 'results/gsva/',
         sampleName = '{sample}',
         genesets = config['resources']['genesets'],
+        custom_script = workflow.source_path("../scripts/gsva.R"),
     conda:
         '../envs/gsva.yaml'
     resources:
@@ -321,7 +329,7 @@ rule gsva:
     benchmark:
         'results/gsva/benchmark/{sample}.gsva.benchmark'
     shell:
-        'Rscript workflow/scripts/gsva.R '
+        'Rscript {params.custom_script} '
         '--SCE {input.infile} '
         '--geneset {params.genesets} '
         '--outputDirec {params.outputDirec} '
@@ -339,7 +347,8 @@ rule plotting:
         sampleName = '{sample}',
         genes_of_interest = config['resources']['priority_genes'],
         colour_config = config['resources']['colour_config'],
-        use_alias = config['tools']['plotting']['use_alias']
+        use_alias = config['tools']['plotting']['use_alias'],
+        custom_script = workflow.source_path("../scripts//plotting.R"),
     conda:
         '../envs/plotting.yaml'
     resources:
@@ -350,7 +359,7 @@ rule plotting:
     benchmark:
         'results/plotting/benchmark/{sample}.plotting.benchmark'
     shell:
-        'Rscript workflow/scripts/plotting.R  '
+        'Rscript {params.custom_script} '
         '--sce_in {input.infile} '
         '--genelist {params.genes_of_interest} '
         '--outDir {params.outputDirec} '
@@ -373,6 +382,7 @@ rule gene_exp:
         threshold_sample = config['tools']['gene_exp']['threshold_sample'],
         type_sample = config['tools']['gene_exp']['type_sample'],
         priority_genes = config['resources']['priority_genes'],
+        custom_script = workflow.source_path("../scripts/gene_exp.R"),
     conda:
         '../envs/gene_exp.yaml'
     resources:
@@ -383,7 +393,7 @@ rule gene_exp:
     benchmark:
         'results/gene_exp/benchmark/{sample}.gene_exp.benchmark'
     shell:
-        'Rscript workflow/scripts/gene_exp.R '
+        'Rscript {params.custom_script} '
         '--sce_in {input.sce_in} '
         '--priority_genes {params.priority_genes} '
         '--filtering_threshold_sample {params.threshold_sample} '
@@ -398,6 +408,8 @@ rule generate_qc_plots :
         infile = '{my_path}.h5'
     output:
         out = '{my_path}.h5.histogram_library_sizes.png'
+    params:
+        custom_script = workflow.source_path("../scripts/generate_QC_plots.R"),
     conda:
         '../envs/generate_qc_plots.yaml'
     resources:
@@ -408,7 +420,7 @@ rule generate_qc_plots :
     benchmark:
         'benchmark/{my_path}.generate_qc_plots.benchmark'
     shell:
-        'Rscript workflow/scripts/generate_QC_plots.R '
+        'Rscript {params.custom_script} '
         '--hdf5File {input.infile} '
 
 
