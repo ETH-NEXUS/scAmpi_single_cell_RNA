@@ -30,18 +30,18 @@ resources:
 # The tools in this pipeline use a broad range of resources and have been assigned to the following three categories.
 # If there aren't enough resources specified it can be adapted in the tools corresponding section.
 computingResources:
-    mem:
-        low: 400
-        medium: 4000
-        high: 10000
-    time:
-        low: 60
-        medium: 500
-        high: 800
-    threads:
-        low: 1
-        medium: 4
-        high: 8
+  mem:
+    low: 400
+    medium: 4000
+    high: 10000
+  time:
+    low: 60
+    medium: 500
+    high: 800
+  threads:
+    low: 1
+    medium: 4
+    high: 8
 
 
 tools:
