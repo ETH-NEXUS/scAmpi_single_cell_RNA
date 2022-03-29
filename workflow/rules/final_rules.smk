@@ -15,14 +15,14 @@ rule check_output:
 # defines output of scampi basic
 rule scAmpi_basic:
     input:
-        #        'results/cellranger_run/{sample}.features.tsv',
-        "results/counts_raw/{sample}.h5",
-        "results/counts_filtered/{sample}.doublet_barcodes.txt",
+#        'results/cellranger_run/{sample}.features.tsv',
+#        "results/counts_raw/{sample}.h5",
+#        "results/counts_filtered/{sample}.doublet_barcodes.txt",
         "results/counts_raw/{sample}.h5.histogram_library_sizes.png",
         "results/counts_filtered/{sample}.genes_cells_filtered.h5.histogram_library_sizes.png",
-        "results/counts_corrected/{sample}.corrected.RDS",
-        "results/clustering/{sample}.clusters_phenograph.csv",
-        "results/atypical_removed/{sample}.atypical_removed.RDS",
+#        "results/counts_corrected/{sample}.corrected.RDS",
+#        "results/clustering/{sample}.clusters_phenograph.csv",
+#        "results/atypical_removed/{sample}.atypical_removed.RDS",
         "results/gene_exp/{sample}.gene_expression_per_cluster.tsv",
         "results/plotting/{sample}.celltype_barplot.png",
         "results/gsva/{sample}.gsetscore_hm.png",
@@ -90,8 +90,8 @@ rule clinical_full:
 # this is triggered if either no malignant or no non-malignant cells are found in the sample.
 rule clinical_malignant_only:
     input:
-        # druglist_to_subclones
-        "results/drug_combination/{sample}.full_druglist_to_subclones.txt",
+        # plot gene set enrichment heatmap (is also aggregation rule)
+        "results/gene_set_enrichment/vs_other_malignant/{sample}.DEmalignant.heatmap_enrichment.png",
     output:
         "results/finished/{sample}.clinical_malignant_only.txt",
     resources:

@@ -162,7 +162,7 @@ def count_clusters(wildcards):
     all_count = len(all_clusters)
 
     malignant_clusters = expand('results/diff_exp_analysis/{sample}/vs_other_malignant/{sample}.DEmalignant.{i}.DEgenes.tsv',
-    i = glob_wildcards(os.path.join(checkpoint_output, "{sample,[^/]+}.DEmalignant.{i,[^/]+}.DEgenes.tsv")).i,
+    i = glob_wildcards(os.path.join(checkpoint_output, "vs_other_malignant/{sample,[^/]+}.DEmalignant.{i,[^/]+}.DEgenes.tsv")).i,
     sample = wildcards.sample)
     malignant_count = len(malignant_clusters)
 

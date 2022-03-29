@@ -242,7 +242,7 @@ def getGeneSetHeatmapFilesMalignant(wildcards):
     checkpoint_output = checkpoints.diff_exp_analysis.get(**wildcards).output[0]
     return expand('results/gene_set_enrichment/vs_other_malignant/{sample}.DEmalignant.{i}.enrichedGeneSets.txt',
 #        return expand("results/{result_outdir}/{sample}.{i}.{suffix}.txt",
-            i = glob_wildcards(os.path.join(checkpoint_output, "{sample,[^/]+}.{i,[^/]+}.DEgenes.tsv")).i,
+            i = glob_wildcards(os.path.join(checkpoint_output, "vs_other_malignant/{sample,[^/]+}.DEmalignant.{i,[^/]+}.DEgenes.tsv")).i,
             sample = wildcards.sample)
 
 
