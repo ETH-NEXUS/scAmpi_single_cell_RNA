@@ -455,30 +455,6 @@ rule generate_qc_plots :
 #        'Rscript workflow/scripts/sample_integration.R  --cohort_list {input.previous_samples} --sample_data {input.current_sample} --sampleName {params.sampleName} --sampleName_short {params.sampleName_short} --colour_config {params.colour_config} --outdir {params.outDir}'
 
 
-# calculate for each cluster the number of cells it countains and the percentage of all cells
-rule cell_percent_in_cluster:
-    input:
-        clusterCsv = 'results/atypical_removed/{sample}.atypical_removed.phenograph_celltype_association.txt'
-    output:
-        out = 'results/clustering/{sample}.clusters_cell_count_percent.txt'
-    params:
-        variousParams = config['tools']['cell_percent_in_cluster']['variousParams']
-    conda:
-        '../envs/cell_percent_in_cluster.yaml'
-    resources:
-        mem_mb = config['computingResources']['mem']['medium'],
-        time_min = config['computingResources']['time']['low'],
-    threads:
-        config['computingResources']['threads']['medium']
-    benchmark:
-        'results/clustering/benchmark/{sample}.clusterPercent.benchmark'
-    shell:
-        'python workflow/scripts/cell_percent_in_cluster.py '
-        '--inputTable {input.clusterCsv} '
-        '--outFile {output.out} '
-        '{params.variousParams}'
-
-
 # perform the differential expression analysis using a Wilcoxon test
 checkpoint diff_exp_analysis:
     input:
@@ -494,7 +470,8 @@ checkpoint diff_exp_analysis:
         fc_cut = config['tools']['diff_exp_analysis']['fc_cut'],
         mindiff2second = config['tools']['diff_exp_analysis']['mindiff2second'],
         minNumberNonMalignant = config['tools']['diff_exp_analysis']['minNumberNonMalignant'],
-        outpath = 'results/diff_exp_analysis/{sample}/'
+        outpath = 'results/diff_exp_analysis/{sample}/',
+        custom_script = workflow.source_path("../scripts/diff_exp_analysis.R"),
     conda:
         '../envs/diff_exp_analysis.yaml'
     resources:
@@ -506,7 +483,7 @@ checkpoint diff_exp_analysis:
         'results/diff_exp_analysis/benchmark/{sample}.diff_exp_analysis.benchmark'
     shell:
         'mkdir {params.outpath} ; '
-        'Rscript workflow/scripts/diff_exp_analysis.R '
+        'Rscript {params.custom_script} '
         '--sample_data {input.sce_in} '
         '--sampleName {params.sampleName} '
         '--cluster_table {input.cell_types} '

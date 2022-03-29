@@ -339,6 +339,31 @@ rule parse_for_minSetCover:
         '--drug_list {input.drugList}'
 
 
+# calculate for each cluster the number of cells it countains and the percentage of all cells
+rule cell_percent_in_cluster:
+    input:
+        clusterCsv = 'results/atypical_removed/{sample}.atypical_removed.phenograph_celltype_association.txt'
+    output:
+        out = 'results/clustering/{sample}.clusters_cell_count_percent.txt'
+    params:
+        variousParams = config['tools']['cell_percent_in_cluster']['variousParams']
+    conda:
+        '../envs/cell_percent_in_cluster.yaml'
+    resources:
+        mem_mb = config['computingResources']['mem']['medium'],
+        time_min = config['computingResources']['time']['low'],
+    threads:
+        config['computingResources']['threads']['medium']
+    benchmark:
+        'results/clustering/benchmark/{sample}.clusterPercent.benchmark'
+    shell:
+        'python workflow/scripts/cell_percent_in_cluster.py '
+        '--inputTable {input.clusterCsv} '
+        '--outFile {output.out} '
+        '{params.variousParams}'
+
+
+
 # deduce minimum set cover to find drug (combination) that targets all clusters via interaction with DE gene of this cluster
 rule find_minSetCover:
     input:
