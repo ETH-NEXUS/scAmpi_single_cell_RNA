@@ -105,9 +105,6 @@ rule clinical_malignant_only:
 # defines output of a reduced clinical run.
 # this is triggered if either no malignant or no non-malignant cells are found in the sample.
 rule clinical_nonmalignant:
-    input:
-        # druglist_to_subclones
-        "results/drug_combination/{sample}.full_druglist_to_subclones.txt",
     output:
         "results/finished/{sample}.clinical_nonmalignant.txt",
     resources:
