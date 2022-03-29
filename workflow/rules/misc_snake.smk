@@ -140,3 +140,39 @@ def getCellRangerName(wildcards):
     if wildcards.sample not in sampleMap.keys():
         raise ValueError("Sample '%s' not found in the sample map!" %(wildcards.sample))
     return sampleMap[wildcards.sample]
+
+
+###   input function for local rules in snakefile.smk
+
+# input function for local rule `check_output` in snakefile_basic.smk
+# retrieves the info from the config file if only the basic part, or both, basic and clinical, should be run.
+def define_output(wildcards):
+    if config['inputOutput']['basic_only']:
+        return 'results/finished/{sample}.scAmpi_basic.txt'
+    else:
+        return expand('results/finished/{sample}.scAmpi_{part}.txt', part = ['basic', 'clinical'], sample = wildcards.sample)
+
+
+# input function for local rule `clinical_mode` in snakefile.smk
+def count_clusters(wildcards):
+    checkpoint_output = checkpoints.diff_exp_analysis.get(**wildcards).output[0]
+    all_clusters = expand('results/diff_exp_analysis/{sample}/{sample}_{i}.DEgenes.tsv',
+    i = glob_wildcards(os.path.join(checkpoint_output, "{sample,[^/]+}.{i,[^/]+}.DEgenes.tsv")).i,
+    sample = wildcards.sample)
+    all_count = len(all_clusters)
+
+    malignant_clusters = expand('results/diff_exp_analysis/{sample}/vs_other_malignant/{sample}.DEmalignant.{i}.DEgenes.tsv',
+    i = glob_wildcards(os.path.join(checkpoint_output, "{sample,[^/]+}.DEmalignant.{i,[^/]+}.DEgenes.tsv")).i,
+    sample = wildcards.sample)
+    malignant_count = len(malignant_clusters)
+
+    # get list of all clusters
+    if  all_count > 0:
+        return expand('results/finished/{sample}.clinical_full.txt',
+        sample = wildcards.sample)
+    elif malignant_count > 0:
+        return expand('results/finished/{sample}.clinical_malignant_only.txt',
+        sample = wildcards.sample)
+    else:
+        return expand('results/finished/{sample}.clinical_nonmalignant.txt',
+        sample = wildcards.sample)
