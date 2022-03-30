@@ -23,17 +23,27 @@ include: "rules/misc_snake.smk"
 
 # Include rules
 include: "rules/scAmpi_basic_rules.smk"
-include: "rules/scAmpi_clinical_rules.smk"
-include: "rules/final_rules.smk"
 
 # include local rules
-localrules: all
+localrules: scAmpi_basic
 
 # final rule of pipeline
-rule all:
+# defines output of scampi basic
+rule scAmpi_basic:
     input:
-        expand('results/finished/{sample}.complete.txt', sample = sample_ids)
+#        expand("results/cellranger_run/{sample}.features.tsv", sample = sample_ids),
+#        expand("results/counts_raw/{sample}.h5", sample = sample_ids),
+#        expand("results/counts_filtered/{sample}.doublet_barcodes.txt", sample = sample_ids),
+        expand("results/counts_raw/{sample}.h5.histogram_library_sizes.png", sample = sample_ids),
+        expand("results/counts_filtered/{sample}.genes_cells_filtered.h5.histogram_library_sizes.png", sample = sample_ids),
+#        expand("results/counts_corrected/{sample}.corrected.RDS", sample = sample_ids),
+#        expand("results/clustering/{sample}.clusters_phenograph.csv", sample = sample_ids),
+#        expand("results/atypical_removed/{sample}.atypical_removed.RDS", sample = sample_ids),
+        expand("results/gene_exp/{sample}.gene_expression_per_cluster.tsv", sample = sample_ids),
+        expand("results/plotting/{sample}.celltype_barplot.png", sample = sample_ids),
+        expand("results/gsva/{sample}.gsetscore_hm.png", sample = sample_ids),
+        expand("results/diff_exp_analysis/{sample}/", sample = sample_ids),
     output:
-        'results/complete.txt'
+        "results/complete.txt",
     shell:
-        'date > {output}'
+        "date > {output}"
