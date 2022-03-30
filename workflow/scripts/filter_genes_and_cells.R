@@ -84,6 +84,9 @@ glue("\n\n### threshold_NODG: ", {threshold_NODG})
 minNumberCells <- as.integer(opt$minNumberCells)
 glue("\n\n### minNumberCells: ", {minNumberCells}, "\n")
 
+glue("\n\n### protein_coding_only: ", {opt$protein_coding_only}, "\n")
+str(opt$protein_coding_only)
+
 # get count matrix
 umi_matrix <- h5read(opt$hdf5File, "raw_counts")
 # link cell and gene information to matrix
