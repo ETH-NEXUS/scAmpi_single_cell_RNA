@@ -7,7 +7,8 @@ rule parse_filter_DE_genes:
     output:
         out = 'results/parse_diff_exp/{sample}.{i}.txt',
     params:
-        variousParams = config['tools']['parse_filter_DE_genes']['variousParams']
+        variousParams = config['tools']['parse_filter_DE_genes']['variousParams'],
+        custom_script = workflow.source_path("../scripts/parse_filter_DE_genes.py")
     conda:
         '../envs/parse_filter_DE_genes.yaml'
     resources:
@@ -18,7 +19,7 @@ rule parse_filter_DE_genes:
     benchmark:
         'results/parse_diff_exp/benchmark/{sample}.{i}.parse.benchmark'
     shell:
-        'python workflow/scripts/parse_filter_DE_genes.py '
+        'python {params.custom_script} '
         '{input.tsv} '
         '{output.out} '
         '{params.variousParams}'
@@ -34,7 +35,8 @@ rule query_dgidb:
         outfileGeneCategory = 'results/query_dgidb/{sample}.{i}.dgidb.txt.GeneCategories.txt'
     params:
         minDatabaseNum = config['tools']['query_dgidb']['minDatabaseNum'],
-        colName_genes = config['tools']['query_dgidb']['colName_genes']
+        colName_genes = config['tools']['query_dgidb']['colName_genes'],
+        custom_script = workflow.source_path("../scripts/query_dgidb.R"),
     conda:
         '../envs/query_dgidb.yaml'
     resources:
@@ -45,7 +47,7 @@ rule query_dgidb:
     benchmark:
         'databaseQuery/benchmark/{sample}.{i}.dgidbQuery.benchmark'
     shell:
-         'Rscript workflow/scripts/query_dgidb.R '
+         'Rscript {params.custom_script} '
          '{input.infile} '
          '{output.outfile} '
          '{params.minDatabaseNum} '
@@ -63,7 +65,8 @@ rule query_clinical_trials:
         cancerType = config['tools']['download_clinical_trials']['cancerType'],
         whiteList = config['tools']['query_clinical_trials']['whiteList'],
         blackList = config['tools']['query_clinical_trials']['blackList'],
-        outDirec = 'results/clinical_trials/'
+        outDirec = 'results/clinical_trials/',
+        custom_script = workflow.source_path("../scripts/queryClinicalTrials.py"),
     conda:
         '../envs/query_clinical_trials.yaml'
     resources:
@@ -74,7 +77,7 @@ rule query_clinical_trials:
     benchmark:
         'results/clinical_trials/benchmark/{sample}.{i}.clinicalTrialsQuery.benchmark'
     shell:
-        'python workflow/scripts/queryClinicalTrials.py '
+        'python {params.custom_script} '
         '{input.infile} '
         '{output.outfile} '
         '{params.outDirec}/{params.cancerType}_clinicalTrials/ '
@@ -88,7 +91,7 @@ rule download_clinical_trials:
         outfile = 'results/clinical_trials/downloadSuccess.txt'
     params:
         cancerType = config['tools']['download_clinical_trials']['cancerType'],
-        outDirec = 'results/clinical_trials/'
+        outDirec = 'results/clinical_trials/',
 #    conda:
 #        '../envs/query_dgidb.yaml'
     resources:
@@ -117,7 +120,8 @@ rule annotate_DE_clinical_info:
         outTable = 'results/clinical_annotation/{sample}.{i}.clinicalAnnotation.txt',
         outTable_dgdidbIndependent = 'results/clinical_annotation/{sample}.{i}.clinicalAnnotation.txt_dgidbIndependent.txt'
     params:
-        variousParams = config['tools']['annotate_DE_clinical_info']['variousParams']
+        variousParams = config['tools']['annotate_DE_clinical_info']['variousParams'],
+        custom_script = workflow.source_path("../scripts/annotate_DE_clinical_info.py"),
     conda:
         '../envs/annotate_DE_clinical_info.yaml'
     resources:
@@ -128,7 +132,7 @@ rule annotate_DE_clinical_info:
     benchmark:
         'results/clinical_annotation/benchmark/{sample}.{i}.annotate_DE_clinical_info.benchmark'
     shell:
-        'python workflow/scripts/annotate_DE_clinical_info.py '
+        'python {params.custom_script} '
         '--inputTable {input.infile} '
         '--outFile {output.outTable} '
         '--pathwayDB {input.pathwayDB} '
@@ -149,7 +153,8 @@ rule query_civic:
         highLevel = config['tools']['query_civic']['highLevel'],
         colName_gene = config['tools']['query_civic']['colName_gene'],
         colName_logFC = config['tools']['query_civic']['colName_logFC'],
-        strictExpression = config['tools']['query_civic']['strictExpression']
+        strictExpression = config['tools']['query_civic']['strictExpression'],
+        custom_script = workflow.source_path("../scripts/query_civic_expr.py"),
     conda:
         '../envs/query_civic.yaml'
     resources:
@@ -160,7 +165,7 @@ rule query_civic:
     benchmark:
         'results/query_civic/benchmark/{sample}.{i}.query_civic.benchmark'
     shell:
-        'python workflow/scripts/query_civic_expr.py '
+        'python {params.custom_script} '
         '--inputTable {input.infile} '
         '--outFile {output.outfile} '
         '--cancerTypeList "{params.cancerType}" '
@@ -179,7 +184,8 @@ rule gene_set_enrichment:
         outfile = 'results/gene_set_enrichment/{sample}.{i}.enrichedGeneSets.txt'
     params:
         geneSetDB = config['resources']['genesets'],
-        variousParams = config['tools']['gene_set_enrichment']['variousParams']
+        variousParams = config['tools']['gene_set_enrichment']['variousParams'],
+        custom_script = workflow.source_path("../scripts/gene_set_enrichment.R"),
     conda:
         '../envs/gene_set_enrichment.yaml'
     resources:
@@ -190,7 +196,7 @@ rule gene_set_enrichment:
     benchmark:
         'results/gene_set_enrichment/benchmark/{sample}.{i}.gene_set_enrichment.benchmark'
     shell:
-        'Rscript workflow/scripts/gene_set_enrichment.R '
+        'Rscript {params.custom_script} '
         '{input.infile} '
         '{output.outfile} '
         '{params.geneSetDB} '
@@ -205,7 +211,8 @@ rule gene_set_enrichment_mal_vs_mal:
         outfile = 'results/gene_set_enrichment/vs_other_malignant/{sample}.DEmalignant.{i}.enrichedGeneSets.txt'
     params:
         geneSetDB = config['resources']['genesets'],
-        variousParams = config['tools']['gene_set_enrichment']['variousParams']
+        variousParams = config['tools']['gene_set_enrichment']['variousParams'],
+        custom_script = workflow.source_path("../scripts/gene_set_enrichment.R"),
     conda:
         '../envs/gene_set_enrichment.yaml'
     resources:
@@ -216,7 +223,7 @@ rule gene_set_enrichment_mal_vs_mal:
     benchmark:
         'results/gene_set_enrichment/vs_other_malignant/benchmark/{sample}.DEmalignant.{i}.gene_set_enrichment.benchmark'
     shell:
-        'Rscript workflow/scripts/gene_set_enrichment.R '
+        'Rscript {params.custom_script} '
         '{input.infile} '
         '{output.outfile} '
         '{params.geneSetDB} '
@@ -256,7 +263,8 @@ rule plot_gene_set_enrichment:
     output:
         outfile = 'results/gene_set_enrichment/{sample}.heatmap_enrichment.png'
     params:
-        comparison_direc = 'results/gene_set_enrichment/'
+        comparison_direc = 'results/gene_set_enrichment/',
+        custom_script = workflow.source_path("../scripts/plot_genesets_heatmap.R"),
     conda:
         '../envs/plot_gene_set_enrichment.yaml'
     resources:
@@ -269,7 +277,7 @@ rule plot_gene_set_enrichment:
     shell:
         'if [ "{input.inDir}" != "{params.comparison_direc}" ] ; '
         'then echo "test1" ; '
-        'Rscript workflow/scripts/plot_genesets_heatmap.R {output.outfile} {input.inDir} ; '
+        'Rscript {params.custom_script} {output.outfile} {input.inDir} ; '
         'else touch {output.outfile} ; '
         'fi'
 
@@ -284,7 +292,8 @@ rule plot_gene_set_enrichment_mal_vs_mal:
     output:
         outfile = 'results/gene_set_enrichment/vs_other_malignant/{sample}.DEmalignant.heatmap_enrichment.png'
     params:
-        comparison_direc = 'results/gene_set_enrichment/vs_other_malignant/'
+        comparison_direc = 'results/gene_set_enrichment/vs_other_malignant/',
+        custom_script = workflow.source_path("../scripts/plot_genesets_heatmap.R"),
     conda:
         '../envs/plot_gene_set_enrichment.yaml'
     resources:
@@ -297,7 +306,7 @@ rule plot_gene_set_enrichment_mal_vs_mal:
     shell:
         'if [ "{input.inDir}" != "{params.comparison_direc}" ] ; '
         'then echo "test1" ; '
-        'Rscript workflow/scripts/plot_genesets_heatmap.R {output.outfile} {input.inDir} ; '
+        'Rscript {params.custom_script} {output.outfile} {input.inDir} ; '
         'else touch {output.outfile} ; '
         'fi'
 
@@ -321,6 +330,7 @@ rule parse_for_minSetCover:
     params:
         colName_clinTrial = config['tools']['parse_for_minSetCover']['colName_clinTrial'],
         colName_DGIDB_score = config['tools']['parse_for_minSetCover']['colName_DGIDB_score'],
+        custom_script = workflow.source_path("../scripts/parse_for_minSetCover.py"),
     conda:
         '../envs/parse_for_minSetCover.yaml'
     resources:
@@ -331,7 +341,7 @@ rule parse_for_minSetCover:
     benchmark:
         'results/drug_combination/benchmark/{sample}.{type}.parse_for_minSetCover.benchmark'
     shell:
-        'python workflow/scripts/parse_for_minSetCover.py '
+        'python {params.custom_script} '
         '--inFiles {input.infiles} '
         '--outFile {output.out} '
         '--colName_clinTrial {params.colName_clinTrial} '
@@ -346,7 +356,8 @@ rule cell_percent_in_cluster:
     output:
         out = 'results/clustering/{sample}.clusters_cell_count_percent.txt'
     params:
-        variousParams = config['tools']['cell_percent_in_cluster']['variousParams']
+        variousParams = config['tools']['cell_percent_in_cluster']['variousParams'],
+        custom_script = workflow.source_path("../scripts/cell_percent_in_cluster.py"),
     conda:
         '../envs/cell_percent_in_cluster.yaml'
     resources:
@@ -357,7 +368,7 @@ rule cell_percent_in_cluster:
     benchmark:
         'results/clustering/benchmark/{sample}.clusterPercent.benchmark'
     shell:
-        'python workflow/scripts/cell_percent_in_cluster.py '
+        'python {params.custom_script} '
         '--inputTable {input.clusterCsv} '
         '--outFile {output.out} '
         '{params.variousParams}'
@@ -372,7 +383,8 @@ rule find_minSetCover:
     output:
         out = 'results/drug_combination/{sample}.drugCombination.{type}.txt'
     params:
-        variousParams = config['tools']['find_minSetCover']['variousParams']
+        variousParams = config['tools']['find_minSetCover']['variousParams'],
+        custom_script = workflow.source_path("../scripts/find_minSetCover.py"),
     conda:
         '../envs/find_minSetCover.yaml'
     resources:
@@ -383,7 +395,7 @@ rule find_minSetCover:
     benchmark:
         'results/drug_combination/benchmark/{sample}.{type}.find_minSetCover.benchmark'
     shell:
-        'python workflow/scripts/find_minSetCover.py '
+        'python {params.custom_script} '
         '--input {input.infile} '
         '--outFile {output.out} '
         '--percentageTable {input.percTable} '
@@ -397,6 +409,8 @@ rule filter_drugs:
         drugList = config['resources']['drugList']
     output:
         out = 'results/clinical_trials/{sample}.{i}.dgidb.txt.CompleteTable.ClinicalTrials.filteredDrugs.txt'
+    params:
+        custom_script = workflow.source_path("../scripts/filter_drugs.py"),
     conda:
         '../envs/filter_drugs.yaml'
     resources:
@@ -407,7 +421,7 @@ rule filter_drugs:
     benchmark:
         'results/clinical_trials/benchmark/{sample}.{i}.filter_drugs.benchmark'
     shell:
-        'python workflow/scripts/filter_drugs.py '
+        'python {params.custom_script} '
         '--inFile {input.infile} '
         '--outFile {output.out} '
         '--drugList {input.drugList}'
@@ -421,6 +435,8 @@ rule preprocess_upsetr_plot:
         infile = 'results/drug_combination/{sample}.drugToCluster.{type}.txt'
     output:
         out = 'results/upsetr_plot/{sample}.drugToCluster.{type}.processedForUpSetR.txt'
+    params:
+        custom_script = workflow.source_path("../scripts/preprocess_upsetr_plot.py"),
     conda:
         '../envs/preprocess_upsetr_plot.yaml'
     resources:
@@ -431,7 +447,7 @@ rule preprocess_upsetr_plot:
     benchmark:
         'results/upsetr_plot/benchmark/{sample}.{type}.upsetr_plot.benchmark'
     shell:
-        'python workflow/scripts/preprocess_upsetr_plot.py '
+        'python {params.custom_script} '
         '--inFile {input.infile} '
         '--outFile {output.out}'
 
@@ -444,7 +460,8 @@ rule plot_upsetr:
     output:
         out = 'results/upsetr_plot/{sample}.drugToCluster.{type}.vennplot.png'
     params:
-        variousParams = config['tools']['plot_upsetr']['variousParams']
+        variousParams = config['tools']['plot_upsetr']['variousParams'],
+        custom_script = workflow.source_path("../scripts/plot_upsetr.R"),
     conda:
         '../envs/plot_upsetr.yaml'
     resources:
@@ -455,7 +472,7 @@ rule plot_upsetr:
     benchmark:
         'results/upsetr_plot/benchmark/{sample}.{type}.plot_upsetr.benchmark'
     shell:
-        'Rscript workflow/scripts/plot_upsetr.R '
+        'Rscript {params.custom_script} '
         '--inFile {input.infile} '
         '--outFile {output.out} '
         '{params.variousParams}'
@@ -470,7 +487,8 @@ rule get_full_druglist_to_subclones:
     output:
         out = 'results/drug_combination/{sample}.full_druglist_to_subclones.txt'
     params:
-        drugList = config['resources']['drugList']
+        drugList = config['resources']['drugList'],
+        custom_script = workflow.source_path("../scripts/get_full_druglist_to_subclones_assignm.py"),
     conda:
         '../envs/get_full_druglist_to_subclones.yaml'
     resources:
@@ -481,7 +499,7 @@ rule get_full_druglist_to_subclones:
     benchmark:
         'results/drug_combination/benchmark/{sample}.full_druglist_to_subclones.benchmark'
     shell:
-        'python workflow/scripts/get_full_druglist_to_subclones_assignm.py '
+        'python {params.custom_script} '
         '--in_drugToCluster {input.infile} '
         '--in_drugList {params.drugList} '
         '--outFile {output.out} '
@@ -510,7 +528,8 @@ rule plot_drug_prediction:
         sampleName = '{sample}',
         inputDir = 'results/query_civic/',
         outputDirec = 'results/plot_drug_prediction/',
-        variousParams = config['tools']['plot_drug_prediction']['variousParams']
+        variousParams = config['tools']['plot_drug_prediction']['variousParams'],
+        custom_script = workflow.source_path("../scripts/show_drugPrediction_on_clones.R"),
     conda:
         '../envs/plot_drug_prediction.yaml'
     resources:
@@ -521,7 +540,7 @@ rule plot_drug_prediction:
     benchmark:
         'results/plot_drug_prediction/benchmark/{sample}.plot_drug_prediction.benchmark'
     shell:
-        'Rscript workflow/scripts/show_drugPrediction_on_clones.R '
+        'Rscript {params.custom_script} '
         '--SCE {input.rdsFile} '
         '--drugPredDir {params.inputDir} '
         '--outputDirec {params.outputDirec} '
@@ -558,5 +577,11 @@ rule aggregate:
                         config['tools']['aggregate']['result_outdir'])
     output:
         'results/{outdir}/{sample}.aggregated.txt'
+    resources:
+        mem_mb = config['computingResources']['mem']['medium'],
+        time_min = config['computingResources']['time']['low'],
+    threads:
+        config['computingResources']['threads']['medium']
     shell:
         'touch {output}'
+
