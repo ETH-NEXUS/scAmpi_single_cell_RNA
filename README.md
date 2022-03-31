@@ -104,3 +104,13 @@ Other side results, e.g. the minimum set cover computation, the plotting of drug
 Snakemake is a Python-based workflow management system for building and executing pipelines. A pipeline is made up of ["rules"](snake/scAmpi_basic_rules.py) that represent single steps of the analysis. In a [yaml config file](config/config_scAmpi.yaml) parameters and rule-specific input can be adjusted to a new analysis without changing the rules. In a ["master" snake file](snake/snake_scAmpi_basic_master.snake) the desired end points of the analysis are specified. With the input and the desired output defined, Snakemake is able infer all steps that have to be performed in-between.
 
 To change one of the steps, e.g. to a different software tool, one can create a new rule, insert a new code block into the config file, and include the input/output directory of this step in the master snake file. It is important to make sure that the format of the input and output of each rule is compatible with the previous and the subsequent rule. For more detailed information please have a look at the excellent [online documentation](https://snakemake.readthedocs.io/en/stable/index.html) of Snakemake.
+
+#### Quick start using test data
+To start a scAmpi run with PBMC test data you can follow the following steps:
+- clone the scAmpi repository
+- create and activate the scAmpi conda environment (see Installation instructions)
+- prepare the cellranger software and reference directory
+- run `prepare_testrun.sh`, preparing the directory, config files and test data (for more detailed instructions see `testdata/README_testdata.md`
+- *optional*: to circumvent the time-consuming mapping step create the subdirectory `rawCounts` in your testdata analysis directory, copy the raw matrix `5k_pbmc_v3.h5.tar` into `rawCounts`, gunzip the file (e.g. `tar -xvf 5k_pbmc_v3.h5.tar`) and start the test run from this step.
+- perform Snakemake dryrun to see a list of steps that will be performed
+- start analysis run
