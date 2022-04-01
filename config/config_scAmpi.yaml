@@ -48,7 +48,7 @@ tools:
     variousParams: ""
   # map reads with starsolo
   starsolo:
-    call: "path/STAR "
+    call: "STAR "
     # UMI length
     # "10" (starsolo default) for 10X Chromium V2
     # "12" for V3
