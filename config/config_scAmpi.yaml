@@ -21,6 +21,10 @@ resources:
   civicDict: "path_to_scAmpi_git/required_files/drug_synonyms_civic.txt"
   # reference for cellranger, e.g. from 10x Genomics resource
   reference_transcriptome: "resources/refdata-gex-GRCh38-2020-A/"
+  # reference genome index for mapping with starsolo
+  genome_index_starsolo: "resources/star/GRCh38_gencode_32.overhang90/"
+  # plain text file with possible barcodes, e.g. provided by 10x Genomics. Must be unzipped.
+  soloCBwhitelist: "resources/star/3M-february-2018.txt"
   transcriptome_code: "GRCh38"
   # celltype_lists gmx file containing a library of cell type classification gene lists
   celltype_lists: "path_to_scAmpi_git/required_files/melanoma/celltype_list_melanoma.gmx"
@@ -42,6 +46,31 @@ tools:
     time: "1440"
     threads: 24
     variousParams: ""
+  # map reads with starsolo
+  starsolo:
+    call: "path/STAR "
+    # UMI length
+    # "10" (starsolo default) for 10X Chromium V2
+    # "12" for V3
+    soloUMIlen: "12"
+    # "--soloType CB_UMI_Simple" turns on STAR solo algorithm
+    # Options to match the cellranger 3.X.X results with STAR solo:
+    # --soloCBmatchWLtype 1MM_multi_Nbase_pseudocounts
+    # --soloUMIfiltering MultiGeneUMI_CR
+    # --soloUMIdedup 1MM_CR
+    # "--soloCellFilter EmptyDrops_CR" cell filtering method corresponding to cellranger 3.X.X
+    # "--readFilesCommand zcat" parameter to indicate the fastq files are *gz
+    variousParams: "--soloType CB_UMI_Simple
+                    --soloCBmatchWLtype 1MM_multi_Nbase_pseudocounts
+                    --soloUMIfiltering MultiGeneUMI_CR
+                    --soloUMIdedup 1MM_CR
+                    --soloCellFilter EmptyDrops_CR
+                    --readFilesCommand zcat"
+    scratch: "2000"
+    mem: "12000"
+    time: "800"
+    threads: 8
+
   # create hdf5 file from cellranger output
   create_hd5:
     call: "python path_to_scAmpi_git/scripts/create_hdf5.py "
