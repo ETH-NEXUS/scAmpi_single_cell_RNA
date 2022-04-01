@@ -19,7 +19,7 @@ dependencies:
   - bioconductor-scdblfinder
   - bioconductor-singlecellexperiment
   - bioconductor-scran
-  - r-sctransform
+  - "r-sctransform >= 0.3.3"
   - r-uwot
   - r-igraph
   - r-reshape2
