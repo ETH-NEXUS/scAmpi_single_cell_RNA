@@ -1,41 +1,37 @@
 ---
 inputOutput:
-  input_fastqs: "dir/fastqs/"
+  input_fastqs: "testdir/fastqs/"
   # fastqc files, if already available
   input_fastqc: ""
-  analysis_output_dir: "dir/analysis/"
-  analysis_temp_dir: "dir/snake_temp/"
+  analysis_output_dir: "testdir/analysis/"
+  analysis_temp_dir: "testdir/snake_temp/"
   # sample map with information on the samples of this analysis
   # see the general README for the required format
-  sample_map: "dir/sample_map.tsv"
+  sample_map: "testdir/snake_files/sample_map_testdata.tsv"
   # cell type name of malignant/diseased cell types - relevant to select clusters that will be analysed in the clinical part of scAmpi.
   # note that cell types are selected via non-strict pattern matching, so also parts of diseased cell type labels can be used.
-  malignant_cell_type: "melanoma"
+  malignant_cell_type: "none"
 resources:
   # pathwayDB for clinical annotation in rule `annotate_DE_clinicalInformation` (scAmpi_clinical)
   pathwayDB: "path_to_scAmpi_git/required_files/hallmark_pathways_converted_example.gmt"
   # drugList for prioritizing drugs in scAmpi_clinical
-  drugList: "path_to_scAmpi_git/required_files/melanoma/melanoma_drug_list.txt"
+  drugList: ""
   # drugCombinations and civicDict for rule `plot_drug_prediction` (scAmpi_clinical)
-  drugCombinations: "path_to_scAmpi_git/required_files/melanoma/drug_combinations_melanoma.txt"
-  civicDict: "path_to_scAmpi_git/required_files/drug_synonyms_civic.txt"
+  drugCombinations: ""
+  civicDict: ""
   # reference for cellranger, e.g. from 10x Genomics resource
-  reference_transcriptome: "resources/refdata-gex-GRCh38-2020-A/"
-  # reference genome index for mapping with starsolo
-  genome_index_starsolo: "resources/star/GRCh38_gencode_32.overhang90/"
-  # plain text file with possible barcodes, e.g. provided by 10x Genomics. Must be unzipped.
-  soloCBwhitelist: "resources/star/3M-february-2018.txt"
+  reference_transcriptome: "reference_dir"
   transcriptome_code: "GRCh38"
   # celltype_lists gmx file containing a library of cell type classification gene lists
-  celltype_lists: "path_to_scAmpi_git/required_files/melanoma/celltype_list_melanoma.gmx"
+  celltype_lists: "path_to_scAmpi_git/required_files/PBMC/celltype_list_PBMC_all.gmx"
   # celltype_config to easily adapt the cell type classification step
-  celltype_config: "path_to_scAmpi_git/required_files/melanoma/celltype_config_melanoma.tsv"
+  celltype_config: "path_to_scAmpi_git/required_files/PBMC/celltype_config_PBMC.tsv"
   # colour_config for a fixed assignment of colours to the cell types in celltype_config
-  colour_config: "path_to_scAmpi_git/required_files/melanoma/colour_config_melanoma.txt"
+  colour_config: "path_to_scAmpi_git/required_files/PBMC/colour_config_PBMC.txt"
   # genesets for GSVA analysis (scAmpi_basic) and geneSetEnrichment (scAmpi_clinical)
   genesets: "path_to_scAmpi_git/required_files/hallmark_pathways_example.gmt"
   # gene expression of priority genes will be plotted and highlighted in per cluster gene expression (gene_exp)
-  priority_genes: "path_to_scAmpi_git/required_files/melanoma/selected_genes_melanoma.txt"
+  priority_genes: "path_to_scAmpi_git/required_files/PBMC/selected_genes_PBMC.txt"
 tools:
   # map reads with cellranger count
   cellranger_count:
@@ -46,31 +42,6 @@ tools:
     time: "1440"
     threads: 24
     variousParams: ""
-  # map reads with starsolo
-  starsolo:
-    call: "STAR "
-    # UMI length
-    # "10" (starsolo default) for 10X Chromium V2
-    # "12" for V3
-    soloUMIlen: "12"
-    # "--soloType CB_UMI_Simple" turns on STAR solo algorithm
-    # Options to match the cellranger 3.X.X results with STAR solo:
-    # --soloCBmatchWLtype 1MM_multi_Nbase_pseudocounts
-    # --soloUMIfiltering MultiGeneUMI_CR
-    # --soloUMIdedup 1MM_CR
-    # "--soloCellFilter EmptyDrops_CR" cell filtering method corresponding to cellranger 3.X.X
-    # "--readFilesCommand zcat" parameter to indicate the fastq files are *gz
-    variousParams: "--soloType CB_UMI_Simple
-                    --soloCBmatchWLtype 1MM_multi_Nbase_pseudocounts
-                    --soloUMIfiltering MultiGeneUMI_CR
-                    --soloUMIdedup 1MM_CR
-                    --soloCellFilter EmptyDrops_CR
-                    --readFilesCommand zcat"
-    scratch: "2000"
-    mem: "12000"
-    time: "800"
-    threads: 8
-
   # create hdf5 file from cellranger output
   create_hd5:
     call: "python path_to_scAmpi_git/scripts/create_hdf5.py "

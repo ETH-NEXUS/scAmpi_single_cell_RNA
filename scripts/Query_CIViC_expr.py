@@ -105,6 +105,10 @@ def reformat_results(results, identifier_type):
                 # Use uppercase for consistency of the tags
                 evidence_status = evidence_record.status.strip().upper()
                 evidence_type = evidence_record.evidence_type.strip().upper()
+                # TODO: extend query to be applicable to new evidence types 'ONCOGENIC' and 'FUNCTIONAL'
+                # Skip for now, as they trigger errors due to empty disease names (also, they have not been fully tested)
+                if evidence_type not in ['PREDICTIVE', 'DIAGNOSTIC', 'PROGNOSTIC', 'PREDISPOSING']:
+                    continue
                 disease = evidence_record.disease.name.strip().upper()
 
                 evidence_level = evidence_record.evidence_level                     # just in case, should never be None
