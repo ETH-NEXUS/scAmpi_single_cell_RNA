@@ -22,7 +22,7 @@ if not 'TMPDIR' in globals():
 
 
 # This is the default order in which the programs are executed
-# Note: currently this is the default also soecified in the rule files, so currently this is only for explanatory reasons displayed here
+# Note: currently this is the default also specified in the rule files, so currently this is only for explanatory reasons displayed here
 # If the user specified a different order in the project specific snake file, the user specified version is chosen.
 
 # Start with Cellranger count for mapping reads
@@ -30,12 +30,6 @@ CELLRANGER_IN = INPUTDIR
 CELLRANGER_OUT = OUTDIR + 'cellranger_run/'
 CREATEHD5_IN = CELLRANGER_OUT
 CREATEHD5_OUT = OUTDIR + 'rawCounts/'
-
-# OR, start with STARsolo for mapping reads
-#STARSOLO_IN = INPUTDIR
-#STARSOLO_OUT = OUTDIR + 'starsolo_mapping/'
-#CREATEHD5_IN = STARSOLO_OUT
-#CREATEHD5_OUT = OUTDIR + 'rawCounts/'
 
 FILTER_GENES_CELLS_IN = CREATEHD5_OUT
 FILTER_GENES_CELLS_OUT = OUTDIR + 'filteredCounts/'
@@ -81,15 +75,13 @@ DRUGCOMBINATION = OUTDIR + 'drugCombination/'
 
 # Include the rules
 include: "scAmpi_basic_rules.py"
-include: "starsolo_rules.py"
 
 # This rule defines which files should be created
 localrules: scAmpi_basic
 rule scAmpi_basic:
     input:
-        # Use cellranger or starsolo for read mapping
+        # Use cellranger for read mapping
         expand(CELLRANGER_OUT + '{sample}.features.tsv', sample = getSampleNames()),
-#        expand(STARSOLO_OUT + '{sample}.features.tsv', sample = getSampleNames()),
         expand(PERCENTAGE_OUT + '{sample}.genes_cells_filtered.corrected.atypical_removed.clusters_cell_count_percent.txt', sample = getSampleNames()),
         expand(DIFF_EXP_OUT + '{sample}.genes_cells_filtered.corrected.atypical_removed.diffExp_success.txt', sample = getSampleNames()),
         expand(GENE_EXP_OUT + '{sample}.genes_cells_filtered.corrected.atypical_removed.gene_expression_per_cluster.tsv', sample = getSampleNames()),
