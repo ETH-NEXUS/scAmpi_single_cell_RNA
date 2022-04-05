@@ -25,21 +25,21 @@ To activate the environment, type:
 >> conda activate scAmpi_scRNA
 ```
 
-Additionally required installations that are not available via conda:
+#### Installations of tools for initial read mapping and counting
+For the read mapping and UMI counting step scAmpi offers pre-defined rules for using either Cellranger or STARsolo. Both tools are not available for installation via conda and need to be installed separately. Only one of the tools needs to be installed, depending on the method of choice.  
 - [Cellranger](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/what-is-cell-ranger): Follow the instructions on the 10xGenomics installation support page to install cellranger and to include the cellranger binary to your path.
 Webpage: [https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/installation](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/installation)
 - [STAR](https://github.com/alexdobin/STAR/blob/master/docs/STARsolo.md) as open source alternative to Cellranger. For installation, follow the instructions in the excellent STAR documentation and include STAR in your path upon running the pipeline.
 
 #### Example data
 
-For a test run the freely available 10X Genomics data from PBMC cells can be used. A step by step guideline and example config file are provided in the directory `testdata`.  
+For a test run the freely available 10X Genomics data from PBMC cells can be used. A step by step guideline and example config file are provided in the directory `testdata`. Note that this testrun assumes that the method cellranger has been chosen for read mapping.  
 
 #### Before running the pipeline
 
 * **internet connection**  
 Some steps of the scAmpi workflow perform online queries. Please make sure that this is possible on your computing system, e.g. by loading the respective modules to enable the proxy connection. (Most systems will have this enabled per default).  
-* **Non-human datasets**  
-Note that currently the filtering step of scAmpi_basic is designed to handle human data only.
+
 
 * **config file**
   * input/output directories  
