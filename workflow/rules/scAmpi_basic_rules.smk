@@ -20,8 +20,10 @@ rule cellranger_count:
         time_min = config['tools']['cellranger_count']['time']
     threads:
         config['tools']['cellranger_count']['local_cores']
+    log:
+        "logs/cellranger_count/{sample}.log"
     benchmark:
-        'results/cellranger_run/benchmark/{sample}.cellranger_count.benchmark'
+        'logs/benchmarks/cellranger_run/{sample}.benchmark'
     # NOTE: cellranger count function cannot specify the output directory, the output is the path you call it from.
     # Therefore, a subshell is used here.
     shell:
@@ -33,7 +35,7 @@ rule cellranger_count:
         '--localcores={params.local_cores} '
         '--fastqs={input.fastqs_dir} '
         '--nosecondary '
-        '{params.variousParams}); '
+        ' &> {log} ; '
         'gunzip {params.cr_out}{params.mySample}/outs/filtered_feature_bc_matrix/features.tsv.gz ; '
         'gunzip {params.cr_out}{params.mySample}/outs/filtered_feature_bc_matrix/barcodes.tsv.gz ; '
         'gunzip {params.cr_out}{params.mySample}/outs/filtered_feature_bc_matrix/matrix.mtx.gz ; '
@@ -61,14 +63,17 @@ rule create_hdf5:
         time_min = config['computingResources']['time']['low']
     threads:
         config['computingResources']['threads']['medium']
+    log:
+        "logs/create_hdf5/{sample}.log"
     benchmark:
-        'results/counts_raw/benchmark/{sample}.create_hd5.benchmark'
+        'logs/benchmarks/create_hdf5/{sample}.benchmark'
     shell:
         'python {params.custom_script} '
         '-g {input.genes_file} '
         '-m {input.matrix_file} '
         '-b {input.barcodes_file} '
-        '-o {output.outfile}'
+        '-o {output.outfile} '
+        ' &> {log} '
 
 
 # identify doublets with scDblFinder
@@ -88,13 +93,16 @@ rule identify_doublets:
         time_min = config['computingResources']['time']['low']
     threads:
         config['computingResources']['threads']['medium']
+    log:
+        "logs/identify_doublets/{sample}.log"
     benchmark:
-        'results/counts_filtered/benchmark/{sample}.identify_doublets.benchmark'
+        'logs/benchmarks/identify_doublets/{sample}.benchmark'
     shell:
         'Rscript {params.custom_script} '
         '--hdf5File {input.infile} '
         '--sample {params.sample} '
-        '--outdir {params.outdir}'
+        '--outdir {params.outdir} '
+        '&> {log} '
 
 
 # filter out whole genes and cells.
@@ -125,22 +133,25 @@ rule filter_genes_and_cells:
         time_min = config['computingResources']['time']['low'],
     threads:
         config['computingResources']['threads']['medium']
+    log:
+        "logs/filter_genes_and_cells/{sample}.log"
     benchmark:
-        'results/counts_filtered/benchmark/{sample}.filter_genes_and_cells.benchmark'
+        'logs/benchmarks/filter_genes_and_cells/{sample}.benchmark'
     shell:
-            'Rscript {params.custom_script} '
-            '--hdf5File {input.infile} '
-            '--nmads_NODG {params.nmads_NODG} '
-            '--nmads_fractionMT {params.nmads_fractionMT} '
-            '--threshold_NODG {params.threshold_NODG} '
-            '--threshold_fractionMT {params.threshold_fractionMT} '
-            '--genomeVersion {params.genomeVersion} '
-            '--doublet_barcodes {input.doublets} '
-            '--remove_doublets {params.remove_doublets} '
-            '--minNumberCells {params.minNumberCells} '
-            '--protein_coding_only {params.protein_coding_only} '
-            '--sample {params.sample} '
-            '--outDir {params.outDir}'
+        'Rscript {params.custom_script} '
+        '--hdf5File {input.infile} '
+        '--nmads_NODG {params.nmads_NODG} '
+        '--nmads_fractionMT {params.nmads_fractionMT} '
+        '--threshold_NODG {params.threshold_NODG} '
+        '--threshold_fractionMT {params.threshold_fractionMT} '
+        '--genomeVersion {params.genomeVersion} '
+        '--doublet_barcodes {input.doublets} '
+        '--remove_doublets {params.remove_doublets} '
+        '--minNumberCells {params.minNumberCells} '
+        '--protein_coding_only {params.protein_coding_only} '
+        '--sample {params.sample} '
+        '--outDir {params.outDir} '
+        '&> {log} '
 
 
 # perform normalisation, cell cycle correction and other preprocessing using sctransform
@@ -164,8 +175,10 @@ rule sctransform_preprocessing:
         time_min = config['computingResources']['time']['medium'],
     threads:
         config['computingResources']['threads']['medium']
+    log:
+        "logs/sctransform_preprocessing/{sample}.log"
     benchmark:
-        'results/counts_corrected/benchmark/{sample}.corrected.benchmark'
+        'logs/benchmarks/sctransform_preprocessing/{sample}.benchmark'
     shell:
         'Rscript {params.custom_script} '
         '--inHDF5 {input.hdf5_file} '
@@ -174,6 +187,7 @@ rule sctransform_preprocessing:
         '--min_var {params.min_var} '
         '--n_nn {params.n_nn} '
         '--outdir {params.outDir} '
+        '&> {log} '
 
 
 # perform clustering with phenograph
@@ -196,8 +210,10 @@ rule phenograph:
         time_min = config['computingResources']['time']['low']
     threads:
         config['computingResources']['threads']['medium']
+    log:
+        "logs/phenograph/{sample}.log"
     benchmark:
-        'results/clustering/benchmark/{sample}.phenograph.benchmark'
+        'logs/benchmarks/phenograph/{sample}.benchmark'
     shell:
         'python {params.custom_script} '
         '--input_file {input.infile} '
@@ -207,7 +223,8 @@ rule phenograph:
         '--n_neighbours {params.n_neighbours} '
         '--min_size {params.min_cluster_size} '
         '--log_normalize {params.log_normalize} '
-        '--n_threads {threads}'
+        '--n_threads {threads} '
+        '&> {log} '
 
 
 # prepare sce object in RDS file for cell type classification
@@ -230,8 +247,10 @@ rule prepare_celltyping:
         time_min = config['computingResources']['time']['low'],
     threads:
         config['computingResources']['threads']['medium']
+    log:
+        "logs/prepare_celltyping/{sample}.log"
     benchmark:
-        'results/prep_celltyping/benchmark/{sample}.prepare_celltyping.benchmark'
+        'logs/benchmarks/prepare_celltyping/{sample}.benchmark'
     shell:
         'Rscript {params.custom_script} '
         '--in_sce {input.RDS_file} '
@@ -239,7 +258,8 @@ rule prepare_celltyping:
         '--outputDirec {params.outputDirec} '
         '--sampleName {params.sampleName} '
         '--distanceMatrix {input.distanceMatrix} '
-        '--modularity_score {input.modularity_score}'
+        '--modularity_score {input.modularity_score} '
+        '&> {log} '
 
 
 # perform cell type classification
@@ -263,8 +283,10 @@ rule celltyping:
         time_min = config['computingResources']['time']['medium'],
     threads:
         config['computingResources']['threads']['medium']
+    log:
+        "logs/celltyping/{sample}.log"
     benchmark:
-        'results/celltyping/benchmark/{sample}.celltyping.benchmark'
+        'logs/benchmarks/celltyping/{sample}.benchmark'
     shell:
         'Rscript {params.custom_script} '
         '--SCE {input.infile} '
@@ -272,7 +294,8 @@ rule celltyping:
         '--celltype_config {params.celltype_config} '
         '--sampleName {params.sampleName} '
         '--min_genes {params.min_genes} '
-        '--outputDirec {params.outputDirec}'
+        '--outputDirec {params.outputDirec} '
+        '&> {log} '
 
 
 # filter out atypical cells from sce object
@@ -298,8 +321,10 @@ rule remove_atypical_cells:
         time_min = config['computingResources']['time']['low']
     threads:
         config['computingResources']['threads']['medium']
+    log:
+        "logs/remove_atypical_cells/{sample}.log"
     benchmark:
-        'results/atypical_removed/benchmark/{sample}.atypical_removed.benchmark'
+        'logs/benchmarks/remove_atypical_cells/{sample}.benchmark'
     shell:
         'Rscript {params.custom_script} '
         '--sce_in {input.infile} '
@@ -309,7 +334,8 @@ rule remove_atypical_cells:
         '--min_threshold {params.min_threshold} '
         '--threshold_type {params.threshold_type} '
         '--outDir {params.outputDirec} '
-        '--sample_name {params.sample_name}'
+        '--sample_name {params.sample_name} '
+        '&> {log} '
 
 
 # perform gsva gene set analysis
@@ -330,14 +356,17 @@ rule gsva:
         time_min = config['computingResources']['time']['medium'],
     threads:
         config['computingResources']['threads']['medium']
+    log:
+        "logs/gsva/{sample}.log"
     benchmark:
-        'results/gsva/benchmark/{sample}.gsva.benchmark'
+        'logs/benchmarks/gsva/{sample}.benchmark'
     shell:
         'Rscript {params.custom_script} '
         '--SCE {input.infile} '
         '--geneset {params.genesets} '
         '--outputDirec {params.outputDirec} '
-        '--sampleName {params.sampleName}'
+        '--sampleName {params.sampleName} '
+        '&> {log} '
 
 
 # generate plots about sample composition and gene expression
@@ -360,8 +389,10 @@ rule plotting:
         time_min = config['computingResources']['time']['medium'],
     threads:
         config['computingResources']['threads']['medium']
+    log:
+        "logs/plotting/{sample}.log"
     benchmark:
-        'results/plotting/benchmark/{sample}.plotting.benchmark'
+        'logs/benchmarks/plotting/{sample}.benchmark'
     shell:
         'Rscript {params.custom_script} '
         '--sce_in {input.infile} '
@@ -369,7 +400,8 @@ rule plotting:
         '--outDir {params.outputDirec} '
         '--sampleName {params.sampleName} '
         '--colour_config {params.colour_config} '
-        '--toggle_label {params.use_alias}'
+        '--toggle_label {params.use_alias} '
+        '&> {log} '
 
 
 
@@ -394,8 +426,10 @@ rule gene_exp:
         time_min = config['computingResources']['time']['low'],
     threads:
         config['computingResources']['threads']['medium']
+    log:
+        "logs/gene_exp/{sample}.log"
     benchmark:
-        'results/gene_exp/benchmark/{sample}.gene_exp.benchmark'
+        'logs/benchmarks/gene_exp/{sample}.benchmark'
     shell:
         'Rscript {params.custom_script} '
         '--sce_in {input.sce_in} '
@@ -404,6 +438,7 @@ rule gene_exp:
         '--filter_type_sample {params.type_sample} '
         '--outDir {params.outpath} '
         '--sample_name {params.sampleName} '
+        '&> {log} '
 
 
 # This rule generates general quality control plots to hdf5 expression files
@@ -421,11 +456,14 @@ rule generate_qc_plots :
         time_min = config['computingResources']['time']['low'],
     threads:
         config['computingResources']['threads']['medium']
+    log:
+        "logs/generate_qc_plots/{my_path}.log"
     benchmark:
-        'benchmark/{my_path}.generate_qc_plots.benchmark'
+        'logs/benchmarks/generate_qc_plots/{my_path}.benchmark'
     shell:
         'Rscript {params.custom_script} '
         '--hdf5File {input.infile} '
+        '&> {log} '
 
 
 # This rule creates a box plot comparing cell type fractions across samples
@@ -444,10 +482,13 @@ rule generate_qc_plots :
 #        time_min = config['computingResources']['time']['medium'],
 #    threads:
 #        config['computingResources']['threads']['medium']
+#    log:
+#        "logs/generate_cell_type_boxplot/{sample}.log"
 #    benchmark:
-#        'results/plotting/benchmark/{sample}.boxplot_cell_types_cohort.benchmark'
+#        'logs/benchmarks/generate_cell_type_boxplot/{sample}.benchmark'
 #    shell:
-#        'Rscript workflow/scripts/generate_boxplot_fractions_celltypes.R --previous_samples {input.previous_samples} --current_sample {input.sample_cell_types} --sampleName {params.sampleName} --sampleName_short {params.sampleName_short} --outDir {params.outDir}'
+#        'Rscript workflow/scripts/generate_boxplot_fractions_celltypes.R --previous_samples {input.previous_samples} --current_sample {input.sample_cell_types} --sampleName {params.sampleName} --sampleName_short {params.sampleName_short} --outDir {params.outDir} '
+#        '&> {log} '
 
 
 # This rule integrates samples of the cohort and visualizes the integration with UMAPs
@@ -467,10 +508,13 @@ rule generate_qc_plots :
 #        time_min = config['computingResources']['time']['medium'],
 #    threads:
 #        config['computingResources']['threads']['medium']
+#    log:
+#        "logs/sample_integration/{sample}.log"
 #    benchmark:
-#        'results/plotting/benchmark/{sample}.sample_integration.benchmark'
+#        'logs/benchmarks/sample_integration/{sample}.benchmark'
 #    shell:
-#        'Rscript workflow/scripts/sample_integration.R  --cohort_list {input.previous_samples} --sample_data {input.current_sample} --sampleName {params.sampleName} --sampleName_short {params.sampleName_short} --colour_config {params.colour_config} --outdir {params.outDir}'
+#        'Rscript workflow/scripts/sample_integration.R  --cohort_list {input.previous_samples} --sample_data {input.current_sample} --sampleName {params.sampleName} --sampleName_short {params.sampleName_short} --colour_config {params.colour_config} --outdir {params.outDir} '
+#        '&> {log} '
 
 
 # perform the differential expression analysis using a Wilcoxon test
@@ -497,8 +541,10 @@ checkpoint diff_exp_analysis:
         time_min = config['computingResources']['time']['high'],
     threads:
         config['computingResources']['threads']['medium']
+    log:
+        "logs/diff_exp_analysis/{sample}.log"
     benchmark:
-        'results/diff_exp_analysis/benchmark/{sample}.diff_exp_analysis.benchmark'
+        'logs/benchmarks/diff_exp_analysis/{sample}.benchmark'
     shell:
         'mkdir {params.outpath} ; '
         'Rscript {params.custom_script} '
@@ -512,3 +558,4 @@ checkpoint diff_exp_analysis:
         '--threshold_comparison {params.threshold_comparison} '
         '--minNumberNonMalignant {params.minNumberNonMalignant} '
         '--outdir {params.outpath} '
+        '&> {log} '
