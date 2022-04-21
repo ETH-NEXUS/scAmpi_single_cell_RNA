@@ -1,54 +1,56 @@
-from snakemake.utils import min_version
 from snakemake.utils import validate
+from snakemake.utils import min_version
 import pandas as pd
 import os
 from glob import glob
 
-# do not allow subdirectories as part of `sample` or `i` wildcards
+
+# do not allow subdirectories as part of 'sample' or 'i' wildcards
 wildcard_constraints:
-    sample = "[^/]+",
-    i = "[^/]+"
+    sample="[^/]+",
+    i="[^/]+",
+
 
 # Define minimum Snakemake version
 min_version("6.12.1")
 
+
 # Include Config file
 configfile: "config/config.yaml"
 
+
 # Include report functionality
-#report: "../report/workflow.rst"
+# report: "../report/workflow.rst"
+
 
 # This file includes common functions used in the pipeline
 include: "rules/misc_snake.smk"
-
 # Include rules
 include: "rules/scAmpi_basic_rules.smk"
 include: "rules/scAmpi_clinical_rules.smk"
 
+
 # include local rules
-localrules: all
+localrules:
+    all,
+    scAmpi_basic,
+
 
 # final rule of pipeline
 rule all:
     input:
-        expand("results/finished/{sample}.scAmpi_clinical.txt", sample = sample_ids)
+        expand("results/finished/{sample}.scAmpi_clinical.txt", sample=sample_ids),
     output:
-        'results/complete.txt'
+        "results/complete.txt",
     shell:
-        'date > {output}'
+        "date > {output}"
 
 
-# defines output of scampi basic
+## defines output of scampi basic
 rule scAmpi_basic:
     input:
-#        'results/cellranger_run/{sample}.features.tsv',
-#        "results/counts_raw/{sample}.h5",
-#        "results/counts_filtered/{sample}.doublet_barcodes.txt",
         "results/counts_raw/{sample}.h5.histogram_library_sizes.png",
         "results/counts_filtered/{sample}.genes_cells_filtered.h5.histogram_library_sizes.png",
-#        "results/counts_corrected/{sample}.corrected.RDS",
-#        "results/clustering/{sample}.clusters_phenograph.csv",
-#        "results/atypical_removed/{sample}.atypical_removed.RDS",
         "results/gene_exp/{sample}.gene_expression_per_cluster.tsv",
         "results/plotting/{sample}.celltype_barplot.png",
         "results/gsva/{sample}.gsetscore_hm.png",
@@ -83,7 +85,6 @@ rule clinical_full:
     input:
         # trigger basic part of scAmpi
         "results/finished/{sample}.scAmpi_basic.txt",
-
         # trigger clinical part of scAmpi
         "results/aggregated/{sample}.aggregated.txt",
         # plot_drug_prediction is also aggregation rule (as is aggregate)
@@ -121,7 +122,6 @@ rule clinical_malignant_only:
     input:
         # trigger basic part of scAmpi
         "results/finished/{sample}.scAmpi_basic.txt",
-
         # trigger reduced clinical part of scAmpi
         # plot gene set enrichment heatmap (is also aggregation rule)
         "results/gene_set_enrichment/vs_other_malignant/{sample}.DEmalignant.heatmap_enrichment.png",
