@@ -432,8 +432,7 @@ p_final_ref = ggplot(cell_attributes, aes(x=umap1, y=umap2, color=celltype_final
   theme(aspect.ratio=1)+
   #coord_fixed(ratio = 1) +
   xlab("UMAP 1") + ylab("UMAP 2") + theme(legend.position="none")
-p_final_ref
-#ggsave(path_single_plots %&% ".umap_final_celltypes_reference.png", p_final_ref, dpi = 600, width = 3.5, height = 4, units = "cm")
+
 p_legend_ref = ggplot(cell_attributes, aes(x=umap1, y=umap2, color=celltype_final)) +
   scale_color_manual(name="Cell type", values = ct.color[id.final.ct], drop=F)+
   geom_point(size = 1) +
@@ -444,7 +443,7 @@ p_legend_ref = ggplot(cell_attributes, aes(x=umap1, y=umap2, color=celltype_fina
         #legend.text = element_text(size = 3.5),
         legend.spacing.y = unit(0.001, "line"),
         legend.spacing.x = unit(0.25, "line"))
-p_legend_ref
+
 legend_ref <- cowplot::get_legend(p_legend_ref)
 #ggsave(path_single_plots %&% ".legend_ct_colours_reference.png", legend_ref, dpi = 600, width = 3.5, height = 4, units = "cm")
 
@@ -568,7 +567,7 @@ for(group in seq(length(gene.list.all))){
       # combine expression plot and violin plot of current gene to one plot
       plot_gene[[gene]] = plot_grid(plotlist = merged_plots, ncol = 1, rel_heights = c(2.1, .9))
       # add combined plot to list that aggregates plots of all genes of the current group
-      plot_gene[[gene]]
+      #plot_gene[[gene]]
     }
   }
   names(plot_gene) = rownames(matrix_group)
@@ -613,6 +612,6 @@ p_bar = ggplot(t.plot, aes(x=x, y=value, fill=Celltypes)) + xlab("") + ylab("Per
   geom_bar(stat="identity") +
   scale_fill_manual(name="Cell type", values = ct.color[id.bar.ct], drop=F) +
   ggtitle(label = "Celltype composition")
-p_bar
+#p_bar
 ggsave(path %&% ".celltype_barplot.png", p_bar,
        width = 16, height = 18, units = "cm", dpi = 600)

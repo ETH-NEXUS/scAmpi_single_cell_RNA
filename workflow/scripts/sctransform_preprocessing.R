@@ -85,7 +85,7 @@ vst_out = sctransform::vst(dat, cell_attr = cell_desc, method="nb_fast",
                            latent_var_nonreg = c("g2m_score", "s_score"),
                            return_gene_attr = T, return_cell_attr = T)
 print("Start performing sctransform::smooth_via_pca: ")
-y_smooth = sctransform::smooth_via_pca(vst_out$y, do_plot = TRUE)
+y_smooth = sctransform::smooth_via_pca(vst_out$y, do_plot = FALSE)
 print("Start performing sctransform::correct: ")
 dat_cor = sctransform::correct(vst_out, data = y_smooth,
                                do_round = TRUE, do_pos = FALSE)
@@ -232,6 +232,7 @@ plot_1 <- ggplot(data = plot_variance_genes, aes(x = rank, y = residual_variance
   scale_x_continuous(breaks=seq(0, 20000, 1000)) +
   geom_vline(xintercept = number_genes) +
   geom_hline(yintercept = min_var)
-plot_1
-ggsave(filename = paste0(opt$outdir, opt$sample, ".plot_ranking_variance_of_residuals_per_gene.png"), width = 30, height = 20, dpi = 600,units = "cm")
+ggsave(filename = paste0(opt$outdir, opt$sample, ".plot_ranking_variance_of_residuals_per_gene.png"),
+       plot = plot_1,
+       width = 30, height = 20, dpi = 600,units = "cm")
 

@@ -104,7 +104,7 @@ boxplot_melanoma = ggplot(all_samples, aes(x = celltypes, y = percentage_numeric
 #  geom_text(data=labelDD,aes(y=maxVal,label=current_outlier_txt),size=4.3,vjust=-1.8,hjust=0.5, colour = "red", fontface = "bold") +
 #  geom_segment(data=labelDD,aes(y=maxVal*0.97,yend=maxVal, xend=factor(celltypes)), arrow = arrow(length = unit(0.1,"cm")))
 
-boxplot_melanoma
+#boxplot_melanoma
 
 filename = paste0(opt$outDir, opt$sampleName, ".boxplot_cell_types_cohort.png")
 print("Output file:")
