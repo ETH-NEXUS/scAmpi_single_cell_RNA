@@ -404,8 +404,6 @@ rule plotting:
         '&> {log} '
 
 
-
-
 # give out gene expression values per cluster
 rule gene_exp:
     input:
@@ -464,57 +462,6 @@ rule generate_qc_plots :
         'Rscript {params.custom_script} '
         '--hdf5File {input.infile} '
         '&> {log} '
-
-
-# This rule creates a box plot comparing cell type fractions across samples
-#rule generate_cell_type_boxplot:
-#    input:
-#        previous_samples = config['resources']['previous_samples'],
-#        sample_cell_types = 'results/atypical_removed/{sample}.phenograph_celltype_association.txt'
-#    output:
-#        out = 'results/plotting/{sample}.boxplot_cell_types_cohort.png'
-#    params:
-#        sampleName = '{sample}',
-#        sampleName_short = config['tools']['cellranger_count']['cellranger_sampleName'],
-#        outDir = 'results/plotting/',
-#    resources:
-#        mem_mb = config['computingResources']['mem']['medium'],
-#        time_min = config['computingResources']['time']['medium'],
-#    threads:
-#        config['computingResources']['threads']['medium']
-#    log:
-#        "logs/generate_cell_type_boxplot/{sample}.log"
-#    benchmark:
-#        'logs/benchmarks/generate_cell_type_boxplot/{sample}.benchmark'
-#    shell:
-#        'Rscript workflow/scripts/generate_boxplot_fractions_celltypes.R --previous_samples {input.previous_samples} --current_sample {input.sample_cell_types} --sampleName {params.sampleName} --sampleName_short {params.sampleName_short} --outDir {params.outDir} '
-#        '&> {log} '
-
-
-# This rule integrates samples of the cohort and visualizes the integration with UMAPs
-#rule sample_integration:
-#    input:
-#        previous_samples = config['resources']['previous_samples_counts'],
-#        current_sample = 'results/atypical_removed/{sample}.atypical_removed.RDS'
-#    output:
-#        out = 'results/plotting/{sample}.sample_integration_highlight_current.png'
-#    params:
-#        sampleName = '{sample}',
-#        outDir = 'results/plotting/',
-#        sampleName_short = config['tools']['cellranger_count']['cellranger_sampleName'],
-#        colour_config = config['resources']['colour_config']
-#    resources:
-#        mem_mb = config['computingResources']['mem']['medium'],
-#        time_min = config['computingResources']['time']['medium'],
-#    threads:
-#        config['computingResources']['threads']['medium']
-#    log:
-#        "logs/sample_integration/{sample}.log"
-#    benchmark:
-#        'logs/benchmarks/sample_integration/{sample}.benchmark'
-#    shell:
-#        'Rscript workflow/scripts/sample_integration.R  --cohort_list {input.previous_samples} --sample_data {input.current_sample} --sampleName {params.sampleName} --sampleName_short {params.sampleName_short} --colour_config {params.colour_config} --outdir {params.outDir} '
-#        '&> {log} '
 
 
 # perform the differential expression analysis using a Wilcoxon test
