@@ -34,6 +34,10 @@ include: "rules/scAmpi_clinical_rules.smk"
 localrules:
     all,
     scAmpi_basic,
+    clinical_mode,
+    clinical_full,
+    clinical_malignant_only,
+    clinical_nonmalignant,
 
 
 # final rule of pipeline
@@ -57,10 +61,6 @@ rule scAmpi_basic:
         "results/diff_exp_analysis/{sample}/",
     output:
         "results/finished/{sample}.scAmpi_basic.txt",
-    resources:
-        mem_mb=config["computingResources"]["mem"]["low"],
-        time_min=config["computingResources"]["time"]["low"],
-    threads: config["computingResources"]["threads"]["low"]
     shell:
         "date > {output}"
 
@@ -72,10 +72,6 @@ rule clinical_mode:
         count_clusters,
     output:
         "results/finished/{sample}.scAmpi_clinical.txt",
-    resources:
-        mem_mb=config["computingResources"]["mem"]["low"],
-        time_min=config["computingResources"]["time"]["low"],
-    threads: config["computingResources"]["threads"]["low"]
     shell:
         "echo {input}"
 
@@ -83,16 +79,15 @@ rule clinical_mode:
 # defines output of a full clinical run
 rule clinical_full:
     input:
-        # trigger basic part of scAmpi
+        # trigger basic part of scAmpi for each sample
         "results/finished/{sample}.scAmpi_basic.txt",
         # trigger clinical part of scAmpi
-        "results/aggregated/{sample}.aggregated.txt",
-        # plot_drug_prediction is also aggregation rule (as is aggregate)
+        # plot_drug_prediction (aggregation rule)
         "results/plot_drug_prediction/{sample}.drug_prediction_umap.png",
-        # plot gene set enrichment heatmap (is also aggregation rule)
+        # plot gene set enrichment heatmap (aggregation rule)
         "results/gene_set_enrichment/{sample}.heatmap_enrichment.png",
         "results/gene_set_enrichment/vs_other_malignant/{sample}.DEmalignant.heatmap_enrichment.png",
-        # parse_for_minSetCover (is also aggregation rule)
+        # parse_for_minSetCover (aggregation rule)
         "results/drug_combination/{sample}.drugToCluster.allDrugs.txt",
         "results/drug_combination/{sample}.drugToCluster.filteredDrugs.txt",
         # preprocess for upsetR plot
@@ -108,16 +103,12 @@ rule clinical_full:
         "results/drug_combination/{sample}.full_druglist_to_subclones.txt",
     output:
         "results/finished/{sample}.clinical_full.txt",
-    resources:
-        mem_mb=config["computingResources"]["mem"]["low"],
-        time_min=config["computingResources"]["time"]["low"],
-    threads: config["computingResources"]["threads"]["low"]
     shell:
         "date > {output}"
 
 
 # defines output of a reduced clinical run.
-# this is triggered if either no malignant or no non-malignant cells are found in the sample.
+# this is triggered if either no non-malignant cells are found in the sample.
 rule clinical_malignant_only:
     input:
         # trigger basic part of scAmpi
@@ -127,16 +118,12 @@ rule clinical_malignant_only:
         "results/gene_set_enrichment/vs_other_malignant/{sample}.DEmalignant.heatmap_enrichment.png",
     output:
         "results/finished/{sample}.clinical_malignant_only.txt",
-    resources:
-        mem_mb=config["computingResources"]["mem"]["low"],
-        time_min=config["computingResources"]["time"]["low"],
-    threads: config["computingResources"]["threads"]["low"]
     shell:
         "date > {output}"
 
 
 # defines output of a reduced clinical run.
-# this is triggered if either no malignant or no non-malignant cells are found in the sample.
+# this is triggered if either no malignant cells are found in the sample.
 rule clinical_nonmalignant:
     input:
         # trigger basic part of scAmpi
@@ -144,9 +131,5 @@ rule clinical_nonmalignant:
         # no steps of scAmpi clinical can be run
     output:
         "results/finished/{sample}.clinical_nonmalignant.txt",
-    resources:
-        mem_mb=config["computingResources"]["mem"]["low"],
-        time_min=config["computingResources"]["time"]["low"],
-    threads: config["computingResources"]["threads"]["low"]
     shell:
         "date > {output}"
