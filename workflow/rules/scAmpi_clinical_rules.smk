@@ -16,13 +16,16 @@ rule parse_filter_DE_genes:
         time_min = config['computingResources']['time']['low'],
     threads:
         config['computingResources']['threads']['low']
+    log:
+        "logs/parse_filter_DE_genes/{sample}.{i}.log"
     benchmark:
         'results/parse_diff_exp/benchmark/{sample}.{i}.parse.benchmark'
     shell:
         'python {params.custom_script} '
         '{input.tsv} '
         '{output.out} '
-        '{params.variousParams}'
+        '{params.variousParams} '
+        '&> {log} '
 
 
 # query identified variants at dgidb
@@ -44,14 +47,17 @@ rule query_dgidb:
         time_min = config['computingResources']['time']['low'],
     threads:
         config['computingResources']['threads']['medium']
+    log:
+        "logs/query_dgidb/{sample}.{i}.log"
     benchmark:
         'databaseQuery/benchmark/{sample}.{i}.dgidbQuery.benchmark'
     shell:
-         'Rscript {params.custom_script} '
-         '{input.infile} '
-         '{output.outfile} '
-         '{params.minDatabaseNum} '
-         '{params.colName_genes}'
+        'Rscript {params.custom_script} '
+        '{input.infile} '
+        '{output.outfile} '
+        '{params.minDatabaseNum} '
+        '{params.colName_genes} '
+        '&> {log} '
 
 
 # clinical trials query
@@ -74,6 +80,8 @@ rule query_clinical_trials:
         time_min = config['computingResources']['time']['medium'],
     threads:
         config['computingResources']['threads']['medium']
+    log:
+        "logs/query_clinical_trials/{sample}.{i}.log"
     benchmark:
         'results/clinical_trials/benchmark/{sample}.{i}.clinicalTrialsQuery.benchmark'
     shell:
@@ -83,6 +91,7 @@ rule query_clinical_trials:
         '{params.outDirec}/{params.cancerType}_clinicalTrials/ '
         '"{params.whiteList}" '
         '"{params.blackList}" '
+        '&> {log} '
 
 
 # download the clinical trials necessary for the query
@@ -129,6 +138,8 @@ rule annotate_DE_clinical_info:
         time_min = config['computingResources']['time']['low'],
     threads:
         config['computingResources']['threads']['low']
+    log:
+        "logs/annotate_DE_clinical_info/{sample}.{i}.log"
     benchmark:
         'results/clinical_annotation/benchmark/{sample}.{i}.annotate_DE_clinical_info.benchmark'
     shell:
@@ -139,6 +150,7 @@ rule annotate_DE_clinical_info:
         '--dgidb_categ {input.inDGIDB} '
         '--clinTrials {input.inClinicalTrials} '
         '{params.variousParams} '
+        '&> {log} '
 
 
 # query identified expression in civic
@@ -162,6 +174,8 @@ rule query_civic:
         time_min = config['computingResources']['time']['low'],
     threads:
         config['computingResources']['threads']['low']
+    log:
+        "logs/query_civic/{sample}.{i}.log"
     benchmark:
         'results/query_civic/benchmark/{sample}.{i}.query_civic.benchmark'
     shell:
@@ -173,7 +187,8 @@ rule query_civic:
         '--highLevelList "{params.highLevel}" '
         '--colName_gene {params.colName_gene} '
         '--colName_logFC {params.colName_logFC} '
-        '--strictExpression {params.strictExpression}'
+        '--strictExpression {params.strictExpression} '
+        '&> {log} '
 
 
 # gene set enrichment on the DE results
@@ -193,6 +208,8 @@ rule gene_set_enrichment:
         time_min = config['computingResources']['time']['low'],
     threads:
         config['computingResources']['threads']['low']
+    log:
+        "logs/gene_set_enrichment/{sample}.{i}.log"
     benchmark:
         'results/gene_set_enrichment/benchmark/{sample}.{i}.gene_set_enrichment.benchmark'
     shell:
@@ -200,7 +217,8 @@ rule gene_set_enrichment:
         '{input.infile} '
         '{output.outfile} '
         '{params.geneSetDB} '
-        '{params.variousParams}'
+        '{params.variousParams} '
+        '&> {log} '
 
 
 # gene set enrichment on the DE results malignant vs. malignant
@@ -220,6 +238,8 @@ rule gene_set_enrichment_mal_vs_mal:
         time_min = config['computingResources']['time']['low'],
     threads:
         config['computingResources']['threads']['low']
+    log:
+        "logs/gene_set_enrichment_mal_vs_mal/{sample}.{i}.log"
     benchmark:
         'results/gene_set_enrichment/vs_other_malignant/benchmark/{sample}.DEmalignant.{i}.gene_set_enrichment.benchmark'
     shell:
@@ -227,7 +247,8 @@ rule gene_set_enrichment_mal_vs_mal:
         '{input.infile} '
         '{output.outfile} '
         '{params.geneSetDB} '
-        '{params.variousParams}'
+        '{params.variousParams} '
+        '&> {log} '
 
 
 def getGeneSetHeatmapFiles(wildcards):
@@ -272,6 +293,8 @@ rule plot_gene_set_enrichment:
         time_min = config['computingResources']['time']['low'],
     threads:
         config['computingResources']['threads']['low']
+    log:
+        "logs/plot_gene_set_enrichment/{sample}.log"
     benchmark:
         'results/gene_set_enrichment/benchmark/{sample}.plot_gene_set_enrichment.benchmark'
     shell:
@@ -279,7 +302,9 @@ rule plot_gene_set_enrichment:
         'then echo "test1" ; '
         'Rscript {params.custom_script} {output.outfile} {input.inDir} ; '
         'else touch {output.outfile} ; '
-        'fi'
+        'fi '
+        '&> {log} '
+
 
 
 ## plot heat map for gene set enrichment
@@ -301,6 +326,8 @@ rule plot_gene_set_enrichment_mal_vs_mal:
         time_min = config['computingResources']['time']['low'],
     threads:
         config['computingResources']['threads']['low']
+    log:
+        "logs/plot_gene_set_enrichment_mal_vs_mal/{sample}.log"
     benchmark:
         'results/gene_set_enrichment/vs_other_malignant/benchmark/{sample}.DEmalignant.plot_gene_set_enrichment.benchmark'
     shell:
@@ -308,7 +335,8 @@ rule plot_gene_set_enrichment_mal_vs_mal:
         'then echo "test1" ; '
         'Rscript {params.custom_script} {output.outfile} {input.inDir} ; '
         'else touch {output.outfile} ; '
-        'fi'
+        'fi '
+        '&> {log} '
 
 
 # parse the *.dgidb.txt.CompleteTable.ClinicalTrials.txt files of all clusters
@@ -338,6 +366,8 @@ rule parse_for_minSetCover:
         time_min = config['computingResources']['time']['low'],
     threads:
         config['computingResources']['threads']['low']
+    log:
+        "logs/parse_for_minSetCover/{sample}.{type}.log"
     benchmark:
         'results/drug_combination/benchmark/{sample}.{type}.parse_for_minSetCover.benchmark'
     shell:
@@ -346,7 +376,8 @@ rule parse_for_minSetCover:
         '--outFile {output.out} '
         '--colName_clinTrial {params.colName_clinTrial} '
         '--colName_DGIDB_Score {params.colName_DGIDB_score} '
-        '--drug_list {input.drugList}'
+        '--drug_list {input.drugList} '
+        '&> {log} '
 
 
 # calculate for each cluster the number of cells it countains and the percentage of all cells
@@ -365,13 +396,16 @@ rule cell_percent_in_cluster:
         time_min = config['computingResources']['time']['low'],
     threads:
         config['computingResources']['threads']['medium']
+    log:
+        "logs/cell_percent_in_cluster/{sample}.log"
     benchmark:
         'results/clustering/benchmark/{sample}.clusterPercent.benchmark'
     shell:
         'python {params.custom_script} '
         '--inputTable {input.clusterCsv} '
         '--outFile {output.out} '
-        '{params.variousParams}'
+        '{params.variousParams} '
+        '&> {log} '
 
 
 
@@ -392,6 +426,8 @@ rule find_minSetCover:
         time_min = config['computingResources']['time']['low'],
     threads:
         config['computingResources']['threads']['low']
+    log:
+        "logs/find_minSetCover/{sample}.{type}.log"
     benchmark:
         'results/drug_combination/benchmark/{sample}.{type}.find_minSetCover.benchmark'
     shell:
@@ -399,7 +435,8 @@ rule find_minSetCover:
         '--input {input.infile} '
         '--outFile {output.out} '
         '--percentageTable {input.percTable} '
-        '{params.variousParams}'
+        '{params.variousParams} '
+        '&> {log} '
 
 
 # filter the drug-gene interaction results for drugs that are included in TP melanoma clinical list of drugs
@@ -418,13 +455,16 @@ rule filter_drugs:
         time_min = config['computingResources']['time']['low'],
     threads:
         config['computingResources']['threads']['low']
+    log:
+        "logs/filter_drugs/{sample}.{i}.log"
     benchmark:
         'results/clinical_trials/benchmark/{sample}.{i}.filter_drugs.benchmark'
     shell:
         'python {params.custom_script} '
         '--inFile {input.infile} '
         '--outFile {output.out} '
-        '--drugList {input.drugList}'
+        '--drugList {input.drugList} '
+        '&> {log} '
 
 
 # this rule is to preprocess the output of the rule parse_for_minSetCover of type drug,clusters,weight (tab separated)
@@ -444,12 +484,15 @@ rule preprocess_upsetr_plot:
         time_min = config['computingResources']['time']['low'],
     threads:
         config['computingResources']['threads']['low']
+    log:
+        "logs/preprocess_upsetr_plot/{sample}.{type}.log"
     benchmark:
         'results/upsetr_plot/benchmark/{sample}.{type}.upsetr_plot.benchmark'
     shell:
         'python {params.custom_script} '
         '--inFile {input.infile} '
-        '--outFile {output.out}'
+        '--outFile {output.out} '
+        '&> {log} '
 
 
 # this rule generates a plot with UpSetR (comparably to venn diagramm)
@@ -469,13 +512,16 @@ rule plot_upsetr:
         time_min = config['computingResources']['time']['low'],
     threads:
         config['computingResources']['threads']['low']
+    log:
+        "logs/plot_upsetr/{sample}.{type}.log"
     benchmark:
         'results/upsetr_plot/benchmark/{sample}.{type}.plot_upsetr.benchmark'
     shell:
         'Rscript {params.custom_script} '
         '--inFile {input.infile} '
         '--outFile {output.out} '
-        '{params.variousParams}'
+        '{params.variousParams} '
+        '&> {log} '
 
 
 # This rule generates a table with a full list of all clinically relevant drugs and the information
@@ -496,6 +542,8 @@ rule get_full_druglist_to_subclones:
         time_min = config['computingResources']['time']['low'],
     threads:
         config['computingResources']['threads']['low']
+    log:
+        "logs/get_full_druglist_to_subclones/{sample}.log"
     benchmark:
         'results/drug_combination/benchmark/{sample}.full_druglist_to_subclones.benchmark'
     shell:
@@ -503,6 +551,7 @@ rule get_full_druglist_to_subclones:
         '--in_drugToCluster {input.infile} '
         '--in_drugList {params.drugList} '
         '--outFile {output.out} '
+        '&> {log} '
 
 
 # check whether all civic queries are finished
@@ -537,6 +586,8 @@ rule plot_drug_prediction:
         time_min = config['computingResources']['time']['low'],
     threads:
         config['computingResources']['threads']['medium']
+    log:
+        "logs/plot_drug_prediction/{sample}.log"
     benchmark:
         'results/plot_drug_prediction/benchmark/{sample}.plot_drug_prediction.benchmark'
     shell:
@@ -549,6 +600,7 @@ rule plot_drug_prediction:
         '--civicDict {input.civicDict} '
         '--sampleName {params.sampleName} '
         '{params.variousParams} '
+        '&> {log} '
 
 
 
@@ -584,4 +636,3 @@ rule aggregate:
         config['computingResources']['threads']['medium']
     shell:
         'touch {output}'
-
