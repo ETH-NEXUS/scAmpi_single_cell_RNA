@@ -101,8 +101,6 @@ rule download_clinical_trials:
     params:
         cancerType = config['tools']['download_clinical_trials']['cancerType'],
         outDirec = 'results/clinical_trials/',
-#    conda:
-#        '../envs/query_dgidb.yaml'
     resources:
         mem_mb = config['computingResources']['mem']['low'],
         time_min = config['computingResources']['time']['medium'],
@@ -252,35 +250,23 @@ rule gene_set_enrichment_mal_vs_mal:
 
 
 def getGeneSetHeatmapFiles(wildcards):
-#    if "DEmalignant" in wildcards.sample:
-#        if len(CLUSTER_IDS_MALIGNANT) == 0:
-#            return [GENESETANALYSIS_OUT]
-#        return expand(GENESETANALYSIS_OUT + wildcards.sample + '.{clusterid}.enrichedGeneSets.txt', clusterid = CLUSTER_IDS_MALIGNANT)
     checkpoint_output = checkpoints.diff_exp_analysis.get(**wildcards).output[0]
     return expand('results/gene_set_enrichment/{sample}.{i}.enrichedGeneSets.txt',
-#        return expand("results/{result_outdir}/{sample}.{i}.{suffix}.txt",
             i = glob_wildcards(os.path.join(checkpoint_output, "{sample,[^/]+}.{i,[^/]+}.DEgenes.tsv")).i,
             sample = wildcards.sample)
 
 def getGeneSetHeatmapFilesMalignant(wildcards):
-#    if "DEmalignant" in wildcards.sample:
-#        if len(CLUSTER_IDS_MALIGNANT) == 0:
-#            return [GENESETANALYSIS_OUT]
-#        return expand(GENESETANALYSIS_OUT + wildcards.sample + '.{clusterid}.enrichedGeneSets.txt', clusterid = CLUSTER_IDS_MALIGNANT)
     checkpoint_output = checkpoints.diff_exp_analysis.get(**wildcards).output[0]
     return expand('results/gene_set_enrichment/vs_other_malignant/{sample}.DEmalignant.{i}.enrichedGeneSets.txt',
-#        return expand("results/{result_outdir}/{sample}.{i}.{suffix}.txt",
             i = glob_wildcards(os.path.join(checkpoint_output, "vs_other_malignant/{sample,[^/]+}.DEmalignant.{i,[^/]+}.DEgenes.tsv")).i,
             sample = wildcards.sample)
 
 
 ## plot heat map for gene set enrichment
-## NOTE: empty inputs cause snakemake to crash, thus we implemented the workaround
-## that returns GENESETANALYSIS_OUT in case of an empty list of enrichment analyses comparing tumor sub-clones
+## workaround to catch samples with little ((non)malignant) clusters no longer necessary. Rule is not triggered in these cases.
 rule plot_gene_set_enrichment:
     input:
         inDir = getGeneSetHeatmapFiles
-        #inDir = expand(GENESETANALYSIS_OUT + '{{sample}}.{clusterid}.enrichedGeneSets.txt', clusterid = CLUSTER_IDS)
     output:
         outfile = 'results/gene_set_enrichment/{sample}.heatmap_enrichment.png'
     params:
@@ -298,22 +284,18 @@ rule plot_gene_set_enrichment:
     benchmark:
         'results/gene_set_enrichment/benchmark/{sample}.plot_gene_set_enrichment.benchmark'
     shell:
-        'if [ "{input.inDir}" != "{params.comparison_direc}" ] ; '
-        'then echo "test1" ; '
-        'Rscript {params.custom_script} {output.outfile} {input.inDir} ; '
-        'else touch {output.outfile} ; '
-        'fi '
+        'Rscript {params.custom_script} '
+        '{output.outfile} '
+        '{input.inDir} '
         '&> {log} '
 
 
 
 ## plot heat map for gene set enrichment
-## NOTE: empty inputs cause snakemake to crash, thus we implemented the workaround
-## that returns GENESETANALYSIS_OUT in case of an empty list of enrichment analyses comparing tumor sub-clones
+## workaround to catch samples with little ((non)malignant) clusters no longer necessary. Rule is not triggered in these cases.
 rule plot_gene_set_enrichment_mal_vs_mal:
     input:
         inDir = getGeneSetHeatmapFilesMalignant
-        #inDir = expand(GENESETANALYSIS_OUT + '{{sample}}.{clusterid}.enrichedGeneSets.txt', clusterid = CLUSTER_IDS)
     output:
         outfile = 'results/gene_set_enrichment/vs_other_malignant/{sample}.DEmalignant.heatmap_enrichment.png'
     params:
@@ -331,16 +313,14 @@ rule plot_gene_set_enrichment_mal_vs_mal:
     benchmark:
         'results/gene_set_enrichment/vs_other_malignant/benchmark/{sample}.DEmalignant.plot_gene_set_enrichment.benchmark'
     shell:
-        'if [ "{input.inDir}" != "{params.comparison_direc}" ] ; '
-        'then echo "test1" ; '
-        'Rscript {params.custom_script} {output.outfile} {input.inDir} ; '
-        'else touch {output.outfile} ; '
-        'fi '
+        'Rscript {params.custom_script} '
+        '{output.outfile} '
+        '{input.inDir} '
         '&> {log} '
 
 
 # parse the *.dgidb.txt.CompleteTable.ClinicalTrials.txt files of all clusters
-# and generate a table that shows for each Drug the clusters that can be targeted by this drug
+# and generate table that shows for each Drug the clusters that can be targeted by this drug
 # and the weight of the drug for calculating minimum set cover
 def get_parse_for_minSetCover_input(wildcards):
     checkpoint_output = checkpoints.diff_exp_analysis.get(**wildcards).output[0]
@@ -350,7 +330,6 @@ def get_parse_for_minSetCover_input(wildcards):
 
 rule parse_for_minSetCover:
     input:
-#        infiles = expand(PARSETRIALSTABLE_IN + '{{sample}}.{i}.dgidb.txt.CompleteTable.ClinicalTrials.{{type}}.txt', clusterid = CLUSTER_IDS),
         infiles = get_parse_for_minSetCover_input,
         drugList = config['resources']['drugList']
     output:
@@ -557,7 +536,6 @@ rule get_full_druglist_to_subclones:
 # check whether all civic queries are finished
 def getCivicQueryResults(wildcards):
     checkpoint_output = checkpoints.diff_exp_analysis.get(**wildcards).output[0]
-#    return expand(PLOT_DRUGS_IN + wildcards.sample + '.{i}.clinicalAnnotation.civic.txt',
     return expand('results/query_civic/{sample}.{i}.clinicalAnnotation.civic.txt',
         sample = wildcards.sample,
         i = glob_wildcards(os.path.join(checkpoint_output, "{sample,[^/]+}.{i,[^/]+}.DEgenes.tsv")).i)
@@ -601,38 +579,3 @@ rule plot_drug_prediction:
         '--sampleName {params.sampleName} '
         '{params.variousParams} '
         '&> {log} '
-
-
-
-# define input for aggregate rule
-# restrain the wildcards (the global restraint alone does not work)
-def aggregate_input(suffix, result_outdir):
-    """Define a checkpoint compatible function that generates filenames."""
-    def tmp(wildcards):
-        checkpoint_output = checkpoints.diff_exp_analysis.get(**wildcards).output[0]
-        return expand("results/{result_outdir}/{sample}.{i}.{suffix}.txt",
-            result_outdir = result_outdir,
-            suffix = suffix,
-            sample = wildcards.sample,
-            # restrain wildcards to not consider subdirectories
-            # do this here because `glob_wildcards` does not
-            # respect the global wildcard_constraints directive
-            i = glob_wildcards(os.path.join(checkpoint_output, "{sample,[^/]+}.{i,[^/]+}.DEgenes.tsv")).i)
-    return tmp
-
-
-# define what rules after the checkpoint differential expression should be performed.
-# the aggregate rule is triggered by the final scampi rule
-rule aggregate:
-    input:
-        aggregate_input(config['tools']['aggregate']['suffix'],
-                        config['tools']['aggregate']['result_outdir'])
-    output:
-        'results/{outdir}/{sample}.aggregated.txt'
-    resources:
-        mem_mb = config['computingResources']['mem']['medium'],
-        time_min = config['computingResources']['time']['low'],
-    threads:
-        config['computingResources']['threads']['medium']
-    shell:
-        'touch {output}'

@@ -80,25 +80,31 @@ def define_output(wildcards):
 
 
 # input function for local rule `clinical_mode` in snakefile.smk
+# With this function one of the three clinical output rules are triggered, depending on the number of clusters found.
 def count_clusters(wildcards):
     checkpoint_output = checkpoints.diff_exp_analysis.get(**wildcards).output[0]
     all_clusters = expand('results/diff_exp_analysis/{sample}/{sample}_{i}.DEgenes.tsv',
     i = glob_wildcards(os.path.join(checkpoint_output, "{sample,[^/]+}.{i,[^/]+}.DEgenes.tsv")).i,
     sample = wildcards.sample)
+
     all_count = len(all_clusters)
 
     malignant_clusters = expand('results/diff_exp_analysis/{sample}/vs_other_malignant/{sample}.DEmalignant.{i}.DEgenes.tsv',
     i = glob_wildcards(os.path.join(checkpoint_output, "vs_other_malignant/{sample,[^/]+}.DEmalignant.{i,[^/]+}.DEgenes.tsv")).i,
     sample = wildcards.sample)
+
     malignant_count = len(malignant_clusters)
 
     # get list of all clusters
     if  all_count > 0:
+        # then there is at least one malignant cluster and at least two non-malignant as is requested by the DE script to run
         return expand('results/finished/{sample}.clinical_full.txt',
         sample = wildcards.sample)
     elif malignant_count > 0:
+        # there are no non-malignant clusters but several malignant
         return expand('results/finished/{sample}.clinical_malignant_only.txt',
         sample = wildcards.sample)
     else:
+        # there are no malignant clusters and therefore no DE in this sample (or in total only one cluster)
         return expand('results/finished/{sample}.clinical_nonmalignant.txt',
         sample = wildcards.sample)
