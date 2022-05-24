@@ -19,7 +19,7 @@ rule parse_filter_DE_genes:
     log:
         "logs/parse_filter_DE_genes/{sample}.{i}.log"
     benchmark:
-        'results/parse_diff_exp/benchmark/{sample}.{i}.parse.benchmark'
+        'logs/benchmark/parse_diff_exp/{sample}.{i}.parse.benchmark'
     shell:
         'python {params.custom_script} '
         '{input.tsv} '
@@ -50,7 +50,7 @@ rule query_dgidb:
     log:
         "logs/query_dgidb/{sample}.{i}.log"
     benchmark:
-        'databaseQuery/benchmark/{sample}.{i}.dgidbQuery.benchmark'
+        'logs/benchmark/databaseQuery/{sample}.{i}.dgidbQuery.benchmark'
     shell:
         'Rscript {params.custom_script} '
         '{input.infile} '
@@ -83,7 +83,7 @@ rule query_clinical_trials:
     log:
         "logs/query_clinical_trials/{sample}.{i}.log"
     benchmark:
-        'results/clinical_trials/benchmark/{sample}.{i}.clinicalTrialsQuery.benchmark'
+        'logs/benchmark/clinical_trials/{sample}.{i}.clinicalTrialsQuery.benchmark'
     shell:
         'python {params.custom_script} '
         '{input.infile} '
@@ -107,7 +107,7 @@ rule download_clinical_trials:
     threads:
         config['computingResources']['threads']['medium']
     benchmark:
-        'results/clinical_trials/benchmark/downloadClinicalTrials.benchmark'
+        'logs/benchmark/clinical_trials/downloadClinicalTrials.benchmark'
     shell:
         ('wget "https://clinicaltrials.gov/search?term={params.cancerType}&studyxml=true" '
         '-O {params.outDirec}/{params.cancerType}_clinicalTrials.zip ; '
@@ -139,7 +139,7 @@ rule annotate_DE_clinical_info:
     log:
         "logs/annotate_DE_clinical_info/{sample}.{i}.log"
     benchmark:
-        'results/clinical_annotation/benchmark/{sample}.{i}.annotate_DE_clinical_info.benchmark'
+        'logs/benchmark/clinical_annotation/{sample}.{i}.annotate_DE_clinical_info.benchmark'
     shell:
         'python {params.custom_script} '
         '--inputTable {input.infile} '
@@ -175,7 +175,7 @@ rule query_civic:
     log:
         "logs/query_civic/{sample}.{i}.log"
     benchmark:
-        'results/query_civic/benchmark/{sample}.{i}.query_civic.benchmark'
+        'logs/benchmark/query_civic/{sample}.{i}.query_civic.benchmark'
     shell:
         'python {params.custom_script} '
         '--inputTable {input.infile} '
@@ -209,7 +209,7 @@ rule gene_set_enrichment:
     log:
         "logs/gene_set_enrichment/{sample}.{i}.log"
     benchmark:
-        'results/gene_set_enrichment/benchmark/{sample}.{i}.gene_set_enrichment.benchmark'
+        'logs/benchmark/gene_set_enrichment/{sample}.{i}.gene_set_enrichment.benchmark'
     shell:
         'Rscript {params.custom_script} '
         '{input.infile} '
@@ -239,7 +239,7 @@ rule gene_set_enrichment_mal_vs_mal:
     log:
         "logs/gene_set_enrichment_mal_vs_mal/{sample}.{i}.log"
     benchmark:
-        'results/gene_set_enrichment/vs_other_malignant/benchmark/{sample}.DEmalignant.{i}.gene_set_enrichment.benchmark'
+        'logs/benchmark/gene_set_enrichment/vs_other_malignant/{sample}.DEmalignant.{i}.gene_set_enrichment.benchmark'
     shell:
         'Rscript {params.custom_script} '
         '{input.infile} '
@@ -282,7 +282,7 @@ rule plot_gene_set_enrichment:
     log:
         "logs/plot_gene_set_enrichment/{sample}.log"
     benchmark:
-        'results/gene_set_enrichment/benchmark/{sample}.plot_gene_set_enrichment.benchmark'
+        'logs/benchmark/gene_set_enrichment/{sample}.plot_gene_set_enrichment.benchmark'
     shell:
         'Rscript {params.custom_script} '
         '{output.outfile} '
@@ -311,7 +311,7 @@ rule plot_gene_set_enrichment_mal_vs_mal:
     log:
         "logs/plot_gene_set_enrichment_mal_vs_mal/{sample}.log"
     benchmark:
-        'results/gene_set_enrichment/vs_other_malignant/benchmark/{sample}.DEmalignant.plot_gene_set_enrichment.benchmark'
+        'logs/benchmark/gene_set_enrichment/vs_other_malignant/{sample}.DEmalignant.plot_gene_set_enrichment.benchmark'
     shell:
         'Rscript {params.custom_script} '
         '{output.outfile} '
@@ -348,7 +348,7 @@ rule parse_for_minSetCover:
     log:
         "logs/parse_for_minSetCover/{sample}.{type}.log"
     benchmark:
-        'results/drug_combination/benchmark/{sample}.{type}.parse_for_minSetCover.benchmark'
+        'logs/benchmark/drug_combination/{sample}.{type}.parse_for_minSetCover.benchmark'
     shell:
         'python {params.custom_script} '
         '--inFiles {input.infiles} '
@@ -378,7 +378,7 @@ rule cell_percent_in_cluster:
     log:
         "logs/cell_percent_in_cluster/{sample}.log"
     benchmark:
-        'results/clustering/benchmark/{sample}.clusterPercent.benchmark'
+        'logs/benchmark/clustering/{sample}.clusterPercent.benchmark'
     shell:
         'python {params.custom_script} '
         '--inputTable {input.clusterCsv} '
@@ -408,7 +408,7 @@ rule find_minSetCover:
     log:
         "logs/find_minSetCover/{sample}.{type}.log"
     benchmark:
-        'results/drug_combination/benchmark/{sample}.{type}.find_minSetCover.benchmark'
+        'logs/benchmark/drug_combination/{sample}.{type}.find_minSetCover.benchmark'
     shell:
         'python {params.custom_script} '
         '--input {input.infile} '
@@ -437,7 +437,7 @@ rule filter_drugs:
     log:
         "logs/filter_drugs/{sample}.{i}.log"
     benchmark:
-        'results/clinical_trials/benchmark/{sample}.{i}.filter_drugs.benchmark'
+        'logs/benchmark/clinical_trials/{sample}.{i}.filter_drugs.benchmark'
     shell:
         'python {params.custom_script} '
         '--inFile {input.infile} '
@@ -466,7 +466,7 @@ rule preprocess_upsetr_plot:
     log:
         "logs/preprocess_upsetr_plot/{sample}.{type}.log"
     benchmark:
-        'results/upsetr_plot/benchmark/{sample}.{type}.upsetr_plot.benchmark'
+        'logs/benchmark/upsetr_plot/{sample}.{type}.upsetr_plot.benchmark'
     shell:
         'python {params.custom_script} '
         '--inFile {input.infile} '
@@ -494,7 +494,7 @@ rule plot_upsetr:
     log:
         "logs/plot_upsetr/{sample}.{type}.log"
     benchmark:
-        'results/upsetr_plot/benchmark/{sample}.{type}.plot_upsetr.benchmark'
+        'logs/benchmark/upsetr_plot/{sample}.{type}.plot_upsetr.benchmark'
     shell:
         'Rscript {params.custom_script} '
         '--inFile {input.infile} '
@@ -524,7 +524,7 @@ rule get_full_druglist_to_subclones:
     log:
         "logs/get_full_druglist_to_subclones/{sample}.log"
     benchmark:
-        'results/drug_combination/benchmark/{sample}.full_druglist_to_subclones.benchmark'
+        'logs/benchmark/drug_combination/{sample}.full_druglist_to_subclones.benchmark'
     shell:
         'python {params.custom_script} '
         '--in_drugToCluster {input.infile} '
@@ -567,7 +567,7 @@ rule plot_drug_prediction:
     log:
         "logs/plot_drug_prediction/{sample}.log"
     benchmark:
-        'results/plot_drug_prediction/benchmark/{sample}.plot_drug_prediction.benchmark'
+        'logs/benchmark/plot_drug_prediction/{sample}.plot_drug_prediction.benchmark'
     shell:
         'Rscript {params.custom_script} '
         '--SCE {input.rdsFile} '

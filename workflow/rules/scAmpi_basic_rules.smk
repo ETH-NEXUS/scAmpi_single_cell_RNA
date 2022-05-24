@@ -23,7 +23,7 @@ rule cellranger_count:
     log:
         "logs/cellranger_count/{sample}.log"
     benchmark:
-        'logs/benchmarks/cellranger_run/{sample}.benchmark'
+        'logs/benchmark/cellranger_run/{sample}.benchmark'
     # NOTE: cellranger count function cannot specify the output directory, the output is the path you call it from.
     # Therefore, a subshell is used here.
     shell:
@@ -66,7 +66,7 @@ rule create_hdf5:
     log:
         "logs/create_hdf5/{sample}.log"
     benchmark:
-        'logs/benchmarks/create_hdf5/{sample}.benchmark'
+        'logs/benchmark/create_hdf5/{sample}.benchmark'
     shell:
         'python {params.custom_script} '
         '-g {input.genes_file} '
@@ -96,7 +96,7 @@ rule identify_doublets:
     log:
         "logs/identify_doublets/{sample}.log"
     benchmark:
-        'logs/benchmarks/identify_doublets/{sample}.benchmark'
+        'logs/benchmark/identify_doublets/{sample}.benchmark'
     shell:
         'Rscript {params.custom_script} '
         '--hdf5File {input.infile} '
@@ -136,7 +136,7 @@ rule filter_genes_and_cells:
     log:
         "logs/filter_genes_and_cells/{sample}.log"
     benchmark:
-        'logs/benchmarks/filter_genes_and_cells/{sample}.benchmark'
+        'logs/benchmark/filter_genes_and_cells/{sample}.benchmark'
     shell:
         'Rscript {params.custom_script} '
         '--hdf5File {input.infile} '
@@ -178,7 +178,7 @@ rule sctransform_preprocessing:
     log:
         "logs/sctransform_preprocessing/{sample}.log"
     benchmark:
-        'logs/benchmarks/sctransform_preprocessing/{sample}.benchmark'
+        'logs/benchmark/sctransform_preprocessing/{sample}.benchmark'
     shell:
         'Rscript {params.custom_script} '
         '--inHDF5 {input.hdf5_file} '
@@ -213,7 +213,7 @@ rule phenograph:
     log:
         "logs/phenograph/{sample}.log"
     benchmark:
-        'logs/benchmarks/phenograph/{sample}.benchmark'
+        'logs/benchmark/phenograph/{sample}.benchmark'
     shell:
         'python {params.custom_script} '
         '--input_file {input.infile} '
@@ -250,7 +250,7 @@ rule prepare_celltyping:
     log:
         "logs/prepare_celltyping/{sample}.log"
     benchmark:
-        'logs/benchmarks/prepare_celltyping/{sample}.benchmark'
+        'logs/benchmark/prepare_celltyping/{sample}.benchmark'
     shell:
         'Rscript {params.custom_script} '
         '--in_sce {input.RDS_file} '
@@ -286,7 +286,7 @@ rule celltyping:
     log:
         "logs/celltyping/{sample}.log"
     benchmark:
-        'logs/benchmarks/celltyping/{sample}.benchmark'
+        'logs/benchmark/celltyping/{sample}.benchmark'
     shell:
         'Rscript {params.custom_script} '
         '--SCE {input.infile} '
@@ -324,7 +324,7 @@ rule remove_atypical_cells:
     log:
         "logs/remove_atypical_cells/{sample}.log"
     benchmark:
-        'logs/benchmarks/remove_atypical_cells/{sample}.benchmark'
+        'logs/benchmark/remove_atypical_cells/{sample}.benchmark'
     shell:
         'Rscript {params.custom_script} '
         '--sce_in {input.infile} '
@@ -359,7 +359,7 @@ rule gsva:
     log:
         "logs/gsva/{sample}.log"
     benchmark:
-        'logs/benchmarks/gsva/{sample}.benchmark'
+        'logs/benchmark/gsva/{sample}.benchmark'
     shell:
         'Rscript {params.custom_script} '
         '--SCE {input.infile} '
@@ -392,7 +392,7 @@ rule plotting:
     log:
         "logs/plotting/{sample}.log"
     benchmark:
-        'logs/benchmarks/plotting/{sample}.benchmark'
+        'logs/benchmark/plotting/{sample}.benchmark'
     shell:
         'Rscript {params.custom_script} '
         '--sce_in {input.infile} '
@@ -427,7 +427,7 @@ rule gene_exp:
     log:
         "logs/gene_exp/{sample}.log"
     benchmark:
-        'logs/benchmarks/gene_exp/{sample}.benchmark'
+        'logs/benchmark/gene_exp/{sample}.benchmark'
     shell:
         'Rscript {params.custom_script} '
         '--sce_in {input.sce_in} '
@@ -457,7 +457,7 @@ rule generate_qc_plots :
     log:
         "logs/generate_qc_plots/{my_path}.log"
     benchmark:
-        'logs/benchmarks/generate_qc_plots/{my_path}.benchmark'
+        'logs/benchmark/generate_qc_plots/{my_path}.benchmark'
     shell:
         'Rscript {params.custom_script} '
         '--hdf5File {input.infile} '
@@ -491,7 +491,7 @@ checkpoint diff_exp_analysis:
     log:
         "logs/diff_exp_analysis/{sample}.log"
     benchmark:
-        'logs/benchmarks/diff_exp_analysis/{sample}.benchmark'
+        'logs/benchmark/diff_exp_analysis/{sample}.benchmark'
     shell:
         'mkdir {params.outpath} ; '
         'Rscript {params.custom_script} '
