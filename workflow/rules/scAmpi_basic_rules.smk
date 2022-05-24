@@ -440,7 +440,7 @@ rule gene_exp:
 
 
 # This rule generates general quality control plots to the raw hdf5 expression files
-rule generate_qc_plots_raw :
+rule generate_qc_plots_raw:
     input:
         infile = 'results/counts_raw/{sample}.h5'
     output:
@@ -470,7 +470,7 @@ rule generate_qc_plots_raw :
 
 
 # This rule generates general quality control plots to the raw hdf5 expression files
-rule generate_qc_plots_filtered :
+rule generate_qc_plots_filtered:
     input:
         infile = 'results/counts_filtered/{sample}.genes_cells_filtered.h5'
     output:
