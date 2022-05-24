@@ -68,17 +68,6 @@ config = Config(config)
 
 
 
-###   input function for local rules in snakefile.smk
-
-# input function for local rule `check_output` in snakefile_basic.smk
-# retrieves the info from the config file if only the basic part, or both, basic and clinical, should be run.
-def define_output(wildcards):
-    if config['inputOutput']['basic_only']:
-        return 'results/finished/{sample}.scAmpi_basic.txt'
-    else:
-        return expand('results/finished/{sample}.scAmpi_{part}.txt', part = ['basic', 'clinical'], sample = wildcards.sample)
-
-
 # input function for local rule `clinical_mode` in snakefile.smk
 # With this function one of the three clinical output rules are triggered, depending on the number of clusters found.
 def count_clusters(wildcards):

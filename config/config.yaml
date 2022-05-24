@@ -3,7 +3,6 @@ inputOutput:
   input_fastqs_adt:
   sample_map: config/sample_map.tsv
   malignant_cell_type: "Melanoma"
-  basic_only: TRUE
 
 resources:
   # The following needs to point to the reference transcriptome that will be used by cellranger.
