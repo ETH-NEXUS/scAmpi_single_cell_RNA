@@ -439,14 +439,16 @@ rule gene_exp:
         '&> {log} '
 
 
-# This rule generates general quality control plots to hdf5 expression files
-rule generate_qc_plots :
+# This rule generates general quality control plots to the raw hdf5 expression files
+rule generate_qc_plots_raw :
     input:
-        infile = '{my_path}.h5'
+        infile = 'results/counts_raw/{sample}.h5'
     output:
-        out = '{my_path}.h5.histogram_library_sizes.png'
+        out = 'results/counts_raw/{sample}.raw.histogram_library_sizes.png'
     params:
         custom_script = workflow.source_path("../scripts/generate_QC_plots.R"),
+        outdir = 'results/counts_raw/',
+        sample_status = 'raw',
     conda:
         '../envs/generate_qc_plots.yaml'
     resources:
@@ -455,12 +457,45 @@ rule generate_qc_plots :
     threads:
         config['computingResources']['threads']['medium']
     log:
-        "logs/generate_qc_plots/{my_path}.log"
+        "logs/generate_qc_plots/{sample}.raw.log"
     benchmark:
-        'logs/benchmark/generate_qc_plots/{my_path}.benchmark'
+        'logs/benchmark/generate_qc_plots/{sample}.raw.benchmark'
     shell:
         'Rscript {params.custom_script} '
         '--hdf5File {input.infile} '
+        '--sample_name {wildcards.sample} '
+        '--sample_status {params.sample_status} '
+        '--outdir {params.outdir} '
+        '&> {log} '
+
+
+# This rule generates general quality control plots to the raw hdf5 expression files
+rule generate_qc_plots_filtered :
+    input:
+        infile = 'results/counts_filtered/{sample}.genes_cells_filtered.h5'
+    output:
+        out = 'results/counts_filtered/{sample}.genes_cells_filtered.histogram_library_sizes.png'
+    params:
+        custom_script = workflow.source_path("../scripts/generate_QC_plots.R"),
+        outdir = 'results/counts_filtered/',
+        sample_status = 'genes_cells_filtered',
+    conda:
+        '../envs/generate_qc_plots.yaml'
+    resources:
+        mem_mb = config['computingResources']['mem']['medium'],
+        time_min = config['computingResources']['time']['low'],
+    threads:
+        config['computingResources']['threads']['medium']
+    log:
+        "logs/generate_qc_plots/{sample}.genes_cells_filtered.log"
+    benchmark:
+        'logs/benchmark/generate_qc_plots/{sample}.genes_cells_filtered.benchmark'
+    shell:
+        'Rscript {params.custom_script} '
+        '--hdf5File {input.infile} '
+        '--sample_name {wildcards.sample} '
+        '--sample_status {params.sample_status} '
+        '--outdir {params.outdir} '
         '&> {log} '
 
 

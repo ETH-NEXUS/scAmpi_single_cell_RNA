@@ -53,8 +53,10 @@ rule all:
 ## defines output of scampi basic
 rule scAmpi_basic:
     input:
-        "results/counts_raw/{sample}.h5.histogram_library_sizes.png",
-        "results/counts_filtered/{sample}.genes_cells_filtered.h5.histogram_library_sizes.png",
+        "results/cellranger_run/{sample}.features.tsv",
+        "results/counts_raw/{sample}.h5",
+        "results/counts_raw/{sample}.raw.histogram_library_sizes.png",
+        "results/counts_filtered/{sample}.genes_cells_filtered.histogram_library_sizes.png",
         "results/gene_exp/{sample}.gene_expression_per_cluster.tsv",
         "results/plotting/{sample}.celltype_barplot.png",
         "results/gsva/{sample}.gsetscore_hm.png",
