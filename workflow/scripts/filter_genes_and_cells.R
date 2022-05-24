@@ -12,7 +12,8 @@
 # Filtering Steps:
 # 1. Cells are filtered if number of detected genes (NODG) is too low.
 # 2. Cells are filtered if the fraction of reads mapped to MT- genes is too high.
-# 3. Genes are filtered so that only protein-coding genes are kept (optional)
+# 3. Genes are filtered so that only protein-coding genes are kept (optional).
+#    Note: the filtering for protein-coding genes is currently only enabled for human data.
 # 4. Genes are filtered so that MT- genes are removed
 # 5. Genes are filtered so that genes encoding for ribosomal proteins are removed
 
