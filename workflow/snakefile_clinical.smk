@@ -69,6 +69,7 @@ rule scAmpi_basic:
 # this depends on the number of clusters found in the sample and cannot be determined beforehand.
 rule clinical_mode:
     input:
+        "results/finished/{sample}.scAmpi_basic.txt",
         count_clusters,
     output:
         "results/finished/{sample}.scAmpi_clinical.txt",
@@ -79,8 +80,6 @@ rule clinical_mode:
 # defines output of a full clinical run
 rule clinical_full:
     input:
-        # trigger basic part of scAmpi for each sample
-        "results/finished/{sample}.scAmpi_basic.txt",
         # trigger clinical part of scAmpi
         # plot_drug_prediction (aggregation rule)
         "results/plot_drug_prediction/{sample}.drug_prediction_umap.png",
@@ -111,8 +110,6 @@ rule clinical_full:
 # this is triggered if either no non-malignant cells are found in the sample.
 rule clinical_malignant_only:
     input:
-        # trigger basic part of scAmpi
-        "results/finished/{sample}.scAmpi_basic.txt",
         # trigger reduced clinical part of scAmpi
         # plot gene set enrichment heatmap (is also aggregation rule)
         "results/gene_set_enrichment/vs_other_malignant/{sample}.DEmalignant.heatmap_enrichment.png",
@@ -125,10 +122,6 @@ rule clinical_malignant_only:
 # defines output of a reduced clinical run.
 # this is triggered if either no malignant cells are found in the sample.
 rule clinical_nonmalignant:
-    input:
-        # trigger basic part of scAmpi
-        "results/finished/{sample}.scAmpi_basic.txt",
-        # no steps of scAmpi clinical can be run
     output:
         "results/finished/{sample}.clinical_nonmalignant.txt",
     shell:
