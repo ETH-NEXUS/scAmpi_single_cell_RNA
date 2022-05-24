@@ -1,12 +1,12 @@
 inputOutput:
-  input_fastqs: /cluster/work/nexus/anne/tests/2021-08-26_testrun_scampi/fastqs/
+  input_fastqs: /input/directory/fastq/
   input_fastqs_adt:
   sample_map: config/sample_map.tsv
   malignant_cell_type: "Melanoma"
 
 resources:
   # The following needs to point to the reference transcriptome that will be used by cellranger.
-  reference_transcriptome: /cluster/work/nexus/utilities/databases/singlecell/10xGenomics/gene_expression_3_0_2/refdata-cellranger-GRCh38-3.0.0
+  reference_transcriptome: /path/to/reference/eg/refdata-cellranger-GRCh38-3.0.0
   # celltype_lists gmx file containing a library of cell type classification gene lists
   celltype_lists: "required_files/melanoma/celltype_list_melanoma.gmx"
   # celltype_config to easily adapt the cell type classification step
@@ -48,7 +48,7 @@ tools:
   # It needs to be installed manually & the call in both cellranger rules needs to be adapted.
   # variousParams can be set as described in the Cellranger documentation
   cellranger_count:
-    call: /cluster/work/nexus/utilities/sharedPrograms/cellranger/cellranger-6.1.1/bin/cellranger
+    call: /path/to/cellranger
     local_cores: 12
     mem: 6000
     time: 1440
