@@ -6,8 +6,8 @@ channels:
     - r
     - defaults
 dependencies:
-    - "r >= 4.0"
-    - "r-reshape2 >= 1.4.4"
-    - "r-ggplot2 >= 3.3.3"
-    - "r-gridextra >= 2.3"
-    - "r-gtable >= 0.3.0"
+    - "r>=4.0"
+    - "r-reshape2>=1.4.4"
+    - "r-ggplot2>=3.3.3"
+    - "r-gridextra>=2.3"
+    - "r-gtable>=0.3.0"

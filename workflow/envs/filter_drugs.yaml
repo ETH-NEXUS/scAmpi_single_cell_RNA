@@ -5,5 +5,5 @@ channels:
     - bioconda
     - defaults
 dependencies:
-    - "python >= 3.9"
-    - "configargparse >= 1.4"
+    - "python>=3.9"
+    - "configargparse>=1.4"
