@@ -177,7 +177,8 @@ hm1 <- pheatmap(rgsa_plotting,
                annotation_col = annot.col,
                annotation_colors = plotting_colors,
                annotation_names_col = T,
-               fontsize_row = 8)
+               fontsize_row = 8,
+               silent = TRUE)
 
 ggsave(path %&% ".gsetscore_hm.png", hm1$gtable,
        width = 30, height = 24, units = "cm", dpi = 600)
