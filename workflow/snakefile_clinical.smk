@@ -76,7 +76,7 @@ rule clinical_mode:
     output:
         "results/finished/{sample}.scAmpi_clinical.txt",
     shell:
-        "echo {input}"
+        "date > {output}"
 
 
 # defines output of a full clinical run
