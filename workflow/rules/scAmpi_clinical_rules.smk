@@ -168,7 +168,7 @@ rule query_civic:
     conda:
         '../envs/query_civic.yaml'
     resources:
-        mem_mb = config['computingResources']['mem']['low'],
+        mem_mb = config['computingResources']['mem']['medium'],
         time_min = config['computingResources']['time']['low'],
     threads:
         config['computingResources']['threads']['low']
