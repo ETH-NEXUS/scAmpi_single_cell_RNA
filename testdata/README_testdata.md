@@ -11,12 +11,12 @@ NOTE: some steps of the scAmpi workflow perform online queries. Please make sure
 
 
 #### (i) Preparation of cellranger software
-- **cellranger human reference:** For the test run using cellranger as the mapping tool you need to have a version of the cellranger human reference data files available. (For download instructions of cellranger, refer to the [10xGenomics Webpage](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/installation)).
+- **Provide cellranger human reference:** For the test run using cellranger as the mapping tool the cellranger human reference data files must be available. (For download instructions of cellranger, refer to the [10xGenomics Webpage](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/installation)).
 
-- **cellranger information in config.yaml:** In the testdata/config.yaml file replace the `resources:` -> `reference_transcriptome` entry with your path to the cellranger reference directory.
+- **Adapt cellranger information in config.yaml:** In the `testdata/config.yaml` file replace the `resources:` -> `reference_transcriptome` entry with your path to the cellranger reference directory.
 
-- **cellranger software:** The software `cellranger` must be installed and in your PATH. 
-If you do not want to add cellranger to your PATH you can also provide the full path to the cellranger installation in the `testdata/config.yaml` file at the cellranger_count config block.
+- **Provide cellranger software:** The software `cellranger` must be installed and in your PATH. 
+If you do not want to add cellranger to your PATH the full path to the cellranger installation can be provided in the `testdata/config.yaml` (`tools` -> `cellranger_count` -> `call`).
 
 ```
 # exporting cellranger software to PATH
@@ -39,16 +39,16 @@ rm -r 5k_pbmc_v3_fastqs/
 
 Perform a dry run to check if all preparations were correct:
 ```
->> snakemake -s workflow/snakefile_basic.smk --configfile testdata/config.yaml -n -p
+snakemake -s workflow/snakefile_basic.smk --configfile testdata/config.yaml -n -p -r
 ```
 
 Call the actual run:
 
 ```
->> snakemake -s workflow/snakefile_basic.smk --configfile testdata/config.yaml -p
+snakemake -s workflow/snakefile_basic.smk --configfile testdata/config.yaml -p -r
 ```
 
 If you are working on a cluster with a job scheduling system (e.g. LSF, Slurm) you need to adjust the commands accordingly.
 
 #### Avoid cellranger step
-If the cellranger step should be avoided in the test run, the file `5k_pbmc_v3.h5.tar` can be used as a starting point. With `tar -xvf 5k_pbmc_v3.h5.tar` the file can be unpacked. Then, it should be copied into the direcory `results/counts_raw/`. This way, scAmpi basic starts after the cellranger step, saving time and other resources.
+If the cellranger step should be avoided in the test run, the file `testdata/5k_pbmc_v3.h5.tar` can be used as a starting point. With `tar -xvf 5k_pbmc_v3.h5.tar` the file can be unpacked. Then, it should be copied into the direcory `results/counts_raw/`. This way, scAmpi basic starts after the cellranger step, saving time and other resources.
