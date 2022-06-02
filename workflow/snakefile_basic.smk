@@ -31,7 +31,7 @@ localrules: scAmpi_basic
 # defines output of scampi basic
 rule scAmpi_basic:
     input:
-        expand("results/cellranger_run/{sample}.features.tsv", sample = sample_ids),
+#        expand("results/cellranger_run/{sample}.features.tsv", sample = sample_ids),
         expand("results/counts_raw/{sample}.h5", sample = sample_ids),
         expand("results/counts_filtered/{sample}.doublet_barcodes.txt", sample = sample_ids),
         expand("results/counts_raw/{sample}.raw.histogram_library_sizes.png", sample = sample_ids),
