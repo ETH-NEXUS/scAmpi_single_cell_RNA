@@ -34,8 +34,8 @@ IFS="$OLD_IFS"
 
 mkdir -p fastqs
 cd fastqs
-#wget https://cg.10xgenomics.com/samples/cell-exp/3.0.2/5k_pbmc_v3/5k_pbmc_v3_fastqs.tar
-#tar -xvf 5k_pbmc_v3_fastqs.tar
-#rm 5k_pbmc_v3_fastqs.tar
-#mv 5k_pbmc_v3_fastqs/* .
-#rm -r 5k_pbmc_v3_fastqs/
+wget https://cg.10xgenomics.com/samples/cell-exp/3.0.2/5k_pbmc_v3/5k_pbmc_v3_fastqs.tar
+tar -xvf 5k_pbmc_v3_fastqs.tar
+rm 5k_pbmc_v3_fastqs.tar
+mv 5k_pbmc_v3_fastqs/* .
+rm -r 5k_pbmc_v3_fastqs/
