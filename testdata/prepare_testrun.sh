@@ -11,61 +11,31 @@
 #### Input $2: location of the cellranger reference
 ##################################################
 
-scAmpi_path=$1
-cellranger_ref=$2
-testrun_dir=$(pwd)
+cellranger_ref=$1
 
-echo "Testrun directory: $testrun_dir"
-echo "scAmpi git directory: $scAmpi_path"
 echo "Directory with cellranger reference: $cellranger_ref"
 
-# Create folders for testdata and analysis output
 
-mkdir -p fastqs
-mkdir -p analysis
-mkdir -p snake_temp
-mkdir -p snake_files
+# replace reference directory path in testdata/config.yaml
 
-# copy example config file and sample map to the testrun directory and replace placeholders with correct path
+# temporarily adapt IFS to preserve leading whitespaces
+OLD_IFS="$IFS"
+IFS=
 
-cp ${scAmpi_path}/testdata/config_scAmpi_testdata.json snake_files/
-cp ${scAmpi_path}/testdata/sample_map_testdata.tsv snake_files/
+while read -r line; do
+    echo ${line//refdata-cellranger-GRCh38-3.0.0/${cellranger_ref}}
+    done < testdata/config.yaml > testdata/config_temp.yaml
+    mv testdata/config_temp.yaml testdata/config.yaml
 
-# replace test directory path
-while read line; do
-	    echo ${line//testdir/${testrun_dir}}
-    done < snake_files/config_scAmpi_testdata.json > snake_files/config_scAmpi_testdata_temp.json
-    mv snake_files/config_scAmpi_testdata_temp.json snake_files/config_scAmpi_testdata.json
-
-# replace reference directory path
-while read line; do
-	    echo ${line//reference_dir/${cellranger_ref}}
-    done < snake_files/config_scAmpi_testdata.json > snake_files/config_scAmpi_testdata_temp.json
-    mv snake_files/config_scAmpi_testdata_temp.json snake_files/config_scAmpi_testdata.json
-
-# replace scAmpi git path
-while read line; do
-	    echo ${line//path_to_scAmpi_git/${scAmpi_path}}
-    done < snake_files/config_scAmpi_testdata.json > snake_files/config_scAmpi_testdata_temp.json
-    mv snake_files/config_scAmpi_testdata_temp.json snake_files/config_scAmpi_testdata.json
+# restore IFS to default
+IFS="$OLD_IFS"
 
 # download and extract example data from the 10xGenomics webpage
 
+mkdir -p fastqs
 cd fastqs
-wget https://cg.10xgenomics.com/samples/cell-exp/3.0.2/5k_pbmc_v3/5k_pbmc_v3_fastqs.tar
-tar -xvf 5k_pbmc_v3_fastqs.tar
-rm 5k_pbmc_v3_fastqs.tar
-mv 5k_pbmc_v3_fastqs/* .
-rm -r 5k_pbmc_v3_fastqs/
-
-# go to snake_files and prepare dry run and full run scripts
-
-cd ${testrun_dir}/snake_files/
-echo "snakemake -s ${scAmpi_path}/snake/snake_scAmpi_basic_master.snake --configfile config_scAmpi_testdata.json -n" > dryrun_scAmpi.sh
-chmod +x dryrun_scAmpi.sh
-
-echo "bsub -J scAmpi_test -eo ${testrun_dir}/snake_files/scAmpi_test.err -oo ${testrun_dir}/snake_files/scAmpi_test.out -W 23:59 \"snakemake --latency-wait 60 -s ${scAmpi_path}/snake/snake_scAmpi_basic_master.snake --configfile config_scAmpi_testdata.json --cluster 'bsub -M {params.mem} -n {threads} -W {params.time} -R \"rusage[mem={params.mem},scratch={params.scratch}]\" -eo {params.lsferrfile} -oo {params.lsfoutfile}' -j 10 -p -k\"" > run_scAmpi.sh
-chmod +x run_scAmpi.sh
-
-echo "snakemake -s ${scAmpi_path}/snake/snake_scAmpi_basic_master.snake --configfile config_scAmpi_testdata.json -j 10 -p -k" > run_scAmpi_local.sh
-chmod +x run_scAmpi_local.sh
+#wget https://cg.10xgenomics.com/samples/cell-exp/3.0.2/5k_pbmc_v3/5k_pbmc_v3_fastqs.tar
+#tar -xvf 5k_pbmc_v3_fastqs.tar
+#rm 5k_pbmc_v3_fastqs.tar
+#mv 5k_pbmc_v3_fastqs/* .
+#rm -r 5k_pbmc_v3_fastqs/
