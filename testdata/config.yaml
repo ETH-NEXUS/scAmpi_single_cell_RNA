@@ -1,8 +1,8 @@
 inputOutput:
-  input_fastqs: /input/directory/fastq/
+  input_fastqs: fastqs/
   input_fastqs_adt:
-  sample_map: config/sample_map.tsv
-  malignant_cell_type: "Melanoma"
+  sample_map: testdata/sample_map_testdata.tsv
+  malignant_cell_type: "none"
 
 resources:
   # cellranger
@@ -18,24 +18,24 @@ resources:
 
   # scampi basic
   # celltype_lists gmx file containing a library of cell type classification gene lists
-  celltype_lists: "required_files/melanoma/celltype_list_melanoma.gmx"
+  celltype_lists: "required_files/PBMC/celltype_list_PBMC_all.gmx"
   # celltype_config to easily adapt the cell type classification step
-  celltype_config: "required_files/melanoma/celltype_config_melanoma.tsv"
+  celltype_config: "required_files/PBMC/celltype_config_PBMC.tsv"
   # colour_config for a fixed assignment of colours to the cell types in celltype_config
-  colour_config: "required_files/melanoma/colour_config_melanoma.txt"
+  colour_config: "required_files/PBMC/colour_config_PBMC.txt"
   # gene expression of priority genes will be plotted and highlighted in per cluster gene expression (gene_exp)
-  priority_genes: "required_files/melanoma/selected_genes_melanoma.txt"
+  priority_genes: "required_files/PBMC/selected_genes_PBMC.txt"
   # genesets for GSVA analysis (scAmpi_basic) and geneSetEnrichment (scAmpi_clinical)
   genesets: "required_files/hallmark_pathways_example.gmt"
 
   # scampi clinical
   # pathwayDB for clinical annotation in rule `annotate_DE_clinical_info` (scAmpi_clinical)
-  pathwayDB: "required_files/hallmark_pathways_converted_example.gmt"
+  pathwayDB: ""
   # drugList for prioritizing drugs in scAmpi_clinical
-  drugList: "required_files/melanoma/melanoma_drug_list.txt"
+  drugList: ""
   # drugCombinations and civicDict for rule `plot_drug_prediction` (scAmpi_clinical)
-  drugCombinations: "required_files/melanoma/drug_combinations_melanoma.txt"
-  civicDict: "required_files/drug_synonyms_civic.txt"
+  drugCombinations: ""
+  civicDict: ""
 
 
 # The tools in this pipeline use a broad range of resources and have been assigned to the following three categories.
