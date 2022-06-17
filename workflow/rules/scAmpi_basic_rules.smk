@@ -40,11 +40,11 @@ rule cellranger_count:
         'gunzip {params.cr_out}{params.mySample}/outs/filtered_feature_bc_matrix/features.tsv.gz ; '
         'gunzip {params.cr_out}{params.mySample}/outs/filtered_feature_bc_matrix/barcodes.tsv.gz ; '
         'gunzip {params.cr_out}{params.mySample}/outs/filtered_feature_bc_matrix/matrix.mtx.gz ; '
-        'ln -s "{params.cr_out}{params.mySample}/outs/filtered_feature_bc_matrix/features.tsv" "{output.features_file}"; '
-        'ln -s "{params.cr_out}{params.mySample}/outs/filtered_feature_bc_matrix/matrix.mtx" "{output.matrix_file}"; '
-        'ln -s "{params.cr_out}{params.mySample}/outs/filtered_feature_bc_matrix/barcodes.tsv" "{output.barcodes_file}" ; '
-        'ln -s "{params.cr_out}{params.mySample}/outs/web_summary.html" "{params.web_summary}" ; '
-        'ln -s "{params.cr_out}{params.mySample}/outs/metrics_summary.csv" "{params.metrics_summary}" '
+        'ln -sr "{params.cr_out}{params.mySample}/outs/filtered_feature_bc_matrix/features.tsv" "{output.features_file}"; '
+        'ln -sr "{params.cr_out}{params.mySample}/outs/filtered_feature_bc_matrix/matrix.mtx" "{output.matrix_file}"; '
+        'ln -sr "{params.cr_out}{params.mySample}/outs/filtered_feature_bc_matrix/barcodes.tsv" "{output.barcodes_file}" ; '
+        'ln -sr "{params.cr_out}{params.mySample}/outs/web_summary.html" "{params.web_summary}" ; '
+        'ln -sr "{params.cr_out}{params.mySample}/outs/metrics_summary.csv" "{params.metrics_summary}" '
 
 
 # create hdf5 from count matrix, genes, and cell barcodes file
