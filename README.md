@@ -6,10 +6,7 @@ This scAmpi workflow is organized into two main parts: the `scAmpi_basic` part a
 
 scAmpi_clinical includes the search for disease relevant drug targets for differentially expressed genes. Note that the clinical part is only applied if at least one cluster identified in your sample is indicated as a diseased ("malignant") cell type.
 
-
-![scAmpi_both_rulegraphs](https://user-images.githubusercontent.com/38692323/140029020-6292b989-722d-4c93-909d-1d65c8aacddd.png)
-
-
+![README_rulegraph](https://user-images.githubusercontent.com/38692323/175026243-c55cbafd-e8bc-4bfe-a520-c8538c84cd03.png)
 
 #### Installation instructions
 
