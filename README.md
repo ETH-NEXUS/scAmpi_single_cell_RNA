@@ -137,7 +137,7 @@ To quickly start a scAmpi_basic run with PBMC test data you can follow the follo
 - prepare Cellranger software and reference directory
 - update the path to the cellranger reference directory in `testdata/config.yaml`
 - download example data from the 10xGenomics website (for more detailed instructions see `testdata/README_testdata.md`)
-- *optional*: to circumvent the time-consuming mapping step create the directory `results/counts_raw/` in your scAmpi repository, copy the raw matrix `5k_pbmc_v3.h5.tar` into the directory, gunzip the file (e.g. `tar -xvf 5k_pbmc_v3.h5.tar`) and start the test run from this step.
+- *optional*: to circumvent the time-consuming mapping step create the directory `results/counts_raw/` in your scAmpi repository, copy the raw matrix `testdata/5k_pbmc_v3.h5.tar` into the directory, gunzip the file (e.g. `tar -xvf 5k_pbmc_v3.h5.tar`) and start the test run from this step.
 - perform Snakemake dryrun to see a list of steps that will be performed
   `snakemake -s workflow/snakefile_basic.smk --configfile testdata/config.yaml -n -p`
 - start analysis run
