@@ -1,12 +1,13 @@
 # Changelog
 
 ## [2.0.0] - 2022-06-xx
-The scAmpi pipeline was fully revised to follow the current Snakemake best practices.
+The scAmpi pipeline framework was fully revised to follow the current Snakemake best practices.
+No changes were made regarding the analysis steps.
 
 ### Changed
-- repository set-up uses relative paths and follows the Snakemake best practices
-- using Snakemake checkpoints the basic and clinical pipeline can be started as a whole
-- several samples can be run in the basic/clinical part of the pipeline together
+- the Snakemake pipeline framework was updated to follow current best practices
+- using Snakemake checkpoints the scAmpi basic and clinical parts were joined together to be one workflow
+- several samples can be run in parallel (previously that was only possible for scAmpi_basic)
 
 ## [1.0.0] - 2022-04-05
 
