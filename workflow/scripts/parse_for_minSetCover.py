@@ -3,10 +3,10 @@
 '''
 Parse the output of {sample}.dgidb.txt.CompleteTable.ClinicalTrials.txt to generate
 input table for minSetCover.py. Input file: database results of drugs interacting with DE genes
-Output file: Tap separated file with three columns drug,clusters,weight
+Output file: Tab-separated file with three columns drug,clusters,weight
 
 Anne Richter, April 2018
-Franziska SInger, September 2018
+Franziska Singer, September 2018
 '''
 
 import argparse
