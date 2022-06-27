@@ -3,7 +3,7 @@
 '''
 
 This gets two inputs:
-    - {sample}.coding_region_only.cell_cycle_removed.drugToCluster.allDrugs.txt, which has three tab separated columns: drug,clusters,weight and one line for each drug from the list where a drug-gene interaction was found to a differentially expressed gene in one of the malignant cell clusters
+    - {sample}.drugToCluster.allDrugs.txt, which has three tab separated columns: drug,clusters,weight and one line for each drug from the list where a drug-gene interaction was found to a differentially expressed gene in one of the malignant cell clusters
     - the list of drugs that are especially relevant for the given cancer indication (e.g. melanoma_drug_list_converted_corrected.txt)
 
 The output is a full list of the clinically relevant drugs (rows) with one column for each malignant cluster. With "1" or "0" it is indicated if a drug-gene interaction was found between the drug and any differentially expressed gene of the respective malignant cluster.
@@ -17,7 +17,7 @@ November 2018
 import argparse
 
 parser = argparse.ArgumentParser(description='Script that generates full list of clinically relevant genes and assignment to malignant clusters, "1" or "0" depending on if the drug interacts with any differentially expressed gene of this cluster.')
-parser.add_argument('--in_drugToCluster', dest='in_drugToCluster', required=True, help='Input file of type {}.genes_cells_filtered.cell_cycle_removed.drugToCluster.filteredDrugs.txt')
+parser.add_argument('--in_drugToCluster', dest='in_drugToCluster', required=True, help='Input file of type {sample}.drugToCluster.filteredDrugs.txt')
 parser.add_argument('--in_drugList', dest='in_drugList', required=True, help='Input list of relevant drugs')
 parser.add_argument('--outFile', dest='outFile', required=True, help='Output file.')
 args = parser.parse_args()

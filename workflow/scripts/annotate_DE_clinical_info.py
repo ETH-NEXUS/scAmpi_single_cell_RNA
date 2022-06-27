@@ -18,13 +18,13 @@ function definitions
 def getPathwayInfo(pathwayDB):
     infilePathways = open(pathwayDB,'r')
     dictPathways = {}
-    
+
     for linePW in infilePathways:
         lineSplit = linePW.strip().split()
         geneName = lineSplit[0].strip("\"")  # strip to remove the " symbols
         allPWs = "".join(lineSplit[1:])
         dictPathways[geneName] = allPWs.strip("\"")
-    
+
     infilePathways.close()
     return dictPathways
 
@@ -76,8 +76,8 @@ def getClinicalTrialInfo(clinicalTrialsFile):
         drug = lineSplit[1]
         score = lineSplit[scoreColumn]
         drugType = lineSplit[drugTypeColumn]
-        clinicalTrialsInfo = lineSplit[clinTrialColumn]    
-    
+        clinicalTrialsInfo = lineSplit[clinTrialColumn]
+
         if gene not in dictClinTrials.keys():
             dictClinTrials[gene] = {}
         if drug not in dictClinTrials[gene].keys():
@@ -85,12 +85,12 @@ def getClinicalTrialInfo(clinicalTrialsFile):
         else:
             print("Warning! Frug %s already contained for gene %s!" %(drug,gene))
             continue
-        
+
         dictClinTrials[gene][drug].append(score)
         dictClinTrials[gene][drug].append(drugType)
         dictClinTrials[gene][drug].append(clinicalTrialsInfo)
         drugNum += 1
-    
+
     infileTrials.close()
     print("Found %s drugs for dgidb genes in clinical trials file.\n" %(drugNum))
     return dictClinTrials
@@ -110,7 +110,7 @@ def getGeneColumnIndex(firstInputLine):
 
 
 parser = argparse.ArgumentParser(description='Annotate variants with clincial information.')
-parser.add_argument('--inputTable', dest='inputFile', required=True, help='Input table with variants, expressionn levels, copy numbers.... Columns need to be tab separated.')
+parser.add_argument('--inputTable', dest='inputFile', required=True, help='Input table with variants, expression levels, copy numbers.... Columns need to be tab separated.')
 parser.add_argument('--outFile', dest='outFile', required=True, help='Name of the output file.')
 parser.add_argument('--colName_gene', dest='colName_gene', required=True, help='Column name of column containing gene names')
 parser.add_argument('--pathwayDB', dest='pathwayDB', required=False, help='Pathway database to annotae pathways to gene names. Optional.')
@@ -141,7 +141,7 @@ if (args.dgidb_categ is not None) and (args.clinTrials is not None):
         print("Error! Different number of genes!")
     else:
         print("Number of dgidb genes: %s." %(len(dictDGIDB_categ.keys())) )
-    
+
 # finally parse existing variant table and create new file with more detailed information per gene
 
 infile = open(args.inputFile,'r')
@@ -167,9 +167,9 @@ matchedDGIDB = []
 for line in infile:
     lineSplit = line.strip().split("\t")
     gene = lineSplit[index_geneCol]
-    
+
     outfileLine = line.strip()
-    
+
     # first include pathway
 
     if args.pathwayDB is not None:
@@ -184,15 +184,15 @@ for line in infile:
         outfile.write(outfileLine + "\n")
         outfileIndependent.write(outfileLine + "\n")
         continue
-    
+
     includeInIndependentFile = True
     for dgidbGene in dictDGIDB_categ.keys():
         if (dgidbGene in gene) and (len(gene.strip()) == len(dgidbGene.strip())):
             includeInIndependentFile = False
-            
+
             if dgidbGene not in matchedDGIDB:
                 matchedDGIDB.append(dgidbGene)
-            
+
             # drug and clincical trials info
             drugNames = ""
             clinicalTrialCancerType = ""
@@ -200,11 +200,11 @@ for line in infile:
             if dgidbGene not in dictTrialInfo.keys():
                 print("Error. Gene %s not conatined in dgidb clincial trials dict!" %(dgidbGene))
                 continue
-            
+
             for drugInteractions in dictTrialInfo[dgidbGene].keys():
                 drugNames += drugInteractions + "(" + dictTrialInfo[dgidbGene][drugInteractions][0] + "," + dictTrialInfo[dgidbGene][drugInteractions][1] + ");"
                 clinTrialInfo = dictTrialInfo[dgidbGene][drugInteractions][2]
-                
+
                 foundCT = False
                 foundNotCT = False
                 numTrialsCT = 0
@@ -258,7 +258,7 @@ for line in infile:
                     clincialTrialNotCancerType_temp_1 += ".;"
                     clincialTrialNotCancerType_temp_2 += ".;"
                     clincialTrialNotCancerType_temp_3 += ".;"
-                
+
                 # now append everything to string for outfile
                 clinicalTrialCancerType += drugInteractions + "(" + str(numTrialsCT) + "):" + clinicalTrialCancerType_temp
                 if len(clincialTrialNotCancerType_temp_3) > 0:
@@ -267,17 +267,17 @@ for line in infile:
                     clincialTrialNotCancerType += drugInteractions + "(" + str(numTrialsNotCT) + "):" + clincialTrialNotCancerType_temp_2
                 else:
                     clincialTrialNotCancerType += drugInteractions + "(" + str(numTrialsNotCT) + "):" + clincialTrialNotCancerType_temp_1
-                    
+
             outfileLine = outfileLine + "\t" + drugNames + "\t" + dictDGIDB_categ[dgidbGene][0] + "\t" + dictDGIDB_categ[dgidbGene][1]
             outfileLine = outfileLine + "\t" + clinicalTrialCancerType + "\t" + clincialTrialNotCancerType
             outfile.write(outfileLine + "\n")
             outfileIndependent.write(outfileLine + "\n")
-    
+
     if includeInIndependentFile:
         outfileLine = outfileLine + "\tNA\tNA\tNA" # drug names and dgidb_categ info columns
         outfileLine = outfileLine + "\tNA\tNA" # clinical trial info
         outfileIndependent.write(outfileLine + "\n")
-                    
+
 infile.close()
 outfile.close()
 outfileIndependent.close()
