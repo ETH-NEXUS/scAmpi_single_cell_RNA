@@ -251,15 +251,3 @@ tools:
   find_minSetCover:
     # considerClusterSize "yes" or "no"
     variousParams: "--considerClusterSize no"
-
-
-
-
-  # aggregate all results from the clinical part of the scAmpi pipeline
-  aggregate:
-      # the two variables `suffix` and `result_outdir` define the end point of the clinical part of scampi for cases where none of the "aggregating" rules is triggered.
-      # This is interesting for debugging.
-      # suffix and result_outdir must match and correspond to the output of the last rule
-      # that should be performed.
-      suffix: "dgidb.txt.CompleteTable.ClinicalTrials.filteredDrugs"
-      result_outdir: "clinical_trials"
