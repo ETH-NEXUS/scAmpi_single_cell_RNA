@@ -72,7 +72,7 @@ rule query_clinical_trials:
         whiteList = config['tools']['query_clinical_trials']['whiteList'],
         blackList = config['tools']['query_clinical_trials']['blackList'],
         outDirec = 'results/clinical_trials/',
-        custom_script = workflow.source_path("../scripts/queryClinicalTrials.py"),
+        custom_script = workflow.source_path("../scripts/query_clinical_trials.py"),
     conda:
         '../envs/query_clinical_trials.yaml'
     resources:

@@ -201,11 +201,6 @@ tools:
 
   # query clinical trials data base
   query_clinical_trials:
-    call: "python /path_to_scAmpi_git/scripts/queryClinicalTrials.py "
-    scratch: "3000"
-    mem: "500"
-    time: "200"
-    threads: 8
     # white and black list to determine if study is disease-specific or not
     # comma separated lists, no spaces
     whiteList: "melanoma,solid tumor"
