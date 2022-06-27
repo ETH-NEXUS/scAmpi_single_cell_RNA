@@ -1,14 +1,14 @@
 #!/usr/bin/env python
 
 '''
-Given a table (of type {sample}.coding_region_only.cell_cycle_removed.phenograph_celltype_association.txt) that sums up information about celltype classification and phenograph clustering this script per cluster determines for each malignant cluster: the number of cells in respective cluster, the total number of malignant cells and the percentage of malignant cells in respective cluster
+Given a table (of type {sample}.atypical_removed.phenograph_celltype_association.txt) that sums up information about celltype classification and phenograph clustering this script per cluster determines for each malignant cluster: the number of cells in respective cluster, the total number of malignant cells and the percentage of malignant cells in respective cluster
 Anne Richter, March 2018
 '''
 
 import argparse
 
 parser = argparse.ArgumentParser(description='Gives out number of cells per malignant cluster and percentage of total cells per cluster.')
-parser.add_argument('--inputTable', dest='inputFile', required=True, help='Input table {sample}.coding_region_only.cell_cycle_removed.phenograph_celltype_association.txt that sums up information of celltype classification and phenograph clustering.')
+parser.add_argument('--inputTable', dest='inputFile', required=True, help='Input table {sample}.atypical_removed.phenograph_celltype_association.txt that sums up information of celltype classification and phenograph clustering.')
 parser.add_argument('--outFile', dest='outFile', required=True, help='Name of output file.')
 parser.add_argument('--malignant', dest='malignant', required=True, help='Term that is given as label to clusters with predominantly malignant celltype (e.g. melanoma)')
 

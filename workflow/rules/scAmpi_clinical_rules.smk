@@ -362,7 +362,7 @@ rule parse_for_minSetCover:
 # calculate for each cluster the number of cells it countains and the percentage of all cells
 rule cell_percent_in_cluster:
     input:
-        clusterCsv = 'results/atypical_removed/{sample}.atypical_removed.phenograph_celltype_association.txt'
+        cluster_txt = 'results/atypical_removed/{sample}.atypical_removed.phenograph_celltype_association.txt'
     output:
         out = 'results/clustering/{sample}.clusters_cell_count_percent.txt'
     params:
@@ -381,7 +381,7 @@ rule cell_percent_in_cluster:
         'logs/benchmark/clustering/{sample}.clusterPercent.benchmark'
     shell:
         'python {params.custom_script} '
-        '--inputTable {input.clusterCsv} '
+        '--inputTable {input.cluster_txt} '
         '--outFile {output.out} '
         '{params.variousParams} '
         '&> {log} '
