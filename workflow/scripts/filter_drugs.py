@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
 '''
-Given a list of drug-gene interactions and a list of preferred Melanoma drugs this script
-filters the first list and gives out only those drug-gene interactions of drugs 
+Given a list of drug-gene interactions and a list of preferred drugs this script
+filters the first list and gives out only those drug-gene interactions of drugs
 that are also found in the second list
 
 Anne Richter, April 2018
@@ -11,10 +11,10 @@ Anne Richter, April 2018
 import argparse
 import re
 
-parser = argparse.ArgumentParser(description='Filters drug-gene interaction entries after occurrence in the melanoma drug list.')
+parser = argparse.ArgumentParser(description='Filters drug-gene interaction entries after occurrence in the drug list.')
 parser.add_argument('--inFile', dest='inFile', required=True, help='Input file of type {sample}.dgidb.txt.CompleteTable.ClinicalTrials.txt containing drug-gene interactions of DE genes')
 parser.add_argument('--outFile', dest='outFile', required=True, help='Name of output file.')
-parser.add_argument('--drugList', dest='drugList', required=True, help='Drug list for cancer drugs that are clinically preferred, tab delimited file of type "orig-name,rank (comment),approved for melanoma (CH) ?"')
+parser.add_argument('--drugList', dest='drugList', required=True, help='Drug list for cancer drugs that are clinically preferred, tab delimited file of type "orig-name,rank (comment), approved or off-label"')
 
 args = parser.parse_args()
 
@@ -29,9 +29,6 @@ for line in druglist:
     drugName = lineSplit[0]
     drugName = drugName.upper()
     dictDrugs.setdefault(drugName,[]).append(lineSplit[1])
-    #dictDrugs[drugName].append(lineSplit[2])
-#for key in dictDrugs:
-#    print(key)
 druglist.close()
 
 # infile is list of drug-gene interactions of DE genes
