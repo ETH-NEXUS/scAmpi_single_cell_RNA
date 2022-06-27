@@ -556,7 +556,7 @@ rule plot_drug_prediction:
         inputDir = 'results/query_civic/',
         outputDirec = 'results/plot_drug_prediction/',
         variousParams = config['tools']['plot_drug_prediction']['variousParams'],
-        custom_script = workflow.source_path("../scripts/show_drugPrediction_on_clones.R"),
+        custom_script = workflow.source_path("../scripts/plot_drug_prediction_on_clones.R"),
     conda:
         '../envs/plot_drug_prediction.yaml'
     resources:

@@ -155,6 +155,12 @@ sce_data = readRDS(opt$SCE)
 
 # Generate right pattern for retrieving necessary input files
 endPattern = gsub("\\.", "\\\\.", opt$drugPredEnd) %&% "$"
+
+# NOTE: it is critical that the given --sampleName parameter is included in the search pattern,
+# as files from many different samples can exist in --drugPredDir
+endPattern = paste0(opt$sampleName, "\\.[[:digit:]]+\\.", endPattern)
+cat("\n\n\nendPattern used to find the input files:\n", endPattern, "\n\n")
+
 # Retrieve drug predictions files for all detected *malignant* cell clusters (1 file per cluster)
 files = list.files(path=opt$drugPredDir, pattern=endPattern, full.names=TRUE)
 
