@@ -8,18 +8,18 @@ channels:
 dependencies:
   - snakemake
 ## R
-  - r>=4.0
+  - "r >= 4.1"
   - bioconductor-rdgidb
   - r-optparse
   - bioconductor-rhdf5
-  - r-plyr
-  - r-ggplot2
+  - "r-plyr >= 1.8.6"
+  - "r-ggplot2 >= 3.3.5"
   - r-rcolorbrewer
   - bioconductor-biomart
   - bioconductor-scdblfinder
   - bioconductor-singlecellexperiment
   - bioconductor-scran
-  - r-sctransform
+  - "r-sctransform >= 0.3.3"
   - r-uwot
   - r-igraph
   - r-reshape2
@@ -48,6 +48,8 @@ dependencies:
   - r-multcomp
   - bioconductor-gsva
   - r-upsetr
+  - "r-glue >= 1.6.2"
+  - "r-tidyselect >= 1.1.1"
 ## python
   - scipy
   - configargparse
@@ -55,3 +57,8 @@ dependencies:
   - pip
   - numpy
   - pandas
+  - "leidenalg >= 0.8.4"
+## tools installed via pip install
+  - pip:
+      - PhenoGraph
+      - civicpy
