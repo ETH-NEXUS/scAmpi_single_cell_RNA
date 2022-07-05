@@ -1,6 +1,6 @@
 # Changelog
 
-## [2.0.0] - 2022-06-xx
+## [2.0.0] - 2022-07-05
 The scAmpi pipeline framework was fully revised to follow the current Snakemake best practices.
 No changes were made regarding the analysis steps.
 
