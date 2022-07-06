@@ -1,0 +1,10 @@
+# find env in scAmpi_single_cell_RNA/workflow/envs/gene_set_enrichment.yaml
+name: gene_set_enrichment
+channels:
+    - conda-forge
+    - bioconda
+    - r
+    - defaults
+dependencies:
+    - "r>=4.0"
+    - "bioconductor-limma>=3.46.0"

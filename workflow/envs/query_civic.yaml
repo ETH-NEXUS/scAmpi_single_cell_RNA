@@ -1,0 +1,12 @@
+# find env in scAmpi_single_cell_RNA/workflow/envs/query_civic.yaml
+name: query_civic
+channels:
+    - conda-forge
+    - bioconda
+    - defaults
+dependencies:
+    - "python>=3.9"
+    - "configargparse>=1.4"
+    - "pip>=21.0.1"
+    - pip:
+        - "civicpy>=1.1.3"

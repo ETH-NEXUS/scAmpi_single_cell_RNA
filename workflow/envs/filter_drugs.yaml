@@ -1,0 +1,9 @@
+# find env in scAmpi_single_cell_RNA/workflow/envs/filter_drugs.yaml
+name: filter_drugs
+channels:
+    - conda-forge
+    - bioconda
+    - defaults
+dependencies:
+    - "python>=3.9"
+    - "configargparse>=1.4"

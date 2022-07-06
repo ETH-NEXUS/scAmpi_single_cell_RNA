@@ -1,0 +1,5 @@
+results
+logs
+.lintr
+.snakemake
+*__pycache__*

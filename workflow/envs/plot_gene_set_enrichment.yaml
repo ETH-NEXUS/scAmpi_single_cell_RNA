@@ -1,0 +1,13 @@
+# find env in scAmpi_single_cell_RNA/workflow/envs/plot_gene_set_enrichment.yaml
+name: plot_gene_set_enrichment
+channels:
+    - conda-forge
+    - bioconda
+    - r
+    - defaults
+dependencies:
+    - "r>=4.0"
+    - "r-reshape2>=1.4.4"
+    - "r-ggplot2>=3.3.3"
+    - "r-gridextra>=2.3"
+    - "r-gtable>=0.3.0"

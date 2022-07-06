@@ -1,0 +1,9 @@
+# find env in scAmpi_single_cell_RNA/workflow/envs/parse_for_minSetCover.yaml
+name: parse_for_minSetCover
+channels:
+    - conda-forge
+    - bioconda
+    - defaults
+dependencies:
+    - "python>=3.9"
+    - "configargparse>=1.4"

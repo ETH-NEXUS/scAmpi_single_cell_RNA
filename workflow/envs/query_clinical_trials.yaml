@@ -1,0 +1,9 @@
+# find env in scAmpi_single_cell_RNA/workflow/envs/query_clinical_trials.yaml
+name: query_clinical_trials
+channels:
+    - conda-forge
+    - bioconda
+    - defaults
+dependencies:
+    - "python>=3.9"
+    - "numpy>=1.20.2"
