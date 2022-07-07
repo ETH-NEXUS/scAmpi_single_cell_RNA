@@ -7,7 +7,7 @@ inputOutput:
 resources:
   # cellranger
   # The following needs to point to the reference transcriptome that will be used by cellranger.
-  reference_transcriptome: "refdata-cellranger-GRCh38-3.0.0"
+  reference_transcriptome: "refdata-gex-GRCh38-2020-A/"
 
   # star solo
   # reference genome index for mapping with starsolo
