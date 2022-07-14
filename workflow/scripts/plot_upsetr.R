@@ -75,7 +75,7 @@ No Upset plot could be generated.")+
 if (ncol(druglist)>2){
   # open PNG file for writing, generate upset plot, close and export PNG
   png(opt$outFile, width = 2200, height = 1800, res = 300)
-  upset(data=druglist, nsets=opt_nsets, nintersects=opt_nintersects, order.by=c("freq"), 
+  p1 <- upset(data=druglist, nsets=opt_nsets, nintersects=opt_nintersects, order.by=c("freq"), 
                    #intersections = list("X0", "X1", "X2", "X3", "X4", "X5", "X6", "X7"),
                    matrix.color = 3,        # color of dots and lines
                    shade.color = 3,        # shading in table
@@ -96,6 +96,7 @@ if (ncol(druglist)>2){
                    # Can be a universal scale, or a vector containing individual scales in the following format: 
                    # c(intersection size title, intersection size tick labels, set size title, set size tick labels, set names, numbers above bars)
                    )
+  print(p1)
   dev.off()
 }
 
