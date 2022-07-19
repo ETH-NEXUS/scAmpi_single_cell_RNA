@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.0.1] - 2022-07-19
+
+### Changed
+- Update example Ovarian cancer cell types to include Mesothelial cells and pDCs
+
+### Fixed
+- Fix empty output plot from rule `plot_upsetr`
+
 ## [2.0.0] - 2022-07-05
 The scAmpi pipeline framework was fully revised to follow the current Snakemake best practices.
 No changes were made regarding the analysis steps.
