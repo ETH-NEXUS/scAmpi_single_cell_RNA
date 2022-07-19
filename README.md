@@ -96,12 +96,17 @@ snakemake -s workflow/snakefile_clinical.smk --configfile config/config.yaml -j 
 ### A note on using CIViC
 
 The CIViC query implemented in scAmpi makes use of an offline cache file of the CIViC database. The cache is retrieved with the initial installation of the scAmpi software. Afterwards, users have to manually update the cache file if they want to use a new version.
-To update the cache file, load the scAmpi environemnt and open an R session.
+To update the cache file, load the respective conda environemnt and open a Python session.
 Then type:
 
 ```
 >> civic.update_cache()
 ```
+
+### A note on the clinical trials query
+
+From `clinicaltrials.gov` information about clinical trials is downloaded into the a zipped file `cancer_clinicalTrials.zip` that is unzipped for the subsequent queries. The resulting directory contains a large number of files that you can delete after the successful run, keeping only the zipped version.
+
 
 ### Running scAmpi_clinical independently
 
