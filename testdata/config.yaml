@@ -42,9 +42,9 @@ resources:
 # If there aren't enough resources specified it can be adapted in the tools corresponding section.
 computingResources:
   mem:
-    low: 400
-    medium: 4000
-    high: 10000
+    low: 2000
+    medium: 16000
+    high: 40000
   runtime:
     low: 60
     medium: 500
