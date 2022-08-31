@@ -81,7 +81,7 @@ rule starsolo:
         variousParams=config["tools"]["starsolo"]["variousParams"],
     resources:
         mem_mb=config["tools"]["starsolo"]["mem"],
-        time_min=config["tools"]["starsolo"]["time"],
+        runtime=config["tools"]["starsolo"]["runtime"],
     threads: config["tools"]["starsolo"]["threads"]
     log:
         "logs/starsolo/{sample}.log",

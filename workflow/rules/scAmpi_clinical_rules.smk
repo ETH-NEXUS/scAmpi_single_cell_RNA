@@ -14,7 +14,7 @@ rule parse_filter_DE_genes:
         "../envs/parse_filter_DE_genes.yaml"
     resources:
         mem_mb=config["computingResources"]["mem"]["low"],
-        time_min=config["computingResources"]["time"]["low"],
+        runtime=config["computingResources"]["runtime"]["low"],
     threads: config["computingResources"]["threads"]["low"]
     log:
         "logs/parse_filter_DE_genes/{sample}.{i}.log",
@@ -44,7 +44,7 @@ rule query_dgidb:
         "../envs/query_dgidb.yaml"
     resources:
         mem_mb=config["computingResources"]["mem"]["medium"],
-        time_min=config["computingResources"]["time"]["low"],
+        runtime=config["computingResources"]["runtime"]["low"],
     threads: config["computingResources"]["threads"]["medium"]
     log:
         "logs/query_dgidb/{sample}.{i}.log",
@@ -76,7 +76,7 @@ rule query_clinical_trials:
         "../envs/query_clinical_trials.yaml"
     resources:
         mem_mb=config["computingResources"]["mem"]["low"],
-        time_min=config["computingResources"]["time"]["medium"],
+        runtime=config["computingResources"]["runtime"]["medium"],
     threads: config["computingResources"]["threads"]["medium"]
     log:
         "logs/query_clinical_trials/{sample}.{i}.log",
@@ -101,7 +101,7 @@ rule download_clinical_trials:
         outDirec="results/clinical_trials/",
     resources:
         mem_mb=config["computingResources"]["mem"]["low"],
-        time_min=config["computingResources"]["time"]["medium"],
+        runtime=config["computingResources"]["runtime"]["medium"],
     threads: config["computingResources"]["threads"]["medium"]
     benchmark:
         "logs/benchmark/clinical_trials/downloadClinicalTrials.benchmark"
@@ -132,7 +132,7 @@ rule annotate_DE_clinical_info:
         "../envs/annotate_DE_clinical_info.yaml"
     resources:
         mem_mb=config["computingResources"]["mem"]["low"],
-        time_min=config["computingResources"]["time"]["low"],
+        runtime=config["computingResources"]["runtime"]["low"],
     threads: config["computingResources"]["threads"]["low"]
     log:
         "logs/annotate_DE_clinical_info/{sample}.{i}.log",
@@ -167,7 +167,7 @@ rule query_civic:
         "../envs/query_civic.yaml"
     resources:
         mem_mb=config["computingResources"]["mem"]["medium"],
-        time_min=config["computingResources"]["time"]["low"],
+        runtime=config["computingResources"]["runtime"]["low"],
     threads: config["computingResources"]["threads"]["low"]
     log:
         "logs/query_civic/{sample}.{i}.log",
@@ -200,7 +200,7 @@ rule gene_set_enrichment:
         "../envs/gene_set_enrichment.yaml"
     resources:
         mem_mb=config["computingResources"]["mem"]["low"],
-        time_min=config["computingResources"]["time"]["low"],
+        runtime=config["computingResources"]["runtime"]["low"],
     threads: config["computingResources"]["threads"]["low"]
     log:
         "logs/gene_set_enrichment/{sample}.{i}.log",
@@ -229,7 +229,7 @@ rule gene_set_enrichment_mal_vs_mal:
         "../envs/gene_set_enrichment.yaml"
     resources:
         mem_mb=config["computingResources"]["mem"]["low"],
-        time_min=config["computingResources"]["time"]["low"],
+        runtime=config["computingResources"]["runtime"]["low"],
     threads: config["computingResources"]["threads"]["low"]
     log:
         "logs/gene_set_enrichment_mal_vs_mal/{sample}.{i}.log",
@@ -283,7 +283,7 @@ rule plot_gene_set_enrichment:
         "../envs/plot_gene_set_enrichment.yaml"
     resources:
         mem_mb=config["computingResources"]["mem"]["low"],
-        time_min=config["computingResources"]["time"]["low"],
+        runtime=config["computingResources"]["runtime"]["low"],
     threads: config["computingResources"]["threads"]["low"]
     log:
         "logs/plot_gene_set_enrichment/{sample}.log",
@@ -310,7 +310,7 @@ rule plot_gene_set_enrichment_mal_vs_mal:
         "../envs/plot_gene_set_enrichment.yaml"
     resources:
         mem_mb=config["computingResources"]["mem"]["low"],
-        time_min=config["computingResources"]["time"]["low"],
+        runtime=config["computingResources"]["runtime"]["low"],
     threads: config["computingResources"]["threads"]["low"]
     log:
         "logs/plot_gene_set_enrichment_mal_vs_mal/{sample}.log",
@@ -353,7 +353,7 @@ rule parse_for_minSetCover:
         "../envs/parse_for_minSetCover.yaml"
     resources:
         mem_mb=config["computingResources"]["mem"]["low"],
-        time_min=config["computingResources"]["time"]["low"],
+        runtime=config["computingResources"]["runtime"]["low"],
     threads: config["computingResources"]["threads"]["low"]
     log:
         "logs/parse_for_minSetCover/{sample}.{type}.log",
@@ -382,7 +382,7 @@ rule cell_percent_in_cluster:
         "../envs/cell_percent_in_cluster.yaml"
     resources:
         mem_mb=config["computingResources"]["mem"]["medium"],
-        time_min=config["computingResources"]["time"]["low"],
+        runtime=config["computingResources"]["runtime"]["low"],
     threads: config["computingResources"]["threads"]["medium"]
     log:
         "logs/cell_percent_in_cluster/{sample}.log",
@@ -410,7 +410,7 @@ rule find_minSetCover:
         "../envs/find_minSetCover.yaml"
     resources:
         mem_mb=config["computingResources"]["mem"]["low"],
-        time_min=config["computingResources"]["time"]["low"],
+        runtime=config["computingResources"]["runtime"]["low"],
     threads: config["computingResources"]["threads"]["low"]
     log:
         "logs/find_minSetCover/{sample}.{type}.log",
@@ -438,7 +438,7 @@ rule filter_drugs:
         "../envs/filter_drugs.yaml"
     resources:
         mem_mb=config["computingResources"]["mem"]["low"],
-        time_min=config["computingResources"]["time"]["low"],
+        runtime=config["computingResources"]["runtime"]["low"],
     threads: config["computingResources"]["threads"]["low"]
     log:
         "logs/filter_drugs/{sample}.{i}.log",
@@ -466,7 +466,7 @@ rule preprocess_upsetr_plot:
         "../envs/preprocess_upsetr_plot.yaml"
     resources:
         mem_mb=config["computingResources"]["mem"]["low"],
-        time_min=config["computingResources"]["time"]["low"],
+        runtime=config["computingResources"]["runtime"]["low"],
     threads: config["computingResources"]["threads"]["low"]
     log:
         "logs/preprocess_upsetr_plot/{sample}.{type}.log",
@@ -493,7 +493,7 @@ rule plot_upsetr:
         "../envs/plot_upsetr.yaml"
     resources:
         mem_mb=config["computingResources"]["mem"]["low"],
-        time_min=config["computingResources"]["time"]["low"],
+        runtime=config["computingResources"]["runtime"]["low"],
     threads: config["computingResources"]["threads"]["low"]
     log:
         "logs/plot_upsetr/{sample}.{type}.log",
@@ -524,7 +524,7 @@ rule get_full_druglist_to_subclones:
         "../envs/get_full_druglist_to_subclones.yaml"
     resources:
         mem_mb=config["computingResources"]["mem"]["low"],
-        time_min=config["computingResources"]["time"]["low"],
+        runtime=config["computingResources"]["runtime"]["low"],
     threads: config["computingResources"]["threads"]["low"]
     log:
         "logs/get_full_druglist_to_subclones/{sample}.log",
@@ -572,7 +572,7 @@ rule plot_drug_prediction:
         "../envs/plot_drug_prediction.yaml"
     resources:
         mem_mb=config["computingResources"]["mem"]["medium"],
-        time_min=config["computingResources"]["time"]["low"],
+        runtime=config["computingResources"]["runtime"]["low"],
     threads: config["computingResources"]["threads"]["medium"]
     log:
         "logs/plot_drug_prediction/{sample}.log",

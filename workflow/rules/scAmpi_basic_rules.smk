@@ -17,7 +17,7 @@ rule cellranger_count:
         mySample="{sample}",
     resources:
         mem_mb=config["tools"]["cellranger_count"]["mem"],
-        time_min=config["tools"]["cellranger_count"]["time"],
+        runtime=config["tools"]["cellranger_count"]["runtime"],
     threads: config["tools"]["cellranger_count"]["local_cores"]
     log:
         "logs/cellranger_count/{sample}.log",
@@ -60,7 +60,7 @@ rule create_hdf5:
         "../envs/create_hdf5.yaml"
     resources:
         mem_mb=config["computingResources"]["mem"]["medium"],
-        time_min=config["computingResources"]["time"]["low"],
+        runtime=config["computingResources"]["runtime"]["low"],
     threads: config["computingResources"]["threads"]["medium"]
     log:
         "logs/create_hdf5/{sample}.log",
@@ -89,7 +89,7 @@ rule identify_doublets:
         "../envs/identify_doublets.yaml"
     resources:
         mem_mb=config["computingResources"]["mem"]["medium"],
-        time_min=config["computingResources"]["time"]["low"],
+        runtime=config["computingResources"]["runtime"]["low"],
     threads: config["computingResources"]["threads"]["medium"]
     log:
         "logs/identify_doublets/{sample}.log",
@@ -132,7 +132,7 @@ rule filter_genes_and_cells:
         "../envs/filter_genes_and_cells.yaml"
     resources:
         mem_mb=config["computingResources"]["mem"]["medium"],
-        time_min=config["computingResources"]["time"]["low"],
+        runtime=config["computingResources"]["runtime"]["low"],
     threads: config["computingResources"]["threads"]["medium"]
     log:
         "logs/filter_genes_and_cells/{sample}.log",
@@ -173,7 +173,7 @@ rule sctransform_preprocessing:
         "../envs/sctransform_preprocessing.yaml"
     resources:
         mem_mb=config["computingResources"]["mem"]["medium"],
-        time_min=config["computingResources"]["time"]["medium"],
+        runtime=config["computingResources"]["runtime"]["medium"],
     threads: config["computingResources"]["threads"]["medium"]
     log:
         "logs/sctransform_preprocessing/{sample}.log",
@@ -207,7 +207,7 @@ rule phenograph:
         "../envs/phenograph.yaml"
     resources:
         mem_mb=config["computingResources"]["mem"]["medium"],
-        time_min=config["computingResources"]["time"]["low"],
+        runtime=config["computingResources"]["runtime"]["low"],
     threads: config["computingResources"]["threads"]["medium"]
     log:
         "logs/phenograph/{sample}.log",
@@ -243,7 +243,7 @@ rule prepare_celltyping:
         "../envs/prepare_celltyping.yaml"
     resources:
         mem_mb=config["computingResources"]["mem"]["medium"],
-        time_min=config["computingResources"]["time"]["low"],
+        runtime=config["computingResources"]["runtime"]["low"],
     threads: config["computingResources"]["threads"]["medium"]
     log:
         "logs/prepare_celltyping/{sample}.log",
@@ -278,7 +278,7 @@ rule celltyping:
         "../envs/celltyping.yaml"
     resources:
         mem_mb=config["computingResources"]["mem"]["medium"],
-        time_min=config["computingResources"]["time"]["medium"],
+        runtime=config["computingResources"]["runtime"]["medium"],
     threads: config["computingResources"]["threads"]["medium"]
     log:
         "logs/celltyping/{sample}.log",
@@ -315,7 +315,7 @@ rule remove_atypical_cells:
         "../envs/remove_atypical_cells.yaml"
     resources:
         mem_mb=config["computingResources"]["mem"]["medium"],
-        time_min=config["computingResources"]["time"]["low"],
+        runtime=config["computingResources"]["runtime"]["low"],
     threads: config["computingResources"]["threads"]["medium"]
     log:
         "logs/remove_atypical_cells/{sample}.log",
@@ -349,7 +349,7 @@ rule gsva:
         "../envs/gsva.yaml"
     resources:
         mem_mb=config["computingResources"]["mem"]["medium"],
-        time_min=config["computingResources"]["time"]["medium"],
+        runtime=config["computingResources"]["runtime"]["medium"],
     threads: config["computingResources"]["threads"]["medium"]
     log:
         "logs/gsva/{sample}.log",
@@ -381,7 +381,7 @@ rule plotting:
         "../envs/plotting.yaml"
     resources:
         mem_mb=config["computingResources"]["mem"]["medium"],
-        time_min=config["computingResources"]["time"]["medium"],
+        runtime=config["computingResources"]["runtime"]["medium"],
     threads: config["computingResources"]["threads"]["medium"]
     log:
         "logs/plotting/{sample}.log",
@@ -415,7 +415,7 @@ rule gene_exp:
         "../envs/gene_exp.yaml"
     resources:
         mem_mb=config["computingResources"]["mem"]["medium"],
-        time_min=config["computingResources"]["time"]["low"],
+        runtime=config["computingResources"]["runtime"]["low"],
     threads: config["computingResources"]["threads"]["medium"]
     log:
         "logs/gene_exp/{sample}.log",
@@ -446,7 +446,7 @@ rule generate_qc_plots_raw:
         "../envs/generate_qc_plots.yaml"
     resources:
         mem_mb=config["computingResources"]["mem"]["medium"],
-        time_min=config["computingResources"]["time"]["low"],
+        runtime=config["computingResources"]["runtime"]["low"],
     threads: config["computingResources"]["threads"]["medium"]
     log:
         "logs/generate_qc_plots/{sample}.raw.log",
@@ -475,7 +475,7 @@ rule generate_qc_plots_filtered:
         "../envs/generate_qc_plots.yaml"
     resources:
         mem_mb=config["computingResources"]["mem"]["medium"],
-        time_min=config["computingResources"]["time"]["low"],
+        runtime=config["computingResources"]["runtime"]["low"],
     threads: config["computingResources"]["threads"]["medium"]
     log:
         "logs/generate_qc_plots/{sample}.genes_cells_filtered.log",
@@ -515,7 +515,7 @@ checkpoint diff_exp_analysis:
         "../envs/diff_exp_analysis.yaml"
     resources:
         mem_mb=config["computingResources"]["mem"]["medium"],
-        time_min=config["computingResources"]["time"]["high"],
+        runtime=config["computingResources"]["runtime"]["high"],
     threads: config["computingResources"]["threads"]["medium"]
     log:
         "logs/diff_exp_analysis/{sample}.log",
