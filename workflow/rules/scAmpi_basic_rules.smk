@@ -16,7 +16,7 @@ rule cellranger_count:
         # NOTE: no dots are allowed in sample names!
         mySample="{sample}",
     resources:
-        mem_mb=config["tools"]["cellranger_count"]["mem"],
+        mem_mb=config["tools"]["cellranger_count"]["mem_mb"],
         runtime=config["tools"]["cellranger_count"]["runtime"],
     threads: config["tools"]["cellranger_count"]["local_cores"]
     log:
@@ -59,7 +59,7 @@ rule create_hdf5:
     conda:
         "../envs/create_hdf5.yaml"
     resources:
-        mem_mb=config["computingResources"]["mem"]["medium"],
+        mem_mb=config["computingResources"]["mem_mb"]["medium"],
         runtime=config["computingResources"]["runtime"]["low"],
     threads: config["computingResources"]["threads"]["medium"]
     log:
@@ -88,7 +88,7 @@ rule identify_doublets:
     conda:
         "../envs/identify_doublets.yaml"
     resources:
-        mem_mb=config["computingResources"]["mem"]["medium"],
+        mem_mb=config["computingResources"]["mem_mb"]["medium"],
         runtime=config["computingResources"]["runtime"]["low"],
     threads: config["computingResources"]["threads"]["medium"]
     log:
@@ -131,7 +131,7 @@ rule filter_genes_and_cells:
     conda:
         "../envs/filter_genes_and_cells.yaml"
     resources:
-        mem_mb=config["computingResources"]["mem"]["medium"],
+        mem_mb=config["computingResources"]["mem_mb"]["medium"],
         runtime=config["computingResources"]["runtime"]["low"],
     threads: config["computingResources"]["threads"]["medium"]
     log:
@@ -172,7 +172,7 @@ rule sctransform_preprocessing:
     conda:
         "../envs/sctransform_preprocessing.yaml"
     resources:
-        mem_mb=config["computingResources"]["mem"]["medium"],
+        mem_mb=config["computingResources"]["mem_mb"]["medium"],
         runtime=config["computingResources"]["runtime"]["medium"],
     threads: config["computingResources"]["threads"]["medium"]
     log:
@@ -206,7 +206,7 @@ rule phenograph:
     conda:
         "../envs/phenograph.yaml"
     resources:
-        mem_mb=config["computingResources"]["mem"]["medium"],
+        mem_mb=config["computingResources"]["mem_mb"]["medium"],
         runtime=config["computingResources"]["runtime"]["low"],
     threads: config["computingResources"]["threads"]["medium"]
     log:
@@ -242,7 +242,7 @@ rule prepare_celltyping:
     conda:
         "../envs/prepare_celltyping.yaml"
     resources:
-        mem_mb=config["computingResources"]["mem"]["medium"],
+        mem_mb=config["computingResources"]["mem_mb"]["medium"],
         runtime=config["computingResources"]["runtime"]["low"],
     threads: config["computingResources"]["threads"]["medium"]
     log:
@@ -277,7 +277,7 @@ rule celltyping:
     conda:
         "../envs/celltyping.yaml"
     resources:
-        mem_mb=config["computingResources"]["mem"]["medium"],
+        mem_mb=config["computingResources"]["mem_mb"]["medium"],
         runtime=config["computingResources"]["runtime"]["medium"],
     threads: config["computingResources"]["threads"]["medium"]
     log:
@@ -314,7 +314,7 @@ rule remove_atypical_cells:
     conda:
         "../envs/remove_atypical_cells.yaml"
     resources:
-        mem_mb=config["computingResources"]["mem"]["medium"],
+        mem_mb=config["computingResources"]["mem_mb"]["medium"],
         runtime=config["computingResources"]["runtime"]["low"],
     threads: config["computingResources"]["threads"]["medium"]
     log:
@@ -348,7 +348,7 @@ rule gsva:
     conda:
         "../envs/gsva.yaml"
     resources:
-        mem_mb=config["computingResources"]["mem"]["medium"],
+        mem_mb=config["computingResources"]["mem_mb"]["medium"],
         runtime=config["computingResources"]["runtime"]["medium"],
     threads: config["computingResources"]["threads"]["medium"]
     log:
@@ -380,7 +380,7 @@ rule plotting:
     conda:
         "../envs/plotting.yaml"
     resources:
-        mem_mb=config["computingResources"]["mem"]["medium"],
+        mem_mb=config["computingResources"]["mem_mb"]["medium"],
         runtime=config["computingResources"]["runtime"]["medium"],
     threads: config["computingResources"]["threads"]["medium"]
     log:
@@ -414,7 +414,7 @@ rule gene_exp:
     conda:
         "../envs/gene_exp.yaml"
     resources:
-        mem_mb=config["computingResources"]["mem"]["medium"],
+        mem_mb=config["computingResources"]["mem_mb"]["medium"],
         runtime=config["computingResources"]["runtime"]["low"],
     threads: config["computingResources"]["threads"]["medium"]
     log:
@@ -445,7 +445,7 @@ rule generate_qc_plots_raw:
     conda:
         "../envs/generate_qc_plots.yaml"
     resources:
-        mem_mb=config["computingResources"]["mem"]["medium"],
+        mem_mb=config["computingResources"]["mem_mb"]["medium"],
         runtime=config["computingResources"]["runtime"]["low"],
     threads: config["computingResources"]["threads"]["medium"]
     log:
@@ -474,7 +474,7 @@ rule generate_qc_plots_filtered:
     conda:
         "../envs/generate_qc_plots.yaml"
     resources:
-        mem_mb=config["computingResources"]["mem"]["medium"],
+        mem_mb=config["computingResources"]["mem_mb"]["medium"],
         runtime=config["computingResources"]["runtime"]["low"],
     threads: config["computingResources"]["threads"]["medium"]
     log:
@@ -514,7 +514,7 @@ checkpoint diff_exp_analysis:
     conda:
         "../envs/diff_exp_analysis.yaml"
     resources:
-        mem_mb=config["computingResources"]["mem"]["medium"],
+        mem_mb=config["computingResources"]["mem_mb"]["medium"],
         runtime=config["computingResources"]["runtime"]["high"],
     threads: config["computingResources"]["threads"]["medium"]
     log:

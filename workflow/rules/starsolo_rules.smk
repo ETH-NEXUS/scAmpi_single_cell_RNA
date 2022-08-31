@@ -80,7 +80,7 @@ rule starsolo:
         soloUMIlen=config["tools"]["starsolo"]["soloUMIlen"],
         variousParams=config["tools"]["starsolo"]["variousParams"],
     resources:
-        mem_mb=config["tools"]["starsolo"]["mem"],
+        mem_mb=config["tools"]["starsolo"]["mem_mb"],
         runtime=config["tools"]["starsolo"]["runtime"],
     threads: config["tools"]["starsolo"]["threads"]
     log:

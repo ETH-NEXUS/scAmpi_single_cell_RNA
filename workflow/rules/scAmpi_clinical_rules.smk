@@ -13,7 +13,7 @@ rule parse_filter_DE_genes:
     conda:
         "../envs/parse_filter_DE_genes.yaml"
     resources:
-        mem_mb=config["computingResources"]["mem"]["low"],
+        mem_mb=config["computingResources"]["mem_mb"]["low"],
         runtime=config["computingResources"]["runtime"]["low"],
     threads: config["computingResources"]["threads"]["low"]
     log:
@@ -43,7 +43,7 @@ rule query_dgidb:
     conda:
         "../envs/query_dgidb.yaml"
     resources:
-        mem_mb=config["computingResources"]["mem"]["medium"],
+        mem_mb=config["computingResources"]["mem_mb"]["medium"],
         runtime=config["computingResources"]["runtime"]["low"],
     threads: config["computingResources"]["threads"]["medium"]
     log:
@@ -75,7 +75,7 @@ rule query_clinical_trials:
     conda:
         "../envs/query_clinical_trials.yaml"
     resources:
-        mem_mb=config["computingResources"]["mem"]["low"],
+        mem_mb=config["computingResources"]["mem_mb"]["low"],
         runtime=config["computingResources"]["runtime"]["medium"],
     threads: config["computingResources"]["threads"]["medium"]
     log:
@@ -100,7 +100,7 @@ rule download_clinical_trials:
         cancerType=config["tools"]["download_clinical_trials"]["cancerType"],
         outDirec="results/clinical_trials/",
     resources:
-        mem_mb=config["computingResources"]["mem"]["low"],
+        mem_mb=config["computingResources"]["mem_mb"]["low"],
         runtime=config["computingResources"]["runtime"]["medium"],
     threads: config["computingResources"]["threads"]["medium"]
     benchmark:
@@ -131,7 +131,7 @@ rule annotate_DE_clinical_info:
     conda:
         "../envs/annotate_DE_clinical_info.yaml"
     resources:
-        mem_mb=config["computingResources"]["mem"]["low"],
+        mem_mb=config["computingResources"]["mem_mb"]["low"],
         runtime=config["computingResources"]["runtime"]["low"],
     threads: config["computingResources"]["threads"]["low"]
     log:
@@ -166,7 +166,7 @@ rule query_civic:
     conda:
         "../envs/query_civic.yaml"
     resources:
-        mem_mb=config["computingResources"]["mem"]["medium"],
+        mem_mb=config["computingResources"]["mem_mb"]["medium"],
         runtime=config["computingResources"]["runtime"]["low"],
     threads: config["computingResources"]["threads"]["low"]
     log:
@@ -199,7 +199,7 @@ rule gene_set_enrichment:
     conda:
         "../envs/gene_set_enrichment.yaml"
     resources:
-        mem_mb=config["computingResources"]["mem"]["low"],
+        mem_mb=config["computingResources"]["mem_mb"]["low"],
         runtime=config["computingResources"]["runtime"]["low"],
     threads: config["computingResources"]["threads"]["low"]
     log:
@@ -228,7 +228,7 @@ rule gene_set_enrichment_mal_vs_mal:
     conda:
         "../envs/gene_set_enrichment.yaml"
     resources:
-        mem_mb=config["computingResources"]["mem"]["low"],
+        mem_mb=config["computingResources"]["mem_mb"]["low"],
         runtime=config["computingResources"]["runtime"]["low"],
     threads: config["computingResources"]["threads"]["low"]
     log:
@@ -282,7 +282,7 @@ rule plot_gene_set_enrichment:
     conda:
         "../envs/plot_gene_set_enrichment.yaml"
     resources:
-        mem_mb=config["computingResources"]["mem"]["low"],
+        mem_mb=config["computingResources"]["mem_mb"]["low"],
         runtime=config["computingResources"]["runtime"]["low"],
     threads: config["computingResources"]["threads"]["low"]
     log:
@@ -309,7 +309,7 @@ rule plot_gene_set_enrichment_mal_vs_mal:
     conda:
         "../envs/plot_gene_set_enrichment.yaml"
     resources:
-        mem_mb=config["computingResources"]["mem"]["low"],
+        mem_mb=config["computingResources"]["mem_mb"]["low"],
         runtime=config["computingResources"]["runtime"]["low"],
     threads: config["computingResources"]["threads"]["low"]
     log:
@@ -352,7 +352,7 @@ rule parse_for_minSetCover:
     conda:
         "../envs/parse_for_minSetCover.yaml"
     resources:
-        mem_mb=config["computingResources"]["mem"]["low"],
+        mem_mb=config["computingResources"]["mem_mb"]["low"],
         runtime=config["computingResources"]["runtime"]["low"],
     threads: config["computingResources"]["threads"]["low"]
     log:
@@ -381,7 +381,7 @@ rule cell_percent_in_cluster:
     conda:
         "../envs/cell_percent_in_cluster.yaml"
     resources:
-        mem_mb=config["computingResources"]["mem"]["medium"],
+        mem_mb=config["computingResources"]["mem_mb"]["medium"],
         runtime=config["computingResources"]["runtime"]["low"],
     threads: config["computingResources"]["threads"]["medium"]
     log:
@@ -409,7 +409,7 @@ rule find_minSetCover:
     conda:
         "../envs/find_minSetCover.yaml"
     resources:
-        mem_mb=config["computingResources"]["mem"]["low"],
+        mem_mb=config["computingResources"]["mem_mb"]["low"],
         runtime=config["computingResources"]["runtime"]["low"],
     threads: config["computingResources"]["threads"]["low"]
     log:
@@ -437,7 +437,7 @@ rule filter_drugs:
     conda:
         "../envs/filter_drugs.yaml"
     resources:
-        mem_mb=config["computingResources"]["mem"]["low"],
+        mem_mb=config["computingResources"]["mem_mb"]["low"],
         runtime=config["computingResources"]["runtime"]["low"],
     threads: config["computingResources"]["threads"]["low"]
     log:
@@ -465,7 +465,7 @@ rule preprocess_upsetr_plot:
     conda:
         "../envs/preprocess_upsetr_plot.yaml"
     resources:
-        mem_mb=config["computingResources"]["mem"]["low"],
+        mem_mb=config["computingResources"]["mem_mb"]["low"],
         runtime=config["computingResources"]["runtime"]["low"],
     threads: config["computingResources"]["threads"]["low"]
     log:
@@ -492,7 +492,7 @@ rule plot_upsetr:
     conda:
         "../envs/plot_upsetr.yaml"
     resources:
-        mem_mb=config["computingResources"]["mem"]["low"],
+        mem_mb=config["computingResources"]["mem_mb"]["low"],
         runtime=config["computingResources"]["runtime"]["low"],
     threads: config["computingResources"]["threads"]["low"]
     log:
@@ -523,7 +523,7 @@ rule get_full_druglist_to_subclones:
     conda:
         "../envs/get_full_druglist_to_subclones.yaml"
     resources:
-        mem_mb=config["computingResources"]["mem"]["low"],
+        mem_mb=config["computingResources"]["mem_mb"]["low"],
         runtime=config["computingResources"]["runtime"]["low"],
     threads: config["computingResources"]["threads"]["low"]
     log:
@@ -571,7 +571,7 @@ rule plot_drug_prediction:
     conda:
         "../envs/plot_drug_prediction.yaml"
     resources:
-        mem_mb=config["computingResources"]["mem"]["medium"],
+        mem_mb=config["computingResources"]["mem_mb"]["medium"],
         runtime=config["computingResources"]["runtime"]["low"],
     threads: config["computingResources"]["threads"]["medium"]
     log:

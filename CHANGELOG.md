@@ -5,6 +5,7 @@
 ### Changed
 - change run time keyword in rules and config from "time_min" or "time" to "runtime" as is recommended.
 - have template memory values per job and not per thread
+- use "mem_mb" consistently in rule files and config files
 
 ## [2.0.1] - 2022-07-19
 
