@@ -41,11 +41,11 @@ resources:
 # The tools in this pipeline use a broad range of resources and have been assigned to the following three categories.
 # If there aren't enough resources specified it can be adapted in the tools corresponding section.
 computingResources:
-  mem:
-    low: 400
-    medium: 4000
-    high: 10000
-  time:
+  mem_mb:
+    low: 2000
+    medium: 16000
+    high: 40000
+  runtime:
     low: 60
     medium: 500
     high: 800
@@ -62,8 +62,8 @@ tools:
   cellranger_count:
     call: cellranger
     local_cores: 12
-    mem: 6000
-    time: 1440
+    mem_mb: 6000
+    runtime: 1440
 
   starsolo:
     call: "STAR "
@@ -85,8 +85,8 @@ tools:
                     --soloCellFilter EmptyDrops_CR
                     --readFilesCommand zcat"
     threads: 8
-    mem: 6000
-    time: 1440
+    mem_mb: 6000
+    runtime: 1440
 
   filter_genes_and_cells:
     # cell outlier detection based on fractionMT, disabled per default ("100")
