@@ -1,5 +1,10 @@
 # Changelog
 
+## [2.0.3] - 2022-11-21
+
+### Fixed
+- fix bug in script `filter_genes_and_cells.R` that resulted in colour discrepancy between legend and plot in `{sample}.visualize_filtered_cells.png` in rare cases.
+
 ## [2.0.2] - 2022-08-31
 
 ### Changed
