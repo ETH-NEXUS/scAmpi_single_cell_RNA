@@ -395,6 +395,7 @@ point_size <-  0.4 + (cell_info$log_library_size - min(cell_info$log_library_siz
 plot_cells_filtered <- ggplot(cell_info, aes(x = log2_nodg, y = fractionMTreads, alpha = 0.5)) +
   geom_point(aes(colour = col), size = point_size) +
   scale_colour_manual(values = my_cols,
+                      limits = my_cols,
                       labels = c("dot size corresponds to library size",
                                  "NODG too low",
                                  "doublets",
