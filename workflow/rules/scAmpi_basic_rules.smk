@@ -32,7 +32,7 @@ rule cellranger_count:
         "--sample={params.mySample} "
         "--transcriptome={input.reference} "
         "--localcores={params.local_cores} "
-        "--fastqs=../../{input.fastqs_dir} "
+        "--fastqs={input.fastqs_dir} "
         "--nosecondary "
         " 2>&1 | tee ../../{log} ) ; "
         "pwd ; "
