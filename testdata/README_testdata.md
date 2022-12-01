@@ -1,6 +1,6 @@
 # Guidelines to run test data with scAmpi
 
-The following instructions provide a short guideline to download example data and execute the scAmpi basic scRNA-seq analysis workflow. 
+The following instructions provide a short guideline to download example data and execute the scAmpi basic scRNA-seq analysis workflow.
 
 The test data are human PBMCs, available for download from the 10xGenomics website.
 
@@ -9,13 +9,13 @@ The workflow management tool `snakemake` needs to be in your PATH.
 
 NOTE: some steps of the scAmpi workflow perform online queries. Please make sure that this is possible on your computing system, e.g. by loading the respective modules to enable the proxy connection. (Most systems will have this enabled per default).
 
-
 #### (i) Preparation of cellranger software
+
 - **Provide cellranger human reference:** For the test run using cellranger as the mapping tool the cellranger human reference data files must be available. (For download instructions of cellranger, refer to the [10xGenomics Webpage](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/installation)).
 
 - **Adapt cellranger information in config.yaml:** In the `testdata/config.yaml` file replace the `resources:` -> `reference_transcriptome` entry with your path to the cellranger reference directory.
 
-- **Provide cellranger software:** The software `cellranger` must be installed and in your PATH. 
+- **Provide cellranger software:** The software `cellranger` must be installed and in your PATH.
 If you do not want to add cellranger to your PATH the full path to the cellranger installation can be provided in the `testdata/config.yaml` (`tools` -> `cellranger_count` -> `call`).
 
 ```
@@ -24,7 +24,9 @@ If you do not want to add cellranger to your PATH the full path to the cellrange
 ```
 
 #### (ii) Download example data from 10xGenomics
+
 Make sure you are in base directory of the scAmpi workflow.
+
 ```
 mkdir fastqs
 cd fastqs
@@ -35,9 +37,12 @@ mv 5k_pbmc_v3_fastqs/* .
 rm -r 5k_pbmc_v3_fastqs/
 ```
 
+Set the full path to the input directory in `testdata/config.yaml`, section `[inputOutput][input_fastqs]`.
+
 #### (iii) Run scAmpi
 
 Perform a dry run to check if all preparations were correct:
+
 ```
 snakemake -s workflow/snakefile_basic.smk --configfile testdata/config.yaml -n -p -r
 ```
@@ -51,4 +56,5 @@ snakemake -s workflow/snakefile_basic.smk --configfile testdata/config.yaml -p -
 If you are working on a cluster with a job scheduling system (e.g. LSF, Slurm) you need to adjust the commands accordingly.
 
 #### Avoid cellranger step
+
 If the cellranger step should be avoided in the test run, the file `testdata/5k_pbmc_v3.h5.tar` can be used as a starting point. With `tar -xvf 5k_pbmc_v3.h5.tar` the file can be unpacked. Then, it should be copied into the direcory `results/counts_raw/`. This way, scAmpi basic starts after the cellranger step, saving time and other resources.
