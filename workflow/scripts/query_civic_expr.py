@@ -12,11 +12,12 @@ from civicpy import civic
 
 ## Load relevant functions from CIViCutils package
 
-sys.path.append('/cluster/work/nexus/antoine/Projects/2022_12_integrate_Civicutils/git_files/civicutils/civicutils/')
+sys.path.insert(0, '/cluster/work/nexus/antoine/Projects/2022_12_integrate_Civicutils/git_files/civicutils/civicutils/')
 from read_and_write import readInExpr,write_match
 from query import query_civic
 from filtering import filter_civic
 from match import match_in_civic,annotate_ct,filter_ct,process_drug_support
+sys.path.remove('/cluster/work/nexus/antoine/Projects/2022_12_integrate_Civicutils/git_files/civicutils/civicutils/')
 
 '''
 Script
@@ -61,9 +62,9 @@ if blackList == ['']:
 if highLevelList == ['']:
     highLevelList = []
 
-
+print (args.inputFile)
 # Read in file of input SNV variants
-(rawData,epxrData,extraHeader) = readInExpr(args.inputFile)
+(rawData,epxrData,extraHeader) = readInExpr(args.colName_gene, args.colName_logFC, args.inputFile)
 
 # Query input genes in CIVIC
 varMap = query_civic(list(epxrData.keys()), identifier_type="entrez_symbol")
