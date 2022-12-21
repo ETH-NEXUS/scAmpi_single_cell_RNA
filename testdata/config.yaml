@@ -62,6 +62,7 @@ tools:
     local_cores: 12
     mem_mb: 6000
     runtime: 1440
+    variousParams: ""
 
   starsolo:
     call: "STAR "
