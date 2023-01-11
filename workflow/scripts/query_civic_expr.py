@@ -14,7 +14,7 @@ import re
 
 
 ### Define what combination of directions and clinical significances define 'POSITIVE' and 'NEGATIVE' support
-supportDict = {'SUPPORTS': {'SENSITIVITY/RESPONSE':'POSITIVE', 'RESISTANCE':'NEGATIVE', 'REDUCED SENSITIVITY':'NEGATIVE', 'ADVERSE RESPONSE':'NEGATIVE'}, 'DOES NOT SUPPORT': {'RESISTANCE':'UNKNOWN_DNS', 'SENSITIVITY/RESPONSE':'UNKNOWN_DNS', 'REDUCED SENSITIVITY':'UNKNOWN_DNS', 'ADVERSE RESPONSE':'UNKNOWN_DNS'}}
+supportDict = {'SUPPORTS': {'SENSITIVITYRESPONSE':'POSITIVE', 'RESISTANCE':'NEGATIVE', 'REDUCED SENSITIVITY':'NEGATIVE', 'ADVERSE RESPONSE':'NEGATIVE'}, 'DOES_NOT_SUPPORT': {'RESISTANCE':'UNKNOWN_DNS', 'SENSITIVITYRESPONSE':'UNKNOWN_DNS', 'REDUCED SENSITIVITY':'UNKNOWN_DNS', 'ADVERSE RESPONSE':'UNKNOWN_DNS'}}
 
 ### Define global variable to ensure cache file is only loaded once even if several queries are performed
 global isLoad
@@ -198,7 +198,7 @@ def reformat_results(results, identifier_type):
                     ## On 25.01.2019, source structure was changed to introduce ASCO abstracts as a source type
                     # FIXME: there is no sanity check for empty ID, however assume this should never happen
                     # FIXME: check for type of source? currently, both PUBMED and ASCO would be considered
-                    varMap[gene_key][variant_name][evidence_type][disease][drug][evidence][evidence_level].append(evidence_record.source.citation_id.strip())
+                    varMap[gene_key][variant_name][evidence_type][disease][drug][evidence][evidence_level].append(str(evidence_record.source.citation_id).strip())
 
     # TODO: assertions are currently not considered, as they mostly consist of free text summarizing the available evidence
 
