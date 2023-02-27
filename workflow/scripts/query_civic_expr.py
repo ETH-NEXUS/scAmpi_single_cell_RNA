@@ -11,6 +11,7 @@ import sys
 import argparse
 from civicpy import civic
 import re
+import os
 
 
 ### Define what combination of directions and significances define 'POSITIVE' and 'NEGATIVE' support
@@ -536,6 +537,11 @@ highLevelList = [s.strip().upper() for s in highLevelList.split(',')]
 print('\nWhite listed cancer types: {}'.format(','.join(cancerTypeList)))
 print('Black listed cancer types: {}'.format(','.join(blackList)))
 print('High level cancer types: {}'.format(','.join(highLevelList)))
+
+
+print(civic.__version__)
+print(civic.LOCAL_CACHE_PATH)
+print(os.getenv('CIVICPY_CACHE_FILE'))
 
 ## Sanity check for "empty" input lists (ie. in the form of [''])
 ## Turn them into "real" empty lists for implementation purposes

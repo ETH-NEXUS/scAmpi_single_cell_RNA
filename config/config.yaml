@@ -230,7 +230,7 @@ tools:
   plot_drug_prediction:
     variousParams: '--drugPredEnd "clinicalAnnotation.civic.txt"
       --name_DGIDB "DGIDB-drugs(Score,Type)"
-      --name_CIVIC "CIViC_Drug_Support"'
+      --name_CIVIC "CIViC_therapy_Support"'
 
   # perform gene set enrichment analysis on DE genes
   gene_set_enrichment:
