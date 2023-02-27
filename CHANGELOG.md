@@ -1,4 +1,9 @@
 # Changelog
+## [2.0.6] - 2023-02-14
+
+### Fixed
+- adapt script `query_civic_expr.py` to changed syntax in python package `civicpy` version 3.0. The script no longer works as is with previous versions of the package.
+- adapt installation instructions for `civicpy` to require version 3.0
 
 ## [2.0.5] - 2023-01-11
 

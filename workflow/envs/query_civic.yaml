@@ -9,4 +9,4 @@ dependencies:
     - "configargparse>=1.4"
     - "pip>=21.0.1"
     - pip:
-        - "civicpy>=2.0"
+        - "civicpy>=3.0.0"
