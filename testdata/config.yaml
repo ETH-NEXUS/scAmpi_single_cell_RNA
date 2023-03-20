@@ -1,6 +1,6 @@
 inputOutput:
-  input_fastqs: fastqs/
-  input_fastqs_adt:
+  # full path to directory with input files
+  input_fastqs: "/path/to/fastqs/"
   sample_map: testdata/sample_map_testdata.tsv
   malignant_cell_type: "none"
 
@@ -37,7 +37,6 @@ resources:
   drugCombinations: ""
   civicDict: ""
 
-
 # The tools in this pipeline use a broad range of resources and have been assigned to the following three categories.
 # If there aren't enough resources specified it can be adapted in the tools corresponding section.
 computingResources:
@@ -54,7 +53,6 @@ computingResources:
     medium: 4
     high: 8
 
-
 tools:
   # Cellranger cannot be installed through Conda currently.
   # It needs to be installed manually & the call in both cellranger rules needs to be adapted.
@@ -64,6 +62,7 @@ tools:
     local_cores: 12
     mem_mb: 6000
     runtime: 1440
+    variousParams: ""
 
   starsolo:
     call: "STAR "
@@ -79,11 +78,11 @@ tools:
     # "--soloCellFilter EmptyDrops_CR" cell filtering method corresponding to cellranger 3.X.X
     # "--readFilesCommand zcat" parameter to indicate the fastq files are *gz
     variousParams: "--soloType CB_UMI_Simple
-                    --soloCBmatchWLtype 1MM_multi_Nbase_pseudocounts
-                    --soloUMIfiltering MultiGeneUMI_CR
-                    --soloUMIdedup 1MM_CR
-                    --soloCellFilter EmptyDrops_CR
-                    --readFilesCommand zcat"
+      --soloCBmatchWLtype 1MM_multi_Nbase_pseudocounts
+      --soloUMIfiltering MultiGeneUMI_CR
+      --soloUMIdedup 1MM_CR
+      --soloCellFilter EmptyDrops_CR
+      --readFilesCommand zcat"
     threads: 8
     mem_mb: 6000
     runtime: 1440
@@ -163,7 +162,7 @@ tools:
     variousParams: "--malignant Melanoma"
 
   parse_filter_DE_genes:
-          # parameters are
+    # parameters are
     # pvalue-threshold
     # columnName_geneNames
     # columnName_pvalues
@@ -177,23 +176,23 @@ tools:
     # optionalColumn1
     # ...
     variousParams: "0.01
-                    gene_names
-                    padj
-                    diff
-                    test_statistic
-                    nonmal_max
-                    nonmal_min
-                    malig_mean
-                    1
-                    1
-                    pct_nonzero"
+      gene_names
+      padj
+      diff
+      test_statistic
+      nonmal_max
+      nonmal_min
+      malig_mean
+      1
+      1
+      pct_nonzero"
 
   # annotate DE genes with clinical information
   query_dgidb:
-      # column header containing gene names
-      colName_genes: "gene_names"
-      # minimum number of data base support to report drug-gene interaction
-      minDatabaseNum: "4"
+    # column header containing gene names
+    colName_genes: "gene_names"
+    # minimum number of data base support to report drug-gene interaction
+    minDatabaseNum: "4"
 
   download_clinical_trials:
     # terms of interest downloading data base
@@ -229,9 +228,9 @@ tools:
 
   # show drug support on UMAP plot
   plot_drug_prediction:
-    variousParams: "--drugPredEnd \"clinicalAnnotation.civic.txt\"
-                    --name_DGIDB \"DGIDB-drugs(Score,Type)\"
-                    --name_CIVIC \"CIViC_Drug_Support\""
+    variousParams: '--drugPredEnd "clinicalAnnotation.civic.txt"
+      --name_DGIDB "DGIDB-drugs(Score,Type)"
+      --name_CIVIC "CIViC_therapy_Support"'
 
   # perform gene set enrichment analysis on DE genes
   gene_set_enrichment:

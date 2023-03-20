@@ -11,10 +11,11 @@ import sys
 import argparse
 from civicpy import civic
 import re
+import os
 
 
-### Define what combination of directions and clinical significances define 'POSITIVE' and 'NEGATIVE' support
-supportDict = {'SUPPORTS': {'SENSITIVITY/RESPONSE':'POSITIVE', 'RESISTANCE':'NEGATIVE', 'REDUCED SENSITIVITY':'NEGATIVE', 'ADVERSE RESPONSE':'NEGATIVE'}, 'DOES NOT SUPPORT': {'RESISTANCE':'UNKNOWN_DNS', 'SENSITIVITY/RESPONSE':'UNKNOWN_DNS', 'REDUCED SENSITIVITY':'UNKNOWN_DNS', 'ADVERSE RESPONSE':'UNKNOWN_DNS'}}
+### Define what combination of directions and significances define 'POSITIVE' and 'NEGATIVE' support
+supportDict = {'SUPPORTS': {'SENSITIVITYRESPONSE':'POSITIVE', 'RESISTANCE':'NEGATIVE', 'REDUCED SENSITIVITY':'NEGATIVE', 'ADVERSE RESPONSE':'NEGATIVE'}, 'DOES_NOT_SUPPORT': {'RESISTANCE':'UNKNOWN_DNS', 'SENSITIVITYRESPONSE':'UNKNOWN_DNS', 'REDUCED SENSITIVITY':'UNKNOWN_DNS', 'ADVERSE RESPONSE':'UNKNOWN_DNS'}}
 
 ### Define global variable to ensure cache file is only loaded once even if several queries are performed
 global isLoad
@@ -88,13 +89,13 @@ def reformat_results(results, identifier_type):
             variant_name = variant_record.name.strip().upper()
             hgvs_expressions = variant_record.hgvs_expressions
             # Score to assess the accumulation of evidence for each variant (quantity and quality)
-            civic_score = variant_record.civic_actionability_score
+            civic_score = variant_record.molecular_profiles[0].molecular_profile_score
             # Sanity check for empty scores
             if civic_score is None:
                 civic_score = "NULL"
 
             # List of evidence records available for the current variant (can be empty)
-            evidence_items = variant_record.evidence_items
+            evidence_items = variant_record.molecular_profiles[0].evidence_items
 
             # Iterate through the listed evidence items and store relevant information for this variant
             # Variants which do not have any clinical data associated to them will be directly skipped
@@ -114,29 +115,29 @@ def reformat_results(results, identifier_type):
                 evidence_level = evidence_record.evidence_level                     # just in case, should never be None
                 variant_origin = evidence_record.variant_origin                     # can be None
                 evidence_direction = evidence_record.evidence_direction             # can be None
-                clinical_significance = evidence_record.clinical_significance       # can be None
+                significance = evidence_record.significance       # can be None
 
                 # Skip records that are not accepted evidence
                 if (evidence_status != "ACCEPTED"):
                     continue
 
-                # Sanity check for empty evidence direction, clinical significance or level
+                # Sanity check for empty evidence direction, significance or level
                 # 'NULL' is introduced to distinguish from 'N/A' tag
                 if evidence_direction is None:
                     evidence_direction = "NULL"
                 else:
                     evidence_direction = evidence_direction.strip().upper()
-                if clinical_significance is None:
-                    clinical_significance = "NULL"
+                if significance is None:
+                    significance = "NULL"
                 else:
-                    clinical_significance = clinical_significance.strip().upper()
+                    significance = significance.strip().upper()
                 if evidence_level is None:
                     evidence_level = "NULL"
                 else:
                     evidence_level = evidence_level.strip().upper()
 
                 # Combine the direction and significance of the evidence in one term
-                evidence = evidence_direction + ':' + clinical_significance
+                evidence = evidence_direction + ':' + significance
 
                 # At this point, currently evaluate evidence item has passed all the checks/filters
                 # Keep track of the current evidence item under the corresponding variant and gene
@@ -159,46 +160,46 @@ def reformat_results(results, identifier_type):
                 if disease not in varMap[gene_key][variant_name][evidence_type].keys():
                     varMap[gene_key][variant_name][evidence_type][disease] = {}
 
-                drugs = []
-                evidence_drugs = evidence_record.drugs
-                for evidence_drug in evidence_drugs:
-                    drug_name = evidence_drug.name.strip().upper()
-                    if drug_name not in drugs:
-                        drugs.append(drug_name)
+                therapies = []
+                evidence_therapies = evidence_record.therapies
+                for evidence_therapy in evidence_therapies:
+                    therapy_name = evidence_therapy.name.strip().upper()
+                    if therapy_name not in therapies:
+                        therapies.append(therapy_name)
 
-                # When more than 1 drug are listed for the same evidence item, 'drug_interaction_type' is not null and defines the nature of this multiple drug entry
-                drug_interaction = evidence_record.drug_interaction_type
-                if drug_interaction is not None:
-                    drug_interaction = drug_interaction.strip().upper()
-                    # 'Substitutes' indicates that drugs can be considered individually
-                    if drug_interaction != "SUBSTITUTES":
-                        # Remaining terms ('Sequential' and 'Combination') indicate that drugs should be considered together, so join their names into a single tag
-                        # Sort drugs alphabetically to ensure that their order in the combination treatment is always the same
-                        drugs.sort()
-                        drugs = ["+".join(drugs)]
+                # When more than 1 therapy are listed for the same evidence item, 'therapy_interaction_type' is not null and defines the nature of this multiple therapy entry
+                therapy_interaction = evidence_record.therapy_interaction_type
+                if therapy_interaction is not None:
+                    therapy_interaction = therapy_interaction.strip().upper()
+                    # 'Substitutes' indicates that therapies can be considered individually
+                    if therapy_interaction != "SUBSTITUTES":
+                        # Remaining terms ('Sequential' and 'Combination') indicate that therapies should be considered together, so join their names into a single tag
+                        # Sort therapies alphabetically to ensure that their order in the combination treatment is always the same
+                        therapies.sort()
+                        therapies = ["+".join(therapies)]
 
-                if not drugs:
-                    # Only non-Predictive evidences and Predictive ones without drugs will have this dummy level
+                if not therapies:
+                    # Only non-Predictive evidences and Predictive ones without therapies will have this dummy level
                     # Introduced for consistency purposes within the varMap structure
-                    drugs = ["NULL"]
+                    therapies = ["NULL"]
 
-                # Iterate through drugs to add evidences associated to them
-                #   For non-Predictive evidences or Predictive with empty drugs, drugs=['NULL']
-                #   For Predictive and interaction=None, len(drugs) = 1
-                #   For Predictive and interaction='Substitutes', len(drugs)>1
-                #   For Predictive and interaction!='Substitutes', len(drugs)=1 (combiantion of several using '+')
-                for drug in drugs:
-                    if drug not in varMap[gene_key][variant_name][evidence_type][disease].keys():
-                        varMap[gene_key][variant_name][evidence_type][disease][drug] = {}
-                    if evidence not in varMap[gene_key][variant_name][evidence_type][disease][drug].keys():
-                        varMap[gene_key][variant_name][evidence_type][disease][drug][evidence] = {}
-                    if evidence_level not in varMap[gene_key][variant_name][evidence_type][disease][drug][evidence].keys():
-                        varMap[gene_key][variant_name][evidence_type][disease][drug][evidence][evidence_level] = []
+                # Iterate through therapies to add evidences associated to them
+                #   For non-Predictive evidences or Predictive with empty therapies, therapies=['NULL']
+                #   For Predictive and interaction=None, len(therapies) = 1
+                #   For Predictive and interaction='Substitutes', len(therapies)>1
+                #   For Predictive and interaction!='Substitutes', len(therapies)=1 (combiantion of several using '+')
+                for therapy in therapies:
+                    if therapy not in varMap[gene_key][variant_name][evidence_type][disease].keys():
+                        varMap[gene_key][variant_name][evidence_type][disease][therapy] = {}
+                    if evidence not in varMap[gene_key][variant_name][evidence_type][disease][therapy].keys():
+                        varMap[gene_key][variant_name][evidence_type][disease][therapy][evidence] = {}
+                    if evidence_level not in varMap[gene_key][variant_name][evidence_type][disease][therapy][evidence].keys():
+                        varMap[gene_key][variant_name][evidence_type][disease][therapy][evidence][evidence_level] = []
                     # Group all publications associated to the same level. Do not check publication status
                     ## On 25.01.2019, source structure was changed to introduce ASCO abstracts as a source type
                     # FIXME: there is no sanity check for empty ID, however assume this should never happen
                     # FIXME: check for type of source? currently, both PUBMED and ASCO would be considered
-                    varMap[gene_key][variant_name][evidence_type][disease][drug][evidence][evidence_level].append(evidence_record.source.citation_id.strip())
+                    varMap[gene_key][variant_name][evidence_type][disease][therapy][evidence][evidence_level].append(str(evidence_record.source.citation_id).strip())
 
     # TODO: assertions are currently not considered, as they mostly consist of free text summarizing the available evidence
 
@@ -327,35 +328,35 @@ def expr_is_exon_string(varName):
 
 
 # Write information about a single cancer type item into one or more structured strings
-# i.e. DISEASE[|DRUG1,DRUG2..](direction, significance(level(PMID,..,PMID),level(..)));
-## For 'predictive' evidence (writeDrug=True), keep dictionary of drug support for the current gene/line
-## Format: drug -> ct -> [support1,support2,..,support1] (keep track of all occurrences)
-def write_evidences(item, cancer, ct, drugMap, writeDrug=False):
+# i.e. DISEASE[|therapy1,therapy2..](direction, significance(level(PMID,..,PMID),level(..)));
+## For 'predictive' evidence (writetherapy=True), keep dictionary of therapy support for the current gene/line
+## Format: therapy -> ct -> [support1,support2,..,support1] (keep track of all occurrences)
+def write_evidences(item, cancer, ct, therapyMap, writetherapy=False):
     evidences = []
-    # For each drug associated with the given cancer type
-    for drug in item.keys():
-        # For each evidence associated with the given drug
+    # For each therapy associated with the given cancer type
+    for therapy in item.keys():
+        # For each evidence associated with the given therapy
         # Evidences are simplified by using the combined form 'direction:significance'
-        for evidence in item[drug].keys():
+        for evidence in item[therapy].keys():
             ## For each evidence (ie combination of direction+clin_signf), count how many different evidence items support it
-            ## At this stage, we find count evidence items by counting how many different combinations of level+pmids there are for the same drug, disease and evidence
+            ## At this stage, we find count evidence items by counting how many different combinations of level+pmids there are for the same therapy, disease and evidence
             pmids = []
-            # If drug=True, write drug information, i.e. DISEASE|DRUG(..)
-            if writeDrug:
-                # Always one drug (single or combination with '+')
-                outString = cancer + '|' + drug + '('
+            # If therapy=True, write therapy information, i.e. DISEASE|therapy(..)
+            if writetherapy:
+                # Always one therapy (single or combination with '+')
+                outString = cancer + '|' + therapy + '('
             else:
                 outString = cancer + '('
-            # Split the evidence direction and clinical significance
+            # Split the evidence direction and significance
             direction, clin_signf = evidence.split(':')
             outString += direction + ',' + clin_signf + '('
             # There may be several levels grouped per evidence
             levels = []
-            for level in item[drug][evidence].keys():
+            for level in item[therapy][evidence].keys():
                 # There may be several publications (i.e. PMIDs) grouped per level
-                levels.append(level + '(' + ','.join(item[drug][evidence][level]) + ')')
+                levels.append(level + '(' + ','.join(item[therapy][evidence][level]) + ')')
                 # Count how many different evidence items support this particular evidence item
-                for z in item[drug][evidence][level]:
+                for z in item[therapy][evidence][level]:
                     # Distinguish cases where the same publication is used to support different and identical evidence levels (they nonetheless count as separate evidence items)
                     pmids.append(z)
 #                     new_z = level + '_' + z
@@ -364,17 +365,17 @@ def write_evidences(item, cancer, ct, drugMap, writeDrug=False):
             outString += ','.join(levels) + '))'
             evidences.append(outString)
 
-            ## For 'predictive' evidence, keep dictionary of drug support for the current gene/line
-            ## Format: drug -> ct -> [support1,support2,..,support1] (keep track of all occurrences)
-            if writeDrug:
-                ## Only add current drug and ct to dictionary if this match should indeed be considered for interpretation of the drug support
-                if drug not in drugMap.keys():
-                    drugMap[drug] = {}
+            ## For 'predictive' evidence, keep dictionary of therapy support for the current gene/line
+            ## Format: therapy -> ct -> [support1,support2,..,support1] (keep track of all occurrences)
+            if writetherapy:
+                ## Only add current therapy and ct to dictionary if this match should indeed be considered for interpretation of the therapy support
+                if therapy not in therapyMap.keys():
+                    therapyMap[therapy] = {}
                 ## Possible values for cancer specificity: 'ct' (specific), 'gt' (general), 'nct' (non-specific)
-                if ct not in drugMap[drug].keys():
-                    drugMap[drug][ct] = []
+                if ct not in therapyMap[therapy].keys():
+                    therapyMap[therapy][ct] = []
 
-                ## Evaluate drug support based on the combination of direction + clinical significance
+                ## Evaluate therapy support based on the combination of direction + significance
                 ## Each combination has an associated support: POSITIVE, NEGATIVE, UNKNOWN_DNS or UNKNOWN_BLANK
                 if ('NULL' in direction) or ('N/A' in direction) or ('NULL' in clin_signf) or ('N/A' in clin_signf):
                     thisSupport = 'UNKNOWN_BLANK'
@@ -383,28 +384,28 @@ def write_evidences(item, cancer, ct, drugMap, writeDrug=False):
                         print("Error! Could not find direction %s in support dictionary." %(direction))
                         sys.exit(1)
                     if clin_signf not in supportDict[direction].keys():
-                        print("Error! Could not find clinical significance %s in support dictionary." %(clin_signf))
+                        print("Error! Could not find significance %s in support dictionary." %(clin_signf))
                         sys.exit(1)
                     thisSupport = supportDict[direction][clin_signf]
 
-                ## Keep track of number of occurrences for each support type for the given drug
+                ## Keep track of number of occurrences for each support type for the given therapy
                 ## Here, take into account the number of supporting PMIDs associated to each evidence item
                 for z in pmids:
-                    drugMap[drug][ct].append(thisSupport)
+                    therapyMap[therapy][ct].append(thisSupport)
 
-    return (evidences,drugMap)
+    return (evidences,therapyMap)
 
 
 # Return in a list all evidence items (in written form) for a given evidence type 
-# i.e. DISEASE1[|DRUG1,DRUG2..](direction1,significance1(level1(PMID,..,PMID),level2(..)));
-#      DISEASE1[|DRUG1,DRUG2..](direction2,significance2(level1(PMID,..,PMID),level2(..)));
+# i.e. DISEASE1[|therapy1,therapy2..](direction1,significance1(level1(PMID,..,PMID),level2(..)));
+#      DISEASE1[|therapy1,therapy2..](direction2,significance2(level1(PMID,..,PMID),level2(..)));
 # For each evidence type, return either:
 #   - Info on white listed cancer types (eg. 'Melanoma')
 #   - If previous is not available, info on high level cancer types (eg. 'Cancer', 'Solid tumor')
 #   - If previous is not available, info on all available cancer types for the given variant (except those included in the black list)
-## For 'predictive' evidence (writeDrug=True), keep dictionary of drug support for the current gene/line
-## Format: drug -> ct -> [support1,support2,..,support1] (keep track of all occurrences)
-def match_cancer_and_return_evidences(vardata, evidence_type, cancerTypes, cancerTypes_notSpec, highLevelTypes, drugMap, writeDrug=False):
+## For 'predictive' evidence (writetherapy=True), keep dictionary of therapy support for the current gene/line
+## Format: therapy -> ct -> [support1,support2,..,support1] (keep track of all occurrences)
+def match_cancer_and_return_evidences(vardata, evidence_type, cancerTypes, cancerTypes_notSpec, highLevelTypes, therapyMap, writetherapy=False):
     ## Evidences returned for the matched cancer specificity
     evidences = []
 
@@ -483,12 +484,12 @@ def match_cancer_and_return_evidences(vardata, evidence_type, cancerTypes, cance
         ## They can correspond to either 'ct' (from white-list), 'gt' (from high-level list) or 'nct' (if nothing could be matched, return all that is available)
         for cancerType in matched:
             ## Return evidence items in already formatted strings
-            ## Also, return dictionary of drug support for the current gene/line
-            (strings,drugMap) = write_evidences(vardata[evidence_type][cancerType], cancerType, ct, drugMap, writeDrug)
+            ## Also, return dictionary of therapy support for the current gene/line
+            (strings,therapyMap) = write_evidences(vardata[evidence_type][cancerType], cancerType, ct, therapyMap, writetherapy)
             for s in strings:
                 evidences.append(s)
 
-    return (evidences,drugMap)
+    return (evidences,therapyMap)
 
 
 
@@ -496,7 +497,7 @@ def match_cancer_and_return_evidences(vardata, evidence_type, cancerTypes, cance
 Script
 '''
 
-parser = argparse.ArgumentParser(description='Query CIViC to retrieve drug information for expression.')
+parser = argparse.ArgumentParser(description='Query CIViC to retrieve therapy information for expression.')
 parser.add_argument('--inputTable', dest='inputFile', required=True, help='Input table with genes and logFC values, needs to be tab separated.')
 parser.add_argument('--outFile', dest='outFile', required=True, help='Name of the output file.')
 parser.add_argument('--cancerTypeList', dest='cancerTypeList', required=True, help='Comma-separated list of accepted cancer types. Partial matches will be sought.')
@@ -523,7 +524,7 @@ firstInputLine = infile.readline().strip()
 ## Already write new header into output file
 outfile = open(args.outFile,'w')
 outHeader = firstInputLine
-outHeader += "\tCIViC_Score\tCIViC_Drug_Support\tCIViC_Predictive\tCIViC_Diagnostic\tCIViC_Prognostic\tCIViC_Predisposing"
+outHeader += "\tCIViC_Score\tCIViC_therapy_Support\tCIViC_Predictive\tCIViC_Diagnostic\tCIViC_Prognostic\tCIViC_Predisposing"
 outfile.write(outHeader + "\n")
 
 cancerTypeList = args.cancerTypeList
@@ -536,6 +537,11 @@ highLevelList = [s.strip().upper() for s in highLevelList.split(',')]
 print('\nWhite listed cancer types: {}'.format(','.join(cancerTypeList)))
 print('Black listed cancer types: {}'.format(','.join(blackList)))
 print('High level cancer types: {}'.format(','.join(highLevelList)))
+
+
+print(civic.__version__)
+print(civic.LOCAL_CACHE_PATH)
+print(os.getenv('CIVICPY_CACHE_FILE'))
 
 ## Sanity check for "empty" input lists (ie. in the form of [''])
 ## Turn them into "real" empty lists for implementation purposes
@@ -721,7 +727,7 @@ for lineIndx,line in enumerate(infile):
     ### Process resulting matches in CIVIC (if any) for the current gene, and prepare info to be written to output. Always one gene per line only.
     geneScores = [] # to keep track of the CIVIC score for each matched expression record
     resultMap = {}  # to keep track of all evidence items retrieved from each matched CIVIC record
-    drugMap = {}    # to keep track of evidence for CIVIC drug predictions for the given gene/line (across all matched records)
+    therapyMap = {}    # to keep track of evidence for CIVIC therapy predictions for the given gene/line (across all matched records)
 
     for match in matched:
         matchData = varMap[gene][match]
@@ -735,43 +741,43 @@ for lineIndx,line in enumerate(infile):
             if evidence_type not in resultMap.keys():
                 resultMap[evidence_type] = []
             if evidence_type == 'PREDICTIVE':
-                writeDrug = True
+                writetherapy = True
             else:
-                writeDrug = False
+                writetherapy = False
             # Returns a list of evidence items for the given CIVIC record and evidence type, already in written form
             # Only evidences coming from the matched cancer specificity are returned (either 'ct' if in white list, 'gt' in in high level list or 'nct' if unspecific)
-            (evidence_items,drugMap) = match_cancer_and_return_evidences(matchData, evidence_type, cancerTypeList, blackList, highLevelList, drugMap, writeDrug)
+            (evidence_items,therapyMap) = match_cancer_and_return_evidences(matchData, evidence_type, cancerTypeList, blackList, highLevelList, therapyMap, writetherapy)
             # Add resulting evidence strings for the current record under the appropriate evidence type
             for i in evidence_items:
                 # Add matched CIVIC record name to each evidence item string
                 resultMap[evidence_type].append(match + ':' + i)
 
 
-    ### Parse and process available drug prediction evidence (if any) to agree on CIVIC support decision
-    ### One support decision per available drug; prioritize based on ct and apply majority vote for support decision
+    ### Parse and process available therapy prediction evidence (if any) to agree on CIVIC support decision
+    ### One support decision per available therapy; prioritize based on ct and apply majority vote for support decision
 
-    ## Use dictionary of drug support for the current gene/line
-    ## Format: drug -> ct -> [support1,support2,..,support1] (keep track of all occurrences)
+    ## Use dictionary of therapy support for the current gene/line
+    ## Format: therapy -> ct -> [support1,support2,..,support1] (keep track of all occurrences)
     supportStrings = []
     ## If no predictive evidence is available, corresponding column in output will be empty (ie. '.')
-    for drug in drugMap.keys():
+    for therapy in therapyMap.keys():
         ## Prioritize cancer specificity: ct > gt > nct
         thisCT = ''
-        if 'ct' in drugMap[drug].keys():
+        if 'ct' in therapyMap[therapy].keys():
             thisCT = 'ct'
-        elif 'gt' in drugMap[drug].keys():
+        elif 'gt' in therapyMap[therapy].keys():
             thisCT = 'gt'
-        elif 'nct' in drugMap[drug].keys():
+        elif 'nct' in therapyMap[therapy].keys():
             thisCT = 'nct'
         else:
             print("Error! Unexpected ct case for gene %s." %(gene))
             sys.exit(1)
 
         ## Given the selected ct, count number of occurrences for each possible support type (if any)
-        count_pos = drugMap[drug][thisCT].count('POSITIVE')
-        count_neg = drugMap[drug][thisCT].count('NEGATIVE')
-        count_unk = drugMap[drug][thisCT].count('UNKNOWN_BLANK')
-        count_dns = drugMap[drug][thisCT].count('UNKNOWN_DNS')
+        count_pos = therapyMap[therapy][thisCT].count('POSITIVE')
+        count_neg = therapyMap[therapy][thisCT].count('NEGATIVE')
+        count_unk = therapyMap[therapy][thisCT].count('UNKNOWN_BLANK')
+        count_dns = therapyMap[therapy][thisCT].count('UNKNOWN_DNS')
 
         ## Pool UNKNOWN_BLANK and UNKNOWN_DNS together (as both result in unknown CIVIC support)
         count_total_unk = count_unk + count_dns
@@ -796,10 +802,10 @@ for lineIndx,line in enumerate(infile):
             print("Error! Unexpected support case for gene %s." %(gene))
             sys.exit(1)
 
-        ## Build support string for current drug(+gene in line)
-        ## Format: DRUG:CT:SUPPORT
-        drugSupport = drug + ':' + thisCT.upper() + ':' + tempSupport
-        supportStrings.append(drugSupport)
+        ## Build support string for current therapy(+gene in line)
+        ## Format: therapy:CT:SUPPORT
+        therapiesupport = therapy + ':' + thisCT.upper() + ':' + tempSupport
+        supportStrings.append(therapiesupport)
 
 
     ### Write results for current line to output (ie single gene + logFC value per line)
@@ -809,8 +815,8 @@ for lineIndx,line in enumerate(infile):
         outfileLine += '\t' + ';'.join(geneScores)
     else:
         outfileLine += '\t.'
-    ## Report CIVIC support decision for all the predicted drugs in the line
-    ## Format: DRUG1:CT:SUPPORT;DRUG2:CT:SUPPORT;..;DRUGN:CT:SUPPORT
+    ## Report CIVIC support decision for all the predicted therapies in the line
+    ## Format: therapy1:CT:SUPPORT;therapy2:CT:SUPPORT;..;therapyN:CT:SUPPORT
     if supportStrings:
         outfileLine += '\t' + ';'.join(supportStrings)
     else:

@@ -15,6 +15,7 @@ rule cellranger_count:
         # {sample} needs to be the prefix of all fastq files that belong to this sample.
         # NOTE: no dots are allowed in sample names!
         mySample="{sample}",
+        variousParams=config["tools"]["cellranger_count"]["variousParams"],
     resources:
         mem_mb=config["tools"]["cellranger_count"]["mem_mb"],
         runtime=config["tools"]["cellranger_count"]["runtime"],
@@ -32,8 +33,9 @@ rule cellranger_count:
         "--sample={params.mySample} "
         "--transcriptome={input.reference} "
         "--localcores={params.local_cores} "
-        "--fastqs=../../{input.fastqs_dir} "
+        "--fastqs={input.fastqs_dir} "
         "--nosecondary "
+        "{params.variousParams} "
         " 2>&1 | tee ../../{log} ) ; "
         "pwd ; "
         "gunzip {params.cr_out}{params.mySample}/outs/filtered_feature_bc_matrix/features.tsv.gz ; "

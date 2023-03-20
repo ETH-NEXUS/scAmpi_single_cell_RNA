@@ -79,3 +79,5 @@ use rule create_hdf5 as create_hdf5_starsolo with:
         genes_file="results/starsolo/{sample}.features.tsv",
         matrix_file="results/starsolo/{sample}.matrix.mtx",
         barcodes_file="results/starsolo/{sample}.barcodes.tsv",
+    conda:
+        "envs/create_hdf5.yaml"

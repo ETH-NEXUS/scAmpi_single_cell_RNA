@@ -375,10 +375,9 @@ cell_info$col[cell_info$nodg_lower_threshold] <- "cyan"
 both_filters <- rowSums(cell_info[, c("is_mt_outlier", "mt_higher_threshold")]) > 0 & rowSums(cell_info[, c("is_nodg_outlier", "nodg_lower_threshold")]) > 0
 cell_info$col[both_filters] <- "orange"
 
-cell_info$col[cell_info$cell_info_second] <- "magenta"
+cell_info$col[cell_info$cell_filter_second] <- "magenta"
 cell_info$col[cell_info$is_doublet] <- "green"
-cell_info$col <- as.factor(cell_info$col)
-levels(cell_info$col) <- c("black", "cyan", "green", "orange", "red", "magenta")
+cell_info$col <- factor(cell_info$col, levels = c("black", "cyan", "green", "orange", "red", "magenta"))
 
 # for manual colour scale
 my_cols <- c("black" = "black",
@@ -396,6 +395,7 @@ point_size <-  0.4 + (cell_info$log_library_size - min(cell_info$log_library_siz
 plot_cells_filtered <- ggplot(cell_info, aes(x = log2_nodg, y = fractionMTreads, alpha = 0.5)) +
   geom_point(aes(colour = col), size = point_size) +
   scale_colour_manual(values = my_cols,
+                      limits = my_cols,
                       labels = c("dot size corresponds to library size",
                                  "NODG too low",
                                  "doublets",

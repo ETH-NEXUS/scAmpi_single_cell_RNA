@@ -447,6 +447,8 @@ stopifnot(length(input_and_dgidb)+length(expected_civic_only)==length(all_drugs)
 stopifnot(length(expected_overlap)+length(expected_dgidb_only)+length(expected_civic_only)==length(all_drugs))
 
 ndrugs = length(all_drugs)
+cat("\n\n\nndrugs:\n")
+print(ndrugs)
 
 ########################################################################################################################
 
@@ -643,7 +645,8 @@ if (ndrugs == 0){
 
   ## For having more or less squared facets, use this rule of thumb
   nPanels = sqrt(ndrugs)
-  
+  nPanels = round(nPanels, digits = 0)
+
   str(dfPlot)
   pp = ggplot(dfPlot, aes(x=V1, y=V2) ) + 
     geom_point(aes(color=Prediction), size=1) + xlab("umap-1") + ylab("umap-2") + 
