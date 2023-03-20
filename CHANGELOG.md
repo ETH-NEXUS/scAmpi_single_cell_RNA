@@ -1,5 +1,10 @@
 # Changelog
 
+## [2.0.3] - 2023-03-20
+
+### Changed
+- specify which library should be used for the function ggsave to avoid conflict between ggplot2 and cowplot
+
 ## [2.0.2] - 2022-08-31
 
 ### Changed
