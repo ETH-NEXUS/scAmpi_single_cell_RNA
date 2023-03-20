@@ -188,7 +188,7 @@ p_rank_nodg <- ggplot(cell_info, aes(x = rank_nodg, y = NODG)) +
   theme(legend.position = c(0.8, 0.9))
 
 filename <- paste0(outdir, file_name, ".cell_ranking_nodgs.png")
-ggsave(filename = filename, plot = p_rank_nodg, width = 23, height = 18, units = "cm", dpi = 300)
+ggplot2::ggsave(filename = filename, plot = p_rank_nodg, width = 23, height = 18, units = "cm", dpi = 300)
 
 
 # check if any cells are left after filtering
@@ -430,4 +430,4 @@ plot_cells_filtered <- ggplot(cell_info, aes(x = log2_nodg, y = fractionMTreads,
         )
 
 plotname <- paste0(outdir, file_name, ".visualize_filtered_cells.png")
-ggsave(filename = plotname, plot = plot_cells_filtered, width = 19, height = 14, units = "cm", dpi = 300)
+ggplot2::ggsave(filename = plotname, plot = plot_cells_filtered, width = 19, height = 14, units = "cm", dpi = 300)
