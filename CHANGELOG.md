@@ -1,4 +1,9 @@
 # Changelog
+
+## [2.0.7] - 2023-03-20
+### Changed
+- specify which library should be used for the function `ggsave` to avoid conflict between the R packages `ggplot2` and `cowplot`
+
 ## [2.0.6] - 2023-02-14
 
 ### Fixed
