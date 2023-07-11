@@ -14,12 +14,17 @@ import re
 import os
 
 # Load package and import relevant functions
-import civicutils
-from civicutils.read_and_write import read_in_expr, get_dict_support, write_match
-from civicutils.query import query_civic
-from civicutils.filtering import filter_civic
-from civicutils.match import match_in_civic, annotate_ct, filter_ct, process_drug_support
+sys.path.append("/cluster/work/nexus/antoine/Projects/2023_07_CIViCutils_add_header_option/civicutils/civicutils/")
+#import civicutils
+#from civicutils.read_and_write import read_in_expr, get_dict_support, write_match
+#from civicutils.query import query_civic
+#from civicutils.filtering import filter_civic
+#from civicutils.match import match_in_civic, annotate_ct, filter_ct, process_drug_support
 
+from read_and_write import read_in_expr, get_dict_support, write_match
+from query import query_civic
+from filtering import filter_civic
+from match import match_in_civic, annotate_ct, filter_ct, process_drug_support
 
 ### Define global variable to ensure cache file is only loaded once even if several queries are performed
 global isLoad
@@ -72,7 +77,7 @@ if highLevelList == ['']:
 
 
 # Read-in file of input SNV variants
-(raw_data, expr_data, extra_header) = read_in_expr(inputFile)
+(raw_data, expr_data, extra_header) = read_in_expr(args.inputFile, Gene_name=args.colName_gene, Logfc_name=args.colName_logFC)
 
 # Query input genes in CIViC
 var_map = query_civic(list(expr_data.keys()), identifier_type="entrez_symbol")
@@ -101,15 +106,15 @@ annot_match = process_drug_support(match_map, annot_map, support_dict)
 
 # Write to output
 # Do not report the CT classification of each disease, and write column with the drug responses predicted for each available CT class of every variant match
-write_match(annot_match, annot_map, raw_data, extra_header, data_type="EXPR", outfile=outfile, has_support=True, has_ct=True, write_ct=False, write_support=True, write_complete=False)
+write_match(annot_match, annot_map, raw_data, extra_header, data_type="EXPR", outfile=args.outFile, has_support=True, has_ct=True, write_ct=False, write_support=True, write_complete=False)
 
 
 
 
-print('\nTotal # matches: {}'.format(nMatches))
-print('Total # no matches: {}'.format(noMatches))
-print('Total # unavailable: {}'.format(notFound))
-print('---------------------')
+#print('\nTotal # matches: {}'.format(nMatches))
+#print('Total # no matches: {}'.format(noMatches))
+#print('Total # unavailable: {}'.format(notFound))
+#print('---------------------')
 # TODO: only report # of genes instead of whole list?
-print('Genes with no CIViC variant data:\n {}'.format(','.join(genesNotFound)))
-print('\nUnmatched expression:\n {}'.format('\n '.join(not_matched)))
+#print('Genes with no CIViC variant data:\n {}'.format(','.join(genesNotFound)))
+#print('\nUnmatched expression:\n {}'.format('\n '.join(not_matched)))
