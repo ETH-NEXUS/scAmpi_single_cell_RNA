@@ -31,6 +31,45 @@ global isLoad
 isLoad = False
 
 
+def getPctIndices(firstInputLine):
+    """
+    Given the header, find the input columns containing pct_nonzero value (name is implicitly assumed).
+    :param firstInputLine:		Header of the input file
+    :return:			index of the column containing pct_nonzero value
+    """
+    firstLineSplit = firstInputLine.split('\t')
+    index_pct = -1
+    for pos in range(0,len(firstLineSplit)):
+        if "pct_nonzero" == firstLineSplit[pos].lower(): 
+            index_pct = pos           
+            
+    if index_pct == -1:
+        print("Error! Could not find input column 'pct_nonzero' in header %s." %(firstInputLine))
+        sys.exit(1)
+
+    return (index_pct)
+
+def filterStrictExpression(var_map, malignant_genes):
+    """
+    Apply filtering of variant-level CIViC records for term *EXPRESSION* according to the pct_nonzero value for the associated gene.
+    :param var_map:		Nested dictionary of genes and variant-level evidence records retrieved from CIViC.
+    :param malignant_genes:  List of genes with a pct_nonzero value higher than zero
+    :return:			Updated 'var_map' dictionary after filtering variant 
+    """
+
+    genes_to_remove = []
+    for gene, info in var_map.items():
+        if gene not in malignant_genes:
+            for variant, variant_info in info.items():
+                if variant_info["name"] == "EXPRESSION":
+                    genes_to_remove.append((gene, variant))
+
+    for gene, variant in genes_to_remove:
+        var_map[gene].pop(variant, None)
+
+    return(var_map)
+
+
 '''
 Script
 '''
@@ -69,33 +108,48 @@ print(os.getenv('CIVICPY_CACHE_FILE'))
 ## Sanity check for "empty" input lists (ie. in the form of [''])
 ## Turn them into "real" empty lists for implementation purposes
 if cancerTypeList == ['']:
-    cancerTypeList = []
+    cancerTypeList = [] 
 if blackList == ['']:
-    blackList = []
+    blackList = [] 
 if highLevelList == ['']:
     highLevelList = []
 
 
 # Read-in file of input SNV variants
-(raw_data, expr_data, extra_header) = read_in_expr(args.inputFile, Gene_name=args.colName_gene, Logfc_name=args.colName_logFC)
+(raw_data, expr_data, extra_header) = read_in_expr(args.inputFile, expected_gene_name=args.colName_gene, expected_logFC_name=args.colName_logFC)
+
+# if strictExpression = y, create a list with Gene with pct_nonzero > 0
+if args.strictExpression == "y":
+    infile = open(args.inputFile,'r')
+    index_pct = getPctIndices(infile.readline().strip())
+    malignant_genes = []
+    for lineIndx,line in enumerate(infile):
+        lineSplit = line.strip().split("\t")
+        pct = float(lineSplit[index_pct].strip())
+        if pct > 0:
+            malignant_genes.append(lineSplit[0])
+
 
 # Query input genes in CIViC
 var_map = query_civic(list(expr_data.keys()), identifier_type="entrez_symbol")
 
 # Filter undesired evidences to avoid matching later on
-var_map = filter_civic(var_map, evidence_status_in=["ACCEPTED"], var_origin_not_in=["GERMLINE"], output_empty=False)
+var_map = filter_civic(var_map, evidence_status_in=[], var_origin_not_in=[], output_empty=False)
+
+# if strictExpression = y, remove variant with only the term *EXPRESSION* as name if the genes associated to the variant is not part of the malignant_genes list.             
+if args.strictExpression == "y":
+    var_map = filterStrictExpression(var_map, malignant_genes)
 
 # Match input SNV variants in CIViC, pick highest tier available per input gene+variant
 # Tier hierarchy: 1 > 1b > 2 > 3 > 4
 (match_map, matched_ids, var_map) = match_in_civic(expr_data, data_type="EXPR", identifier_type="entrez_symbol", select_tier="highest", var_map=var_map)
 
 # Annotate matched CIViC evidences with cancer specificity of the associated diseases
-
 annot_map = annotate_ct(var_map, blackList, cancerTypeList, highLevelList)
 
-# Filter CIViC evidences to pick only those for the highest cancer specificity available
+# Do not apply any filtering and return all available disease specificities for each variant match
 # ct hierarchy: ct > gt > nct
-annot_map = filter_ct(annot_map, select_ct="highest")
+annot_map = filter_ct(annot_map, select_ct="all")
 
 # Get custom dictionary of support from data.yml (provided within the package)
 # This defines how each combination of evidence direction + clinical significance in CIViC is classified in terms of drug response (e.g. sensitivity, resistance, unknown, etc.)
