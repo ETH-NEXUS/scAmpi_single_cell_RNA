@@ -14,17 +14,12 @@ import re
 import os
 
 # Load package and import relevant functions
-sys.path.append("/cluster/work/nexus/antoine/Projects/2023_07_CIViCutils_add_header_option/civicutils/civicutils/")
-#import civicutils
-#from civicutils.read_and_write import read_in_expr, get_dict_support, write_match
-#from civicutils.query import query_civic
-#from civicutils.filtering import filter_civic
-#from civicutils.match import match_in_civic, annotate_ct, filter_ct, process_drug_support
+import civicutils
+from civicutils.read_and_write import read_in_expr, get_dict_support, write_match
+from civicutils.query import query_civic
+from civicutils.filtering import filter_civic
+from civicutils.match import match_in_civic, annotate_ct, filter_ct, process_drug_support
 
-from read_and_write import read_in_expr, get_dict_support, write_match
-from query import query_civic
-from filtering import filter_civic
-from match import match_in_civic, annotate_ct, filter_ct, process_drug_support
 
 ### Define global variable to ensure cache file is only loaded once even if several queries are performed
 global isLoad
@@ -39,14 +34,15 @@ def getPctIndices(firstInputLine):
     """
     firstLineSplit = firstInputLine.split('\t')
     index_pct = -1
+    
     for pos in range(0,len(firstLineSplit)):
         if "pct_nonzero" == firstLineSplit[pos].lower(): 
-            index_pct = pos           
-            
+            index_pct = pos    
+                   
     if index_pct == -1:
         print("Error! Could not find input column 'pct_nonzero' in header %s." %(firstInputLine))
         sys.exit(1)
-
+        
     return (index_pct)
 
 def filterStrictExpression(var_map, malignant_genes):
@@ -56,17 +52,17 @@ def filterStrictExpression(var_map, malignant_genes):
     :param malignant_genes:  List of genes with a pct_nonzero value higher than zero
     :return:			Updated 'var_map' dictionary after filtering variant 
     """
-
     genes_to_remove = []
+    
     for gene, info in var_map.items():
         if gene not in malignant_genes:
             for variant, variant_info in info.items():
                 if variant_info["name"] == "EXPRESSION":
                     genes_to_remove.append((gene, variant))
-
+                    
     for gene, variant in genes_to_remove:
         var_map[gene].pop(variant, None)
-
+        
     return(var_map)
 
 
@@ -118,7 +114,7 @@ if highLevelList == ['']:
 # Read-in file of input SNV variants
 (raw_data, expr_data, extra_header) = read_in_expr(args.inputFile, expected_gene_name=args.colName_gene, expected_logFC_name=args.colName_logFC)
 
-# if strictExpression = y, create a list with Gene with pct_nonzero > 0
+# if strictExpression = y, create a list with genes with pct_nonzero > 0
 if args.strictExpression == "y":
     infile = open(args.inputFile,'r')
     index_pct = getPctIndices(infile.readline().strip())
@@ -160,7 +156,7 @@ annot_match = process_drug_support(match_map, annot_map, support_dict)
 
 # Write to output
 # Do not report the CT classification of each disease, and write column with the drug responses predicted for each available CT class of every variant match
-write_match(annot_match, annot_map, raw_data, extra_header, data_type="EXPR", outfile=args.outFile, has_support=True, has_ct=True, write_ct=False, write_support=True, write_complete=False)
+write_match(annot_match, annot_map, raw_data, extra_header, data_type="EXPR", outfile=args.outFile, has_support=True, has_ct=True, write_ct=False, write_support=True, write_complete=False, expected_gene_name=args.colName_gene, expected_logFC_name=args.colName_logFC)
 
 
 
