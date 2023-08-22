@@ -10,3 +10,5 @@ dependencies:
     - "pip>=21.0.1"
     - pip:
         - "civicpy>=3.0.0"
+        - "civicutils>=1.0.3"
+        - "pyyaml>=6.0.1"

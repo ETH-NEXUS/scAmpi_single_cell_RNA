@@ -1,5 +1,11 @@
 # Changelog
 
+## [2.0.8] - 2023-08-22
+
+### Changed
+- Implementation of the CIViCutils package for the query_civic.py script. The query_civic environment has been updated.
+- Added in the configuration file the possibility to provide a path to the CIVICPY database cache file and it is now called and exported in the query_civic rule.
+
 ## [2.0.7] - 2023-03-20
 ### Changed
 - specify which library should be used for the function `ggsave` to avoid conflict between the R packages `ggplot2` and `cowplot`

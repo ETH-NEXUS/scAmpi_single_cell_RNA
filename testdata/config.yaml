@@ -225,12 +225,14 @@ tools:
     # can be "y" or "n", specify whether stricter CIViC evidence interpretation should be applied for term "EXPRESSION".
     # requires "pct_nonzero > 0" in DE analysis to assume "expression"
     strictExpression: "y"
+    # path to the CIVICPY database cache file
+    CIVICPY_CACHE_FILE: "CIVICPY_CACHE_FILE='/cluster/customapps/biomed/nexus/sharedutils/db_cache/civicDB/cache.pkl'"
 
   # show drug support on UMAP plot
   plot_drug_prediction:
     variousParams: '--drugPredEnd "clinicalAnnotation.civic.txt"
       --name_DGIDB "DGIDB-drugs(Score,Type)"
-      --name_CIVIC "CIViC_therapy_Support"'
+      --name_CIVIC "CIViC_Drug_Support"'
 
   # perform gene set enrichment analysis on DE genes
   gene_set_enrichment:
