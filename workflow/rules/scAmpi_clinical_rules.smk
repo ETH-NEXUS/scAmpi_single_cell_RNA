@@ -163,6 +163,7 @@ rule query_civic:
         colName_logFC=config["tools"]["query_civic"]["colName_logFC"],
         strictExpression=config["tools"]["query_civic"]["strictExpression"],
         custom_script=workflow.source_path("../scripts/query_civic_expr.py"),
+        path_civicpy_cache=config["tools"]["query_civic"]["CIVICPY_CACHE_FILE"],
     conda:
         "../envs/query_civic.yaml"
     resources:
@@ -174,6 +175,7 @@ rule query_civic:
     benchmark:
         "logs/benchmark/query_civic/{sample}.{i}.query_civic.benchmark"
     shell:
+        "export {params.path_civicpy_cache} && "
         "python {params.custom_script} "
         "--inputTable {input.infile} "
         "--outFile {output.outfile} "
