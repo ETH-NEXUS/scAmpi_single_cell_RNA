@@ -12,7 +12,9 @@ def cellranger_to_hdf5 (genes, matrix_file, barcodes, out_path):
     matrix = mmread(matrix_file.__str__()).astype("float32").todense().T
     matrix = np.asarray(matrix)
 
-    gene_ids = np.genfromtxt(genes.__str__(), dtype='S16')[:,0]
+    # Check why dtype needs to be supplied & find better solution than hardcoding it. For mouse it needs to be 19, for human 16 is enough.
+#    gene_ids = np.genfromtxt(genes.__str__(), dtype='S16')[:,0]
+    gene_ids = np.genfromtxt(genes.__str__(), dtype='S19')[:,0]
     gene_names = np.genfromtxt(genes.__str__(), dtype='S16')[:, 1]
     cell_names = np.genfromtxt(barcodes.__str__(), dtype='S16')
 
