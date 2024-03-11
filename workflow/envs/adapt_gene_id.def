@@ -1,0 +1,24 @@
+Bootstrap: docker
+From: rocker/r-ver:4.3.3
+
+# Install required system dependencies
+%post 
+  apt-get update && apt-get install -y \
+    r-base-dev \
+    libssl-dev \
+    libxml2-dev \
+    libgit2-dev \
+    libcurl4-openssl-dev 
+
+# Install required R packages
+%post
+  R -e "install.packages('optparse', repos='https://cran.rstudio.com/')"
+  R -e "if (!requireNamespace('BiocManager', quietly = TRUE)) install.packages('BiocManager')"
+  R -e "BiocManager::install('EnsDb.Mmusculus.v79')"
+
+# Metadata
+  echo "R version: $(R --version | grep -o '[0-9].[0-9].[0-9]')" > /docker-metadata.txt
+  echo "Base image: rocker/r-ver:4.0.0" >> /docker-metadata.txt
+  echo "optparse version: $(R -e "packageVersion('optparse')")" >> /docker-metadata.txt
+  echo "EnsDb.Mmusculus.v79 version: $(R -e "packageVersion('EnsDb.Mmusculus.v79')")" >> /docker-metadata.txt
+
