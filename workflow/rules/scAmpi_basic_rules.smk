@@ -169,6 +169,7 @@ rule sctransform_preprocessing:
         number_genes=config["tools"]["sctransform_preprocessing"]["number_genes"],
         min_var=config["tools"]["sctransform_preprocessing"]["min_var"],
         n_nn=config["tools"]["sctransform_preprocessing"]["n_nn"],
+        organism=config["inputOutput"]["organism"],
         outDir="results/counts_corrected/",
         custom_script=workflow.source_path("../scripts/sctransform_preprocessing.R"),
     conda:
@@ -188,6 +189,7 @@ rule sctransform_preprocessing:
         "--number_genes {params.number_genes} "
         "--min_var {params.min_var} "
         "--n_nn {params.n_nn} "
+        "--organism {params.organism} "
         "--outdir {params.outDir} "
         "&> {log} "
 

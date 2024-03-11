@@ -30,6 +30,7 @@ make_option("--sample", type = "character", help = "Sample name."),
 make_option("--number_genes", type = "character", help = "Number of genes with the highest variance in the residuals that will be used for the calculation of umap coordinates and given out into an hdf5 file for the phenograph clustering."),
 make_option("--min_var", type = "character", help = "Minimum variance of the residuals for a gene to be used for the calculation of umap coordinates and given out into an hdf5 file for the phenograph clustering."),
 make_option("--n_nn", type = "character", help = "Number of nearest neighbours for the UMAP calculation."),
+make_option("--organism", type = "character", help = "Organism. Either mouse or human are supported."),
 make_option("--outdir", type = "character", help = "Path to output directory.")
 )
 
@@ -37,59 +38,172 @@ opt_parser = OptionParser(option_list = option_list)
 opt = parse_args(opt_parser)
 
 
-dat = h5read(opt$inHDF5, "raw_counts")
-A = rowSums(dat)
-B = colSums(dat)
-C = apply(dat, 2, function(x) length(which(x>0)))
-dat = dat[!is.na(A) & A > 0, B > 0 & C > 0]
+#dat = h5read(opt$inHDF5, "raw_counts")
+#A = rowSums(dat)
+#B = colSums(dat)
+#C = apply(dat, 2, function(x) length(which(x>0)))
+#dat = dat[!is.na(A) & A > 0, B > 0 & C > 0]
 
+## cell description table
+#cell_desc = as.data.frame(h5read(opt$inHDF5, "cell_attrs"))
+#colnames(cell_desc)[colnames(cell_desc) == "cell_names"] = "barcodes"
+#rownames(cell_desc) = cell_desc$barcodes
+##str(cell_desc)
+## gene description table
+#gene_desc = as.data.frame(h5read(opt$inHDF5, "gene_attrs"))
+#gene_desc$SYMBOL = gene_desc$gene_names
+#str(gene_desc)
 # cell description table
-cell_desc = as.data.frame(h5read(opt$inHDF5, "cell_attrs"))
-colnames(cell_desc)[colnames(cell_desc) == "cell_names"] = "barcodes"
-rownames(cell_desc) = cell_desc$barcodes
-str(cell_desc)
-# gene description table
-gene_desc = as.data.frame(h5read(opt$inHDF5, "gene_attrs"))
-gene_desc$SYMBOL = gene_desc$gene_names
-str(gene_desc)
-
-
 # exclude duplicated gene symbols
-if(length(which(duplicated(gene_desc$SYMBOL)))>0) warning("Some gene symbols are duplicated. Only the first is kept.")
-keep = setdiff(seq(nrow(gene_desc)), which(duplicated(gene_desc$SYMBOL)))
-gene_desc = gene_desc[keep,]
-dat = dat[keep,]
-rownames(gene_desc) = gene_desc$gene_ids
-rownames(dat) = rownames(gene_desc)
-colnames(dat) = rownames(cell_desc)
-# calculate more gene_desc features
-gene_desc$mean = rowMeans(dat)
-gene_desc$detection_rate = rowMeans(dat > 0)
-gene_desc$var = apply(dat, 1, var)
-# calculate more cell_desc features
-cell_desc$n_umi = colSums(dat)
-cell_desc$n_gene = colSums(dat > 0)
-cell_desc$log_umi = log(cell_desc$n_umi)
-## cell cycle correction scores
-hs.pairs <- readRDS(system.file("exdata", "human_cycle_markers.rds", package="scran"))
+#if(length(which(duplicated(gene_desc$SYMBOL)))>0) warning("Some gene symbols are duplicated. Only the first is kept.")
+#keep = setdiff(seq(nrow(gene_desc)), which(duplicated(gene_desc$SYMBOL)))
+#gene_desc = gene_desc[keep,]
+#dat = dat[keep,]
+#rownames(gene_desc) = gene_desc$gene_ids
+#rownames(dat) = rownames(gene_desc)
+#colnames(dat) = rownames(cell_desc)
+#str(dat)
+## calculate more gene_desc features
+#gene_desc$mean = rowMeans(dat)
+#gene_desc$detection_rate = rowMeans(dat > 0)
+#gene_desc$var = apply(dat, 1, var)
+## calculate more cell_desc features
+#cell_desc$n_umi = colSums(dat)
+#cell_desc$n_gene = colSums(dat > 0)
+#cell_desc$log_umi = log(cell_desc$n_umi)
+### cell cycle correction scores
+
+#if (opt$organism == "human")(
+#  hs.pairs <- readRDS(system.file("exdata", "human_cycle_markers.rds", package="scran"))
+#) else if (opt$organism == "mouse")(
+#  mm.pairs <- readRDS(system.file("exdata", "mouse_cycle_markers.rds", package="scran"))
+#)
+
+#print(mm.pairs)
+#print("Start performing scran::cyclone: ")
+#if (opt$organism == "human")(
+#  cecy = scran::cyclone(dat, pairs=hs.pairs)
+#) else if (opt$organism == "mouse")(
+#  cecy = scran::cyclone(dat, pairs=mm.pairs, gene.names=rownames(dat))
+#)
+
+# Read gene expression data from HDF5 file
+geneExpression <- h5read(opt$inHDF5, "raw_counts")
+
+# Calculate total expression for each gene
+geneTotalExpression <- rowSums(geneExpression)
+
+# Calculate total expression for each barcode
+barcodeTotalExpression <- colSums(geneExpression)
+
+# Count the number of expressed genes for each barcode
+expressedGenesCount <- apply(geneExpression, 2, function(x) sum(x > 0))
+
+# Filter gene expression data based on conditions:
+# 1. Ensure each gene has non-zero expression in at least one barcode
+# 2. Ensure each barcode has non-zero expression in at least one gene
+filteredGeneExpression <- geneExpression[!is.na(geneTotalExpression) & geneTotalExpression > 0, barcodeTotalExpression > 0 & expressedGenesCount > 0]
+
+# Read cell attributes from HDF5 file and convert them into a data frame
+cell_desc <- as.data.frame(h5read(opt$inHDF5, "cell_attrs"))
+
+# Rename column "cell_names" to "barcodes" for clarity
+colnames(cell_desc)[colnames(cell_desc) == "cell_names"] <- "barcodes"
+
+# Set row names of cell_desc to barcodes
+rownames(cell_desc) <- cell_desc$barcodes
+
+# Read gene attributes from HDF5 file and convert them into a data frame
+gene_desc <- as.data.frame(h5read(opt$inHDF5, "gene_attrs"))
+
+# Create a new column "SYMBOL" and copy values from "gene_names"
+gene_desc$SYMBOL <- gene_desc$gene_names
+
+# Exclude duplicated gene symbols
+if (any(duplicated(gene_desc$SYMBOL))) {
+    warning("Some gene symbols are duplicated. Only the first is kept.")
+}
+keep <- !duplicated(gene_desc$SYMBOL)
+gene_desc <- gene_desc[keep,]
+filteredGeneExpression <- filteredGeneExpression[keep,]
+
+# Update row names of gene_desc and filteredGeneExpression
+rownames(gene_desc) <- gene_desc$gene_ids
+rownames(filteredGeneExpression) <- rownames(gene_desc)
+
+# Update column names of filteredGeneExpression to match row names of cell_desc
+colnames(filteredGeneExpression) <- rownames(cell_desc)
+
+# Calculate more gene_desc features
+gene_desc$mean <- rowMeans(filteredGeneExpression)
+gene_desc$detection_rate <- rowMeans(filteredGeneExpression > 0)
+gene_desc$var <- apply(filteredGeneExpression, 1, var)
+
+# Calculate more cell_desc features
+cell_desc$n_umi <- colSums(filteredGeneExpression)
+cell_desc$n_gene <- colSums(filteredGeneExpression > 0)
+cell_desc$log_umi <- log(cell_desc$n_umi)
+
+# Read cycle marker gene pairs based on the specified organism
+if (opt$organism == "human") {
+  hs.pairs <- readRDS(system.file("exdata", "human_cycle_markers.rds", package="scran"))
+} else if (opt$organism == "mouse") {
+  mm.pairs <- readRDS(system.file("exdata", "mouse_cycle_markers.rds", package="scran"))
+  print(head(mm.pairs))
+}
+
+# Print a message indicating the start of cyclone
 print("Start performing scran::cyclone: ")
-cecy = scran::cyclone(dat, pairs=hs.pairs)
+
+# Perform scran::cyclone based on the specified organism
+if (opt$organism == "human") {
+  cecy <- scran::cyclone(filteredGeneExpression, pairs = hs.pairs)
+} else if (opt$organism == "mouse") {
+  cecy <- scran::cyclone(filteredGeneExpression, pairs = mm.pairs, gene.names = rownames(filteredGeneExpression), verbose = TRUE)
+}
+
+# Assign cell cycle scores and phases to cell_desc
 cell_desc$g2m_score = cecy$normalized.scores$G2M
+print(head(cell_desc$g2m_score))
+print(head(filteredGeneExpression))
+print(str(filteredGeneExpression))
 cell_desc$s_score = cecy$normalized.scores$S
 cell_desc$cycle_phase = cecy$phases
-## variance stabilizing transformation:
+
+# Perform variance stabilizing transformation (VST)
 set.seed(44)
 print("Start performing sctransform::vst: ")
-vst_out = sctransform::vst(dat, cell_attr = cell_desc, method="nb_fast",
+vst_out = sctransform::vst(filteredGeneExpression, cell_attr = cell_desc, method = "nb_fast",
                            latent_var = c('log_umi'),
                            latent_var_nonreg = c("g2m_score", "s_score"),
-                           return_gene_attr = T, return_cell_attr = T)
+                           return_gene_attr = TRUE, return_cell_attr = TRUE)
+
+# Smooth the transformed data using PCA
 print("Start performing sctransform::smooth_via_pca: ")
 y_smooth = sctransform::smooth_via_pca(vst_out$y, do_plot = FALSE)
+
+# Perform batch correction and normalization
 print("Start performing sctransform::correct: ")
 dat_cor = sctransform::correct(vst_out, data = y_smooth,
                                do_round = TRUE, do_pos = FALSE)
-#dev_res = get_deviance_residuals(vst_out, dat)
+
+
+#cell_desc$g2m_score = cecy$normalized.scores$G2M
+#cell_desc$s_score = cecy$normalized.scores$S
+#cell_desc$cycle_phase = cecy$phases
+### variance stabilizing transformation:
+#set.seed(44)
+#print("Start performing sctransform::vst: ")
+#vst_out = sctransform::vst(dat, cell_attr = cell_desc, method="nb_fast",
+#                           latent_var = c('log_umi'),
+#                           latent_var_nonreg = c("g2m_score", "s_score"),
+#                           return_gene_attr = T, return_cell_attr = T)
+#print("Start performing sctransform::smooth_via_pca: ")
+#y_smooth = sctransform::smooth_via_pca(vst_out$y, do_plot = FALSE)
+#print("Start performing sctransform::correct: ")
+#dat_cor = sctransform::correct(vst_out, data = y_smooth,
+#                               do_round = TRUE, do_pos = FALSE)
+##dev_res = get_deviance_residuals(vst_out, dat)
 
 # Print string of the model:
 print("Character representation of the model formula:")
@@ -129,9 +243,9 @@ ggsave(opt$outdir %&% opt$sample %&% ".mean_vs_variance_plot_2.png", mvp2, dpi =
 ## make SingleCellExperiment object and save to disk
 vst_out$gene_attr$gene_ids = rownames(vst_out$gene_attr)
 gene_desc = merge(vst_out$gene_attr, gene_desc, sort=F, by = "gene_ids")
-idx = match(rownames(dat_cor), rownames(dat))
-idy = match(colnames(dat_cor), colnames(dat))
-sce = SingleCellExperiment(assays = list(counts=dat[idx, idy],
+idx = match(rownames(dat_cor), rownames(filteredGeneExpression))
+idy = match(colnames(dat_cor), colnames(filteredGeneExpression))
+sce = SingleCellExperiment(assays = list(counts=filteredGeneExpression[idx, idy],
                                          normcounts=dat_cor,
                                          pearson_resid=vst_out$y),
                            colData = cell_desc,
