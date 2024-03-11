@@ -44,7 +44,7 @@ option_list <- list(
   make_option("--nmads_NODG", type = "character", help = "Number of median-absolute-deviations away from median required for a value to be called an outlier, e.g. 5"),
   make_option("--nmads_fractionMT", type = "character", help = "Number of median-absolute-deviations away from median required for a value to be called an outlier, e.g. 5"),
   make_option("--outDir", type = "character", help = "Full path to output directory"),
-  make_option("--genomeVersion", type = "character", help = "Specify the genome annotation version, either hg19 or GRCh38 are supported. The default is GRCh38."),
+  make_option("--genomeVersion", type = "character", help = "Specify the genome annotation version, either hg19 or GRCh38 or for mouse the ensembl version are supported. The default is GRCh38."),
   make_option("--threshold_NODG", type = "character", help = "Hard threshold that gives the minimum NODG a cell must have to be further processed. E.g. 250"),
   make_option("--threshold_fractionMT", type = "character", help = "Hard threshold that gives the maximum fraction of MT reads a cell can have and be further processed. E.g. 0.5"),
   make_option("--minNumberCells", type = "character", help = "Minimum number of cells that should express a gene for it to be kept. E.g. 20"),
@@ -91,6 +91,8 @@ print(str(opt$protein_coding_only))
 # get count matrix
 umi_matrix <- h5read(opt$hdf5File, "raw_counts")
 # link cell and gene information to matrix
+print(h5read(opt$hdf5File, "gene_attrs/gene_ids")[duplicated(h5read(opt$hdf5File, "gene_attrs/gene_ids"))])
+
 rownames(umi_matrix) <- h5read(opt$hdf5File, "gene_attrs/gene_ids")
 colnames(umi_matrix) <- h5read(opt$hdf5File, "cell_attrs/cell_names")
 
@@ -131,7 +133,7 @@ if (opt$remove_doublets) {
 cat("\n\n\n###   Filter cells with fraction of reads mapped to MT-genes\n\n")
 
 # Get all mitochondrial genes:
-gene_info$is_mt <- grepl("^MT-", gene_info$hgnc_symbol)
+gene_info$is_mt <- grepl("^MT-", gene_info$hgnc_symbol, ignore.case=TRUE)
 mt <- gene_info[gene_info$is_mt, "ensembl_gene_id"]
 glue("\n### Number of MT- genes: ", {length(mt)})
 glue("### Gene IDs of all MT- genes:")
@@ -217,6 +219,11 @@ if (opt$protein_coding_only) {
     print("Use genome version hg19.")
     mart_obj <- biomaRt::useEnsembl(biomart = "ensembl", host = "www.ensembl.org", dataset = "hsapiens_gene_ensembl", GRCh = 37)
   }
+  
+  if (genomeVersion == "111") {
+    print("Use genome version mm34.")
+    mart_obj <- biomaRt::useEnsembl(biomart = "ensembl", host = "www.ensembl.org", dataset = "mmusculus_gene_ensembl", version = 111 )
+  }
   print(mart_obj)
 
   # get table with biomart info of only protein-coding genes
@@ -226,6 +233,8 @@ if (opt$protein_coding_only) {
                                            mart = mart_obj,
                                            uniqueRows = T)
 
+  print(biomart_protein_coding)
+  stop()
   # get mask if non-protein coding filter was applied for each gene, for exporting the information on filtered genes
   gene_info$non_protein_coding <- !(gene_info$ensembl_gene_id %in% biomart_protein_coding$ensembl_gene_id)
 
@@ -256,7 +265,7 @@ gene_info$too_few_cells_express <- rowSums(matrix_cells_removed > 0) < minNumber
 ### Filter genes that encode for ribosomal proteins
 cat("\n\n###   Filter genes encoding for ribosomal proteins\n\n")
 gene_info$encodes_ribo_protein <- grepl(x = gene_info$hgnc_symbol,
-                                        pattern = "^(RPL|MRPL|RPS|MRPS)")
+                                        pattern = "^(RPL|MRPL|RPS|MRPS)" , ignore.case=TRUE)
 
 # apply gene filters
 if (opt$protein_coding_only) {

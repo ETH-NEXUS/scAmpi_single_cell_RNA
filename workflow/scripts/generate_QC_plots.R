@@ -127,7 +127,7 @@ for (N in c(25,50,100)) {
 
 ###  Plot proportion of mitochondrial (MT) reads
 # Grep all mitochondrial genes:
-mt <- as.vector(ENS2HGNC[endog,1][grep("^MT-", ENS2HGNC[endog,2])])
+mt <- as.vector(ENS2HGNC[endog,1][grep("^MT-", ENS2HGNC[endog,2], ignore.case=TRUE)])
 print(length(mt))
 print(mt)
 
@@ -171,11 +171,11 @@ dev.off()
 # Fraction of reads mapping to genes that encode for ribosomal proteins
 
 # Calculate fraction of ribosomal reads
-riboall <- as.vector(ENS2HGNC[endog,1][grep("^(RPL|MRPL|RPS|MRPS)", ENS2HGNC[endog,2])])
+riboall <- as.vector(ENS2HGNC[endog,1][grep("^(RPL|MRPL|RPS|MRPS)", ENS2HGNC[endog,2], ignore.case=TRUE)])
 print(length(riboall))
 print(head(riboall))
 
-ribo_names <- as.vector(ENS2HGNC[endog,2][grep("^(RPL|MRPL|RPS|MRPS)", ENS2HGNC[endog,2])])
+ribo_names <- as.vector(ENS2HGNC[endog,2][grep("^(RPL|MRPL|RPS|MRPS)", ENS2HGNC[endog,2],ignore.case=TRUE,)])
 print(length(ribo_names))
 print(head(ribo_names))
 
