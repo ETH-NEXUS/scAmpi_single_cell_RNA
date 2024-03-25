@@ -1,0 +1,43 @@
+SYMBOL	group	notes	known_mutations
+Pdpn	LECs		
+Prox1	LECs		
+Pecam1	LECs		
+Ptprc	Leukocytes		
+Ccl21a	LECs		
+Ccl21b	LECs		
+Ccl21d	LECs		
+Ccl21e	LECs		
+Ccl21f	LECs		
+Lyve1	LECs		
+Foxp2	LECs		
+Cldn11	LECs		
+Alcam	LECs		
+Esam	LECs		
+Ptx3	LECs		
+Mrc1	LECs		
+Ackr2	LECs		
+Cd3e	Leukocytes		
+Cd8a	Leukocytes		
+Tcf7	Leukocytes		
+Lef1	Leukocytes		
+Sell	Leukocytes		
+Cd3d	Leukocytes		
+Cd3g	Leukocytes		
+Foxp3	Leukocytes		
+Ctla4	Leukocytes		
+Trdc	Leukocytes		
+Itgae	Leukocytes		
+Itgam	Leukocytes		
+Cd207	Leukocytes		
+Itgax	Leukocytes		
+Fcgr1	Leukocytes		
+Cd19	Leukocytes		
+Cd79a	Leukocytes		
+Ccr2	Leukocytes		
+Marco	Leukocytes		
+Ncr1	Leukocytes		
+Prf1	Leukocytes		
+Icam1	additional Genes 
+Vcam1	additional Genes
+Nrp1	additional Genes
+Nectin2	additional Genes

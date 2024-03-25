@@ -1,0 +1,11 @@
+Major	Subtype
+B.cells_melanoma_Tirosh16	B.cells.naive_normal_Newman15,B.cells.memory_normal_Newman15
+Plasma.cells_normal_Newman15	none
+Melanoma.melanocytic_melanoma_Tirosh16	none
+Melanoma.mesenchymal_melanoma_literature	none
+CAFs_melanoma_Tirosh16	none
+Endothelial.cells_melanoma_Tirosh16	none
+T.cells_melanoma_Tirosh16	T.cells.CD8_normal_Newman15,T.cells.CD4.naive_normal_Newman15,T.cells.memory.resting_normal_Newman15,T.cells.memory.activated_normal_Newman15,T.cells.regulatory_normal_Newman15,T.cells.gamma.delta_normal_Newman15,NK.cells.resting_normal_Newman15,NK.cells.activated_normal_Newman15,Tcell.CD8.early.activated_melanoma_Feldman18,T.cell.memory.effector_melanoma_Feldman18,T.cell.CD8.exhausted_melanoma_Feldman18
+Macrophages_melanoma_Tirosh16	M1.Macrophages_normal_literature,M2.Macrophages_normal_literature,TAM.Macrophages_normal_literature,TCRpos.Macrophages_normal_literature,CD169pos.Macrophages_normal_literature
+Dendritic.cells_normal_Newman15.MERGED	none
+Plasmacytoid.dendritic.cell_melanoma_classifier	none
