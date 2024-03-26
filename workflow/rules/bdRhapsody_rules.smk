@@ -41,9 +41,9 @@ rule adapt_gene_id:
         singularity=config["tools"]["singularity"],
         call=config["tools"]["adapt_gene_id"]["call"]
     resources:
-        mem_mb=config["computingResources"]["mem_mb"]["low"],
-        runtime=config["computingResources"]["runtime"]["low"],
-    threads: config["computingResources"]["threads"]["low"]
+        mem_mb=config["computingResources"]["mem_mb"]["medium"],
+        runtime=config["computingResources"]["runtime"]["medium"],
+    threads: config["computingResources"]["threads"]["medium"]
     log:
         "logs/adapt_gene_id/{sample}.log",
     benchmark:

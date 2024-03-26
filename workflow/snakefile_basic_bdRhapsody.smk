@@ -61,8 +61,9 @@ rule scAmpi_basic:
             sample=sample_ids,
         ),
         expand("results/plotting/{sample}.celltype_barplot.png", sample=sample_ids),
-        expand("results/gsva/{sample}.gsetscore_hm.png", sample=sample_ids),
-        expand("results/diff_exp_analysis/{sample}/", sample=sample_ids),
+        # both gsva and de analysis have not yet been tested and used on mouse bd rhapsody data.
+#        expand("results/gsva/{sample}.gsetscore_hm.png", sample=sample_ids),
+#        expand("results/diff_exp_analysis/{sample}/", sample=sample_ids),
     output:
         "results/complete.txt",
     shell:
