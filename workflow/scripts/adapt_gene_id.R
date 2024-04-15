@@ -37,6 +37,12 @@ print(ensembl_ids)
 # Replace IDs with Ensembl IDs in the first column
 my_features[, 1] <- ensembl_ids
 
+# Write a list of all genes where no Ensembl ID could be assigned
+na_features <- my_features[is.na(my_features[,1]),2, drop = FALSE]
+colnames(na_features) <- "Genes_without_Ensembl_ID"
+no_match_file <- gsub("matrix\\.original\\.mtx", "unmatched_genes\\.txt", opt$matrix)
+write.table(na_features, no_match_file, row.names = FALSE, quote = FALSE)
+
 # Filter out rows in the feature barcode matrix where the feature is NA
 non_na_features <- my_features[!is.na(my_features[, 1]),1]
 my_non_na_features <- my_features[!is.na(my_features[, 1]),]

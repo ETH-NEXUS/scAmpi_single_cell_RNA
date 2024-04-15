@@ -170,6 +170,7 @@ rule sctransform_preprocessing:
         min_var=config["tools"]["sctransform_preprocessing"]["min_var"],
         n_nn=config["tools"]["sctransform_preprocessing"]["n_nn"],
         organism=config["inputOutput"]["organism"],
+	correct_cell_cycle=config["tools"]["sctransform_preprocessing"]["correct_cell_cycle"],
         outDir="results/counts_corrected/",
         custom_script=workflow.source_path("../scripts/sctransform_preprocessing.R"),
     conda:
@@ -190,6 +191,7 @@ rule sctransform_preprocessing:
         "--min_var {params.min_var} "
         "--n_nn {params.n_nn} "
         "--organism {params.organism} "
+	"--correct_cell_cycle {params.correct_cell_cycle} "
         "--outdir {params.outDir} "
         "&> {log} "
 
@@ -271,6 +273,7 @@ rule celltyping:
     output:
         outfile="results/celltyping/{sample}.celltyping.phenograph_celltype_association.txt",
         out_sce="results/celltyping/{sample}.celltyping.RDS",
+        final_assignment="results/celltyping/{sample}.cts_final.txt",
     params:
         min_genes=config["tools"]["celltyping"]["min_genes"],
         celltype_lists=config["resources"]["celltype_lists"],
@@ -298,7 +301,32 @@ rule celltyping:
         "--outputDirec {params.outputDirec} "
         "&> {log} "
 
+# generate a summary table with the number of cells per cell type and sample
+# currently uses the same env as the plotting since it has all required packages
+rule celltype_summary_table:
+    input:
+        expand("results/celltyping/{sample}.cts_final.txt", sample=sample_ids)
+    output:
+        "results/celltyping/cells_per_celltype_and_sample.txt"
+    params:
+        custom_script=workflow.source_path("../scripts/celltype_summary.R"),
+    resources:
+        mem_mb=config["computingResources"]["mem_mb"]["low"],
+        runtime=config["computingResources"]["runtime"]["low"],
+    threads: config["computingResources"]["threads"]["low"]
+    log:
+        "logs/celltyping/celltype_summary.log"
+    conda:
+        "../envs/plotting.yaml"
+    shell:
+        "Rscript {params.custom_script} "
+        "--input {input} "
+        "--output {output} "
+        "&> {log}"
 
+
+
+# Todo: Clearify in a bigger group if this should be part of the default 
 # filter out atypical cells from sce object
 rule remove_atypical_cells:
     input:
@@ -380,13 +408,14 @@ rule plotting:
         genes_of_interest=config["resources"]["priority_genes"],
         colour_config=config["resources"]["colour_config"],
         use_alias=config["tools"]["plotting"]["use_alias"],
+        correct_cell_cycle=config["tools"]["sctransform_preprocessing"]["correct_cell_cycle"],
         custom_script=workflow.source_path("../scripts//plotting.R"),
     conda:
         "../envs/plotting.yaml"
     resources:
         mem_mb=config["computingResources"]["mem_mb"]["medium"],
-        runtime=config["computingResources"]["runtime"]["medium"],
-    threads: config["computingResources"]["threads"]["medium"]
+        runtime=config["computingResources"]["runtime"]["low"],
+    threads: config["computingResources"]["threads"]["low"]
     log:
         "logs/plotting/{sample}.log",
     benchmark:
@@ -399,13 +428,14 @@ rule plotting:
         "--sampleName {params.sampleName} "
         "--colour_config {params.colour_config} "
         "--toggle_label {params.use_alias} "
+        "--correct_cell_cycle {params.correct_cell_cycle} "
         "&> {log} "
 
 
 # give out gene expression values per cluster
 rule gene_exp:
     input:
-        sce_in="results/atypical_removed/{sample}.atypical_removed.RDS",
+        sce_in="results/celltyping/{sample}.celltyping.RDS",
     output:
         out="results/gene_exp/{sample}.gene_expression_per_cluster.tsv",
     params:

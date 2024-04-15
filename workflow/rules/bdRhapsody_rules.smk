@@ -12,7 +12,7 @@ rule unzip_bdrhapsody_matrix:
     output:
         features_file="results/bdr_matrix/{sample}.features.original.tsv",
         matrix_file="results/bdr_matrix/{sample}.matrix.original.mtx",
-        barcodes_file="results/bdr_matrix/{sample}.barcodes.tsv",
+        barcodes_file="results/bdr_matrix/{sample}.barcodes.tsv"
     params:
         br_out="results/bdr_matrix/",
         mySample="{sample}",
@@ -37,6 +37,7 @@ rule adapt_gene_id:
     output:
         features_file="results/bdr_matrix/{sample}.features.tsv",
         matrix_file="results/bdr_matrix/{sample}.matrix.mtx",
+        unmatched="results/bdr_matrix/{sample}.unmatched_genes.txt"
     params:
         singularity=config["tools"]["singularity"],
         call=config["tools"]["adapt_gene_id"]["call"]

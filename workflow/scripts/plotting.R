@@ -36,7 +36,8 @@ make_option("--genelist", type = "character", help = "Path to a tab separated fi
 make_option("--colour_config", type = "character", help = "Text file that specifies a fixed colour for each cell type."),
 make_option("--sampleName", type = "character", help = "Sample name that will be added to the names of all output files."),
 make_option("--outDir", type = "character", help = "Full path to output directory."),
-make_option("--toggle_label", type = "logical", action = "store_true", default = TRUE,  help = "Set gene plot title labels to include user-defined gene aliases. (On by default.)")
+make_option("--toggle_label", type = "logical", action = "store_true", default = TRUE,  help = "Set gene plot title labels to include user-defined gene aliases. (On by default.)"),
+make_option("--correct_cell_cycle", type = "logical", action = "store_true", default = TRUE,  help = "Should cell cycle correction be applied? (On by default.)")
 )
 opt_parser = OptionParser(option_list = option_list)
 opt = parse_args(opt_parser)
@@ -234,6 +235,7 @@ p_umap_lsn_fix <- set_panel_size(p_umap_lsn, width  = unit(12, "cm"), height = u
 ggsave(path_qc %&% ".LibSize.png", p_umap_lsn_fix,
        width = 20, height = 15, units = "cm", dpi = 300)
 
+if(opt$correct_cell_cycle) {
 # plot UMAP (based on highly variable genes), colours = cell cycle phase
 p_umap_ccphase = ggplot(cell_attributes, aes(x=umap1, y=umap2, color=cycle_phase) ) +
   geom_point(alpha = 0.7, size = 0.8) + xlab("UMAP 1") + ylab("UMAP 2") +
@@ -269,7 +271,7 @@ p_umap_g2m_fix <- set_panel_size(p_umap_g2m, width  = unit(12, "cm"), height = u
 #p_umap_g2m
 ggsave(path_qc %&% ".g2m_score.png", p_umap_g2m_fix,
        width = 20, height = 15, units = "cm", dpi = 300)
-
+}
 # plot UMAP (based on highly variable genes), colours = fraction MT genes)
 p_umap_MT = ggplot(cell_attributes, aes(x=umap1, y=umap2, color=fractionMT) ) +
   geom_point(alpha = 0.7, size = 0.8) + xlab("UMAP 1") + ylab("UMAP 2") +
@@ -345,6 +347,7 @@ ridge6 = ggplot(cell_attributes, aes(x = n_gene, y = phenograph_clusters, fill =
 ggsave(path_qc %&% ".ridge_n.gene_per_cluster.png", ridge6,
        dpi = 300)
 
+if(opt$correct_cell_cycle) {
 # plot ridge plot s_score vs celltype
 ridge7 = ggplot(cell_attributes, aes(x = s_score, y = celltype_final, fill = celltype_final)) +
   geom_density_ridges(alpha = 0.82, jittered_points = TRUE, point_alpha = 0.4, point_size = 0.4) +
@@ -372,6 +375,7 @@ ridge10 = ggplot(cell_attributes, aes(x = g2m_score, y = phenograph_clusters, fi
   geom_density_ridges(alpha = 0.82, jittered_points = TRUE, point_alpha = 0.4, point_size = 0.4)
 ggsave(path_qc %&% ".ridge_g2m.score_per_cluster.png", ridge10,
        dpi = 300)
+}
 
 # plot expression of marker genes in UMAP
 # read in gene list

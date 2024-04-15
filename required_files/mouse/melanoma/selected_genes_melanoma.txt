@@ -37,7 +37,7 @@ Ccr2	Leukocytes
 Marco	Leukocytes		
 Ncr1	Leukocytes		
 Prf1	Leukocytes		
-Icam1	additional Genes 
-Vcam1	additional Genes
-Nrp1	additional Genes
-Nectin2	additional Genes
+Icam1	additional_Genes		
+Vcam1	additional_Genes		
+Nrp1	additional_Genes		
+Nectin2	additional_Genes		

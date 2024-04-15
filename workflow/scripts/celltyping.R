@@ -202,6 +202,7 @@ cat("\n\n")
 # celltype config file, sub types are individual for each major type
 type_config <- as.data.frame(read.table(opt$celltype_config, sep = "\t", head = T, stringsAsFactors = F))
 major_types <- type_config$Major
+
 print("str(major_types):")
 print(str(major_types))
 minor_types <- lapply(type_config$Subtype, function(x) strsplit(x, ",")[[1]])

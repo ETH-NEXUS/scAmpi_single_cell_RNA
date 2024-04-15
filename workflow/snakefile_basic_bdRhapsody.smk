@@ -5,6 +5,13 @@ import os
 from glob import glob
 
 
+# Environment variable specifying where the singularity image is located
+# can be set as: export SINGULARITY_CACHE=<path to where our singularity images are on customapps>
+#envvars:
+#    "SINGULARITY_CACHE"
+
+
+
 # do not allow subdirectories as part of `sample` or `i` wildcards
 wildcard_constraints:
     sample="[^/]+",
@@ -61,6 +68,8 @@ rule scAmpi_basic:
             sample=sample_ids,
         ),
         expand("results/plotting/{sample}.celltype_barplot.png", sample=sample_ids),
+        "results/celltyping/cells_per_celltype_and_sample.txt",
+
         # both gsva and de analysis have not yet been tested and used on mouse bd rhapsody data.
 #        expand("results/gsva/{sample}.gsetscore_hm.png", sample=sample_ids),
 #        expand("results/diff_exp_analysis/{sample}/", sample=sample_ids),
@@ -70,7 +79,6 @@ rule scAmpi_basic:
         "date > {output}"
 
 
-# replace the cellranger step that is the default in this pipeline with the open source starsolo
 ruleorder: create_hdf5_bdrhapsody > create_hdf5
 
 

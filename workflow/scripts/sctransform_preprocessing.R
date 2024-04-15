@@ -31,6 +31,7 @@ make_option("--number_genes", type = "character", help = "Number of genes with t
 make_option("--min_var", type = "character", help = "Minimum variance of the residuals for a gene to be used for the calculation of umap coordinates and given out into an hdf5 file for the phenograph clustering."),
 make_option("--n_nn", type = "character", help = "Number of nearest neighbours for the UMAP calculation."),
 make_option("--organism", type = "character", help = "Organism. Either mouse or human are supported."),
+make_option("--correct_cell_cycle", type = "logical", action = "store_true", default = TRUE,  help = "Should cell cycle correction be applied? (On by default.)"),
 make_option("--outdir", type = "character", help = "Path to output directory.")
 )
 
@@ -145,38 +146,68 @@ cell_desc$n_gene <- colSums(filteredGeneExpression > 0)
 cell_desc$log_umi <- log(cell_desc$n_umi)
 
 # Read cycle marker gene pairs based on the specified organism
-if (opt$organism == "human") {
-  hs.pairs <- readRDS(system.file("exdata", "human_cycle_markers.rds", package="scran"))
-} else if (opt$organism == "mouse") {
-  mm.pairs <- readRDS(system.file("exdata", "mouse_cycle_markers.rds", package="scran"))
-  print(head(mm.pairs))
+if(opt$correct_cell_cycle) {
+  if (opt$organism == "human") {
+    hs.pairs <-
+      readRDS(system.file("exdata", "human_cycle_markers.rds", package = "scran"))
+  } else if (opt$organism == "mouse") {
+    mm.pairs <-
+      readRDS(system.file("exdata", "mouse_cycle_markers.rds", package = "scran"))
+    print(head(mm.pairs))
+  }
+  
+  # Print a message indicating the start of cyclone
+  print("Start performing scran::cyclone: ")
+  
+  # Perform scran::cyclone based on the specified organism
+  if (opt$organism == "human") {
+    cecy <- scran::cyclone(filteredGeneExpression, pairs = hs.pairs)
+  } else if (opt$organism == "mouse") {
+    cecy <-
+      scran::cyclone(
+        filteredGeneExpression,
+        pairs = mm.pairs,
+        gene.names = rownames(filteredGeneExpression),
+        verbose = TRUE
+      )
+  }
+  warnings()
+  # Assign cell cycle scores and phases to cell_desc
+  cell_desc$g2m_score = cecy$normalized.scores$G2M
+  #print(head(cell_desc$g2m_score))
+  #print(head(filteredGeneExpression))
+  print(str(filteredGeneExpression))
+  cell_desc$s_score = cecy$normalized.scores$S
+  cell_desc$cycle_phase = cecy$phases
+  
+} else {
+  cell_desc$g2m_score <- NA
+  cell_desc$s_score <- NA
+  cell_desc$cycle_phase <- NA
 }
-
-# Print a message indicating the start of cyclone
-print("Start performing scran::cyclone: ")
-
-# Perform scran::cyclone based on the specified organism
-if (opt$organism == "human") {
-  cecy <- scran::cyclone(filteredGeneExpression, pairs = hs.pairs)
-} else if (opt$organism == "mouse") {
-  cecy <- scran::cyclone(filteredGeneExpression, pairs = mm.pairs, gene.names = rownames(filteredGeneExpression), verbose = TRUE)
-}
-
-# Assign cell cycle scores and phases to cell_desc
-cell_desc$g2m_score = cecy$normalized.scores$G2M
-print(head(cell_desc$g2m_score))
-print(head(filteredGeneExpression))
-print(str(filteredGeneExpression))
-cell_desc$s_score = cecy$normalized.scores$S
-cell_desc$cycle_phase = cecy$phases
-
 # Perform variance stabilizing transformation (VST)
 set.seed(44)
 print("Start performing sctransform::vst: ")
-vst_out = sctransform::vst(filteredGeneExpression, cell_attr = cell_desc, method = "nb_fast",
-                           latent_var = c('log_umi'),
-                           latent_var_nonreg = c("g2m_score", "s_score"),
-                           return_gene_attr = TRUE, return_cell_attr = TRUE)
+if(opt$correct_cell_cycle) {
+  vst_out = sctransform::vst(
+    filteredGeneExpression,
+    cell_attr = cell_desc,
+    method = "nb_fast",
+    latent_var = c('log_umi'),
+    latent_var_nonreg = c("g2m_score", "s_score"),
+    return_gene_attr = TRUE,
+    return_cell_attr = TRUE
+  )
+} else {
+  vst_out = sctransform::vst(
+    filteredGeneExpression,
+    cell_attr = cell_desc,
+    method = "nb_fast",
+    latent_var = c('log_umi'),
+    return_gene_attr = TRUE,
+    return_cell_attr = TRUE
+  )
+}
 
 # Smooth the transformed data using PCA
 print("Start performing sctransform::smooth_via_pca: ")
