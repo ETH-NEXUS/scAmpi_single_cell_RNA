@@ -88,7 +88,7 @@ rule cellranger_count_8:
         "--id={wildcards.sample} "
         "--transcriptome={input.reference} "
         "--localcores={params.local_cores} "
-        "--fastqs={input.fastqs_dir}/{wildcards.sample} "
+        "--fastqs={input.fastqs_dir} "
         "--nosecondary "
         "--create-bam={params.create_bam} "
         "--output-dir={params.cr_out} "
