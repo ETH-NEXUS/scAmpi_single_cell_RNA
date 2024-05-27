@@ -28,6 +28,8 @@ include: "rules/misc_snake.smk"
 # Include rules
 include: "rules/scAmpi_basic_rules.smk"
 
+# run up-to-date cellranger_8 rule
+ruleorder: gunzip_and_link_cellranger > cellranger_count
 
 # include local rules
 localrules:
