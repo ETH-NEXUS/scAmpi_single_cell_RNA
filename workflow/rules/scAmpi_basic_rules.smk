@@ -48,9 +48,19 @@ rule cellranger_count:
         'ln -sr "{params.cr_out}{params.mySample}/outs/metrics_summary.csv" "{params.metrics_summary}" '
 
 
+# Retrieve the fastqs directory name (ie. uses cellranger sample name) corresponding to a given sample
+def get_fastq_dir(wildcards):
+    "return fastq directory of one sample"
+    sample = wildcards.sample
+    fastqs_dir = config["inputOutput"]["input_fastqs"]
+    sample_fastq_dir = fastqs_dir + sample
+    return sample_fastq_dir
+
+
+# Run cellranger v8. Some new parameters are required (e.g. --create-bam)
 rule cellranger_count_8:
     input:
-        fastqs_dir=config["inputOutput"]["input_fastqs"],
+        fastqs_dir=get_fastq_dir,
         reference=config["resources"]["reference_transcriptome"],
     output:
         # the cellranger output cannot be specified directly because this would trigger Snakemake
