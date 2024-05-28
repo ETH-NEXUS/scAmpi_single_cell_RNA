@@ -1,4 +1,7 @@
 # scAmpi - Single Cell Analysis mRNA pipeline
+### Adaptions
+* cell ranger is critical with file names (contain only letters, digits, underscores, and dashes), which can be worked around with links. I automated this step, to this end the sample map must contain the "file_stem" original file names without the '_S1_L001_I1_001.fastq.gz' part, and "sample_name", which is used for cell ranger.
+
 
 ### General overview
 

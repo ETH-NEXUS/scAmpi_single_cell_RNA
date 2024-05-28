@@ -1,4 +1,4 @@
-import os.path
+import os
 import sys
 import inspect
 import copy
@@ -7,9 +7,12 @@ from snakemake.utils import validate
 
 # import sample map and retrieve sample names
 samples_table = pd.read_table(config["inputOutput"]["sample_map"], header=0)
-samples = samples_table.set_index("sample", drop=False)
-sample_ids = samples_table["sample"].tolist()
-validate(samples, "../schema/sample_map.schema.yaml")
+sample_map = samples_table.set_index("sample_name", drop=False)
+sample_ids = samples_table["sample_name"].tolist()
+file_stem_dict=dict(sample_map['file_stem'])
+sample_name_dict={v:k for k,v in file_stem_dict.items()}
+
+validate(sample_map, "../schema/sample_map.schema.yaml")
 
 
 #########################################
@@ -120,3 +123,16 @@ def count_clusters(wildcards):
             "results/finished/{sample}.clinical_nonmalignant.txt",
             sample=wildcards.sample,
         )
+
+def get_symlink_names(wildcards):
+    sa=wildcards.sample
+    in_path = config['inputOutput']['input_fastqs']
+    in_files = [f for f in os.listdir(in_path) if f.startswith(wildcards.sample)]
+    targets = [f.replace(file_stem_dict[sa],sa, 1) for f in in_files ]
+    return targets
+
+def get_input_fastq(wildcards):
+    fn=wildcards.link_filename
+    sa=next(sa for sa in sample_ids if fn.startswith(sa))
+    return fn.replace(sa,file_stem_dict[sa], 1)
+    

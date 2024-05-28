@@ -1,13 +1,28 @@
+from snakemake import logger
+
+
 # cellranger call to process the raw samples
+rule fastq_symlinks:
+    input:
+        lambda w: f"{config['inputOutput']['input_fastqs']}/{get_input_fastq(w)}"
+    output:
+        # attempt to check whether the filename is cellranger conform 
+        target="results/input_fastq/{link_filename,[a-zA-Z0-9_-]+\.fastq\.gz}"
+    shell:
+        "ln -s {input} {output.target}"
+
+
 rule cellranger_count:
     input:
-        fastqs_dir=config["inputOutput"]["input_fastqs"],
+        #fastqs_dir=config["inputOutput"]["input_fastqs"],
+        fastq_files=lambda w: [f'results/input_fastq/{fn}' for fn in get_symlink_names(w)],
         reference=config["resources"]["reference_transcriptome"],
     output:
         features_file="results/cellranger_run/{sample}.features.tsv",
         matrix_file="results/cellranger_run/{sample}.matrix.mtx",
         barcodes_file="results/cellranger_run/{sample}.barcodes.tsv",
     params:
+        fastqs_dir="../input_fastq/", # needs to be relative to cr_out
         cr_out="results/cellranger_run/",
         local_cores=config["tools"]["cellranger_count"]["local_cores"],
         metrics_summary="results/cellranger_run/{sample}.metrics_summary.csv",
@@ -33,11 +48,11 @@ rule cellranger_count:
         "--sample={params.mySample} "
         "--transcriptome={input.reference} "
         "--localcores={params.local_cores} "
-        "--fastqs={input.fastqs_dir} "
+        "--fastqs={params.fastqs_dir} "
         "--nosecondary "
         "{params.variousParams} "
         " 2>&1 | tee ../../{log} ) ; "
-        "pwd ; "
+        "pwd ; " # we should be back in working directory
         "gunzip {params.cr_out}{params.mySample}/outs/filtered_feature_bc_matrix/features.tsv.gz ; "
         "gunzip {params.cr_out}{params.mySample}/outs/filtered_feature_bc_matrix/barcodes.tsv.gz ; "
         "gunzip {params.cr_out}{params.mySample}/outs/filtered_feature_bc_matrix/matrix.mtx.gz ; "
