@@ -93,7 +93,8 @@ rule cellranger_count_8:
         "--create-bam={params.create_bam} "
         "--output-dir={params.cr_out} "
         "{params.variousParams} "
-        " 2>&1 | tee {log} "
+        " 2>&1 | tee {log} ; "
+        "date > {output}"
 
 
 # get sample ID to output files
