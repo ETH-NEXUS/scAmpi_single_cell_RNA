@@ -1,3 +1,4 @@
+from snakemake import logger
 # Retrieve the fastqs directory name (ie. uses cellranger sample name) corresponding to a given sample
 def get_fastq_dir(wildcards):
     "return fastq directory of one sample"
@@ -8,12 +9,25 @@ def get_fastq_dir(wildcards):
 
 
 # cellranger call to process the raw samples
+rule fastq_symlinks:
+    input:
+        lambda w: f"{config['inputOutput']['input_fastqs']}/{get_input_fastq(w)}"
+    output:
+        # attempt to check whether the filename is cellranger conform 
+        target="results/input_fastq/{link_filename,[a-zA-Z0-9_-]+\.fastq\.gz}"
+    shell:
+        "ln -s {input} {output.target}"
+
+
 rule cellranger_count:
     input:
+        #fastqs_dir=config["inputOutput"]["input_fastqs"],
+        fastq_files=lambda w: [f'results/input_fastq/{fn}' for fn in get_symlink_names(w)],
         reference=config["resources"]["reference_transcriptome"],
     output:
         success="results/cellranger_run/{sample}_success_cellranger.txt",
     params:
+        fastqs_dir="../input_fastq/", # needs to be relative to cr_out
         cr_out="results/cellranger_run/",
         local_cores=config["tools"]["cellranger_count"]["local_cores"],
         variousParams=config["tools"]["cellranger_count"]["variousParams"],
@@ -34,7 +48,7 @@ rule cellranger_count:
         "--sample={wildcards.sample} "
         "--transcriptome={input.reference} "
         "--localcores={params.local_cores} "
-        "--fastqs={input.fastqs_dir} "
+        "--fastqs={params.fastqs_dir} "
         "--nosecondary "
         "{params.variousParams} "
         " 2>&1 | tee ../../{log} ; "
@@ -111,6 +125,16 @@ rule gunzip_and_link_cellranger:
         'ln -sr "{params.cr_out}/outs/filtered_feature_bc_matrix/barcodes.tsv" "{output.barcodes_file}" 2>> {log} ; '
         'ln -sr "{params.cr_out}/outs/web_summary.html" "{params.web_summary}" 2>> {log} ; '
         'ln -sr "{params.cr_out}/outs/metrics_summary.csv" "{params.metrics_summary}" 2>> {log} '
+        " 2>&1 | tee ../../{log} ) ; "
+        "pwd ; " # we should be back in working directory
+        "gunzip {params.cr_out}{params.mySample}/outs/filtered_feature_bc_matrix/features.tsv.gz ; "
+        "gunzip {params.cr_out}{params.mySample}/outs/filtered_feature_bc_matrix/barcodes.tsv.gz ; "
+        "gunzip {params.cr_out}{params.mySample}/outs/filtered_feature_bc_matrix/matrix.mtx.gz ; "
+        'ln -sr "{params.cr_out}{params.mySample}/outs/filtered_feature_bc_matrix/features.tsv" "{output.features_file}"; '
+        'ln -sr "{params.cr_out}{params.mySample}/outs/filtered_feature_bc_matrix/matrix.mtx" "{output.matrix_file}"; '
+        'ln -sr "{params.cr_out}{params.mySample}/outs/filtered_feature_bc_matrix/barcodes.tsv" "{output.barcodes_file}" ; '
+        'ln -sr "{params.cr_out}{params.mySample}/outs/web_summary.html" "{params.web_summary}" ; '
+        'ln -sr "{params.cr_out}{params.mySample}/outs/metrics_summary.csv" "{params.metrics_summary}" '
 
 
 # create hdf5 from count matrix, genes, and cell barcodes file

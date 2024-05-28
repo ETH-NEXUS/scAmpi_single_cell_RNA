@@ -1,3 +1,8 @@
+<<<<<<< HEAD
 sample
 SAMPLENAME1
 SAMPLENAME2
+=======
+sample_name	file_stem
+SAMPLE-1_scR	technical_long_sample.name.vXX_without_restrictions
+>>>>>>> Added feature to automatically create symlinks to work around cellranger filename restrictions
