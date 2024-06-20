@@ -22,7 +22,6 @@ library(ggplot2)
 library(RColorBrewer)
 library(biomaRt)
 suppressMessages(library(scater))
-library(glue)
 
 # convenience function for NOT %in%
 "%!in%" <- function(x, y) !("%in%"(x, y))
@@ -55,7 +54,7 @@ print(Sys.time())
 cat("\n\n\nPrint sessionInfo:\n\n")
 print(sessionInfo())
 cat("\n\n\n")
-cat("\nInput :\n\n")
+cat("\n###   Input:\n\n")
 print(opt)
 cat("\n\n")
 
@@ -68,7 +67,7 @@ sample <- opt$sample
 outdir <- opt$outDir
 
 # print information about input hdf5 file
-cat("\n\nContent of input h5 file:\n")
+cat("\n\n###   Content of input h5 file:\n\n")
 print(h5ls(opt$hdf5File))
 
 # command line parameters
@@ -96,7 +95,7 @@ rownames(gene_info) <- gene_info$ensembl_gene_id
 
 ###   FILTER CELLS   ####
 
-cat("\n\n\n\n#####          FILTER CELLS          #####\n\n")
+cat("\n\n\n\n#####          FILTER CELLS          #####\n")
 
 
 ###   Filter doublets   ####
@@ -104,7 +103,7 @@ cat("\n\n\n\n#####          FILTER CELLS          #####\n\n")
 # check if doublets should be removed or not (command line parameter)
 stopifnot(is.logical(opt$remove_doublets))
 if (opt$remove_doublets) {
-  cat("\n\n\n###   Filter doublets\n\n")
+  cat("\n\n###   Filter doublets\n")
   doublet_barcodes <- read.csv(opt$doublet_barcodes,
     header = FALSE,
     stringsAsFactors = FALSE
@@ -113,7 +112,7 @@ if (opt$remove_doublets) {
   stopifnot(colnames(umi_matrix) == cell_info$barcodes)
   cell_info$is_doublet <- cell_info$barcodes %in% doublet_barcodes
 } else if (!opt$remove_doublets) {
-  cat("\n\n\n###   No doublet filtering performed\n\n")
+  cat("\n\n###   No doublet filtering performed\n")
   doublet_barcodes <- character()
   cell_info$is_doublet <- cell_info$barcodes %in% doublet_barcodes
   stopifnot(sum(cell_info$is_doublet) == 0)
@@ -122,15 +121,15 @@ if (opt$remove_doublets) {
 
 ###   Filter cells with fraction of MT-reads   ####
 
-cat("\n\n\n###   Filter cells with fraction of reads mapped to MT-genes\n\n")
+cat("\n\n###   Filter cells with fraction of reads mapped to MT-genes\n")
 
 # get all mitochondrial genes
 gene_info$is_mt <- grepl("^MT-", gene_info$hgnc_symbol)
 mt <- gene_info[gene_info$is_mt, "ensembl_gene_id"]
-cat("\n### Number of MT- genes: ", length(mt))
-cat("\n### Gene IDs of all MT- genes:")
+cat("\n### Number of MT- genes: ", length(mt), "\n")
+cat("\n### Gene IDs of all MT- genes:\n")
 print(mt)
-cat("\n\n### Gene HGNC symbols of all MT- genes:")
+cat("\n\n### Gene HGNC symbols of all MT- genes:\n")
 print(gene_info[gene_info$is_mt, "hgnc_symbol"])
 
 # Calculate fraction of MT reads per cell:
@@ -149,7 +148,7 @@ cell_info$mt_higher_threshold <- cell_info$fractionMTreads > threshold_MT
 
 ###   Filter genes with Number Of Detected Genes (NODG) ####
 
-cat("\n\n\n###   Filter cells with number of detected genes\n")
+cat("\n\n###   Filter cells with number of detected genes\n")
 # Number of detected genes:
 cell_info$NODG <- colSums(umi_matrix > 0)
 cell_info$rank_nodg <- rank(-cell_info$NODG)
@@ -182,17 +181,15 @@ cell_info$remove_cell <- rowSums(cell_info[, c(
 matrix_cells_removed <- umi_matrix[, !cell_info$remove_cell, drop = FALSE]
 
 # check if any cells are left after filtering
-cat("\n\nOnly continue if more than 0 cells are left after filtering.\n")
+cat("\n\n### NOTE: Only continue if more than 0 cells are left after filtering.\n")
 if (dim(matrix_cells_removed)[2] == 0) {
-  stop("No cells are left after filtering! Please check sample quality.")
+  stop("### ERROR: No cells are left after filtering! Please check sample quality.")
 }
 
 
 ###   FILTER GENES   ####
 
 cat("\n\n\n\n#####          FILTER GENES          #####\n\n")
-cat("Total number of genes before filtering: ", length(rownames(matrix_cells_removed)))
-
 
 ###   Filter non-protein-coding genes   ####
 
@@ -201,7 +198,7 @@ stopifnot(is.logical(opt$protein_coding_only))
 
 if (opt$protein_coding_only) {
   ### Filtering so that only protein-coding genes are kept
-  cat("\n\n\n###   Filter non-protein-coding genes\n")
+  cat("\n\n###   Filter non-protein-coding genes\n")
 
   # Download ensembl data
   genomeVersion <- opt$genomeVersion
@@ -239,13 +236,13 @@ if (opt$protein_coding_only) {
   cat("\n\n###   Genes filtered with biomart:", number_genes_filtered_biomart)
   cat("\n###   Genes accepted with biomart:", number_genes_accepted_biomart)
 } else if (!opt$protein_coding_only) {
-  cat("\n\n\n###   Non protein-coding genes are not filtered\n\n\n")
+  cat("\n\n###   Non protein-coding genes are not filtered\n")
 }
 
 
 ###   Filter genes that are expressed in less than minimum number of cells   ####
 
-cat("\n\n\n###   Filter genes not expressed in enough cells\n")
+cat("\n\n###   Filter genes not expressed in enough cells\n")
 
 # Identify genes expressed in less than minNumberCells
 gene_info$too_few_cells_express <- rowSums(matrix_cells_removed > 0) < minNumberCells
@@ -253,7 +250,7 @@ gene_info$too_few_cells_express <- rowSums(matrix_cells_removed > 0) < minNumber
 
 ###   Filter genes that encode for ribosomal proteins   ####
 
-cat("\n\n###   Filter genes encoding for ribosomal proteins\n\n")
+cat("\n\n###   Filter genes encoding for ribosomal proteins\n")
 gene_info$encodes_ribo_protein <- grepl(
   x = gene_info$hgnc_symbol,
   pattern = "^(RPL|MRPL|RPS|MRPS)"
@@ -286,6 +283,8 @@ matrix_filtered_temp <- umi_matrix[!gene_info$remove_gene, !cell_info$remove_cel
 
 ###   Loop to make sure filters are applied   ####
 # for NODGs and number of cells expressing a gene
+
+cat("\n\n###   Filter genes and cells iteratively\n")
 
 # collect barcodes and gene IDs for genes and cells to be filtered
 loop_NODG_filtered_barcodes <- character()
@@ -322,7 +321,7 @@ while (all(dim_matrix_start != dim_matrix_end) && counter < max_iterations) {
 
   dim_matrix_end <- dim(matrix_filtered_temp)
 }
-cat("\n\n###   Number of iterations: ", counter)
+cat("\n\n###   Number of iterations: ", counter, "\t")
 
 # Include iterative filters in gene_info and cell_info
 cell_info$nodg_lower_threshold_iterative <- cell_info$barcodes %in% loop_NODG_filtered_barcodes
@@ -383,7 +382,7 @@ txtname <- paste0(outdir, file_name, ".cell_info.txt")
 write.table(cell_info, txtname, sep = "\t", row.names = F, col.names = T, quote = F)
 
 # give out info about removed genes
-cat("\n\n\n###   Total number of genes: ", length(gene_info$ensembl_gene_id))
+cat("\n\n\n\n###   Total number of genes: ", length(gene_info$ensembl_gene_id))
 cat("\n###   Number genes removed: ", sum(gene_info$remove_gene))
 
 cat("\n\n###   MT genes: ", sum(gene_info$is_mt))
