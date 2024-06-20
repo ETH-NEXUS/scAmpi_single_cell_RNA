@@ -1,11 +1,7 @@
-########################################
-
 ####    File name: filter_genes_and_cells.R
 ####    Author: Anne Richter
-####    October 2018, adapted March 2022
+####    October 2018, adapted March 2022, adapted June 2024
 ####    R Version: 4.0
-
-########################################
 
 # This script takes an hdf5 file of raw expression counts (right after cellranger)
 
@@ -17,7 +13,8 @@
 # 4. Genes are filtered so that MT- genes are removed
 # 5. Genes are filtered so that genes encoding for ribosomal proteins are removed
 
-# R libraries
+###   R libraries   ####
+
 library(rhdf5)
 library(optparse)
 library(plyr)
@@ -27,15 +24,12 @@ library(biomaRt)
 suppressMessages(library(scater))
 library(glue)
 
-# give out session Info
-cat("\n\n\nPrint sessionInfo:\n\n")
-print(sessionInfo())
-cat("\n\n\n\n")
-
 # convenience function for NOT %in%
 "%!in%" <- function(x, y) !("%in%"(x, y))
 
-# parse command line arguments
+
+###   Parse command line arguments   ####
+
 option_list <- list(
   make_option("--hdf5File", type = "character", help = "Path to hdf5 input file. It includes raw expression matrix, gene & cell attributes."),
   make_option("--sample", type = "character", help = "Sample name, prefix of all output files"),
@@ -54,39 +48,35 @@ opt_parser <- OptionParser(option_list = option_list)
 opt <- parse_args(opt_parser)
 
 
-################################
-#####     READ IN DATA     #####
-################################
+###   Give out (session) info   ####
+
+cat("\n\n")
+print(Sys.time())
+cat("\n\n\nPrint sessionInfo:\n\n")
+print(sessionInfo())
+cat("\n\n\n")
+cat("\nInput :\n\n")
+print(opt)
+cat("\n\n")
+
+
+###   Read in data   ####
 
 # get file name of input hdf5 and sample name
 file_name <- basename(opt$hdf5File)
-cat("\n\n### Input file:", file_name)
 sample <- opt$sample
 outdir <- opt$outDir
-cat("\n### Output directory:", outdir)
 
 # print information about input hdf5 file
 cat("\n\nContent of input h5 file:\n")
 print(h5ls(opt$hdf5File))
 
-# import out command line parameters
+# command line parameters
 nmads_fractionMT <- as.integer(opt$nmads_fractionMT)
-glue("\n\n### nmads_fractionMT: ", {nmads_fractionMT})
-
 threshold_MT <- as.numeric(opt$threshold_fractionMT)
-glue("\n\n### threshold_MT: ", {threshold_MT})
-
 nmads_NODG <- as.integer(opt$nmads_NODG)
-glue("\n\n### nmads_NODG: ", {nmads_NODG}, "\n")
-
 threshold_NODG <- as.numeric(opt$threshold_NODG)
-glue("\n\n### threshold_NODG: ", {threshold_NODG})
-
 minNumberCells <- as.integer(opt$minNumberCells)
-glue("\n\n### minNumberCells: ", {minNumberCells}, "\n")
-
-glue("\n\n### protein_coding_only: ", {opt$protein_coding_only}, "\n")
-print(str(opt$protein_coding_only))
 
 # get count matrix
 umi_matrix <- h5read(opt$hdf5File, "raw_counts")
@@ -95,21 +85,22 @@ rownames(umi_matrix) <- h5read(opt$hdf5File, "gene_attrs/gene_ids")
 colnames(umi_matrix) <- h5read(opt$hdf5File, "cell_attrs/cell_names")
 
 # have data frame with cell infos (barcodes)
-cell_info <- as.data.frame(h5read(opt$hdf5File, "cell_attrs/cell_names"))
-names(cell_info) <- "barcodes"
+cell_info <- data.frame(barcodes = h5read(opt$hdf5File, "cell_attrs/cell_names"))
 
 # have data frame with gene info
-gene_info <- as.data.frame(h5read(opt$hdf5File, "gene_attrs/gene_ids"))
-names(gene_info) <- "ensembl_gene_id"
+gene_info <- data.frame(ensembl_gene_id = h5read(opt$hdf5File, "gene_attrs/gene_ids"))
 gene_info$hgnc_symbol <- h5read(opt$hdf5File, "gene_attrs/gene_names")
 # have ensembl IDs as rownames
-rownames(gene_info) <- h5read(opt$hdf5File, "gene_attrs/gene_ids")
+rownames(gene_info) <- gene_info$ensembl_gene_id
 
 
+###   FILTER CELLS   ####
 
 cat("\n\n\n\n#####          FILTER CELLS          #####\n\n")
 
-### Filter doublets
+
+###   Filter doublets   ####
+
 # check if doublets should be removed or not (command line parameter)
 stopifnot(is.logical(opt$remove_doublets))
 if (opt$remove_doublets) {
@@ -127,16 +118,18 @@ if (opt$remove_doublets) {
   stopifnot(sum(cell_info$is_doublet) == 0)
 }
 
-### Filter with fraction of MT-reads
+
+###   Filter cells with fraction of MT-reads   ####
+
 cat("\n\n\n###   Filter cells with fraction of reads mapped to MT-genes\n\n")
 
-# Get all mitochondrial genes:
+# get all mitochondrial genes
 gene_info$is_mt <- grepl("^MT-", gene_info$hgnc_symbol)
 mt <- gene_info[gene_info$is_mt, "ensembl_gene_id"]
-glue("\n### Number of MT- genes: ", {length(mt)})
-glue("### Gene IDs of all MT- genes:")
+cat("\n### Number of MT- genes: ", length(mt))
+cat("\n### Gene IDs of all MT- genes:")
 print(mt)
-glue("\n\n### Gene HGNC symbols of all MT- genes:")
+cat("\n\n### Gene HGNC symbols of all MT- genes:")
 print(gene_info[gene_info$is_mt, "hgnc_symbol"])
 
 # Calculate fraction of MT reads per cell:
@@ -147,13 +140,16 @@ cell_info$is_mt_outlier <- scater::isOutlier(metric = cell_info$fractionMTreads,
                                              nmads = nmads_fractionMT,
                                              type = "higher")
 
-# Filter cells with hard threshold of fraction of MT- reads
+# Filter cells with hard threshold of fraction of MT-reads
 cell_info$mt_higher_threshold <- cell_info$fractionMTreads > threshold_MT
 
-### Filter with Number of detected genes (NODG)
+
+###   Filter genes with Number Of Detected Genes (NODG) ####
+
 cat("\n\n\n###   Filter cells with number of detected genes\n")
 # Number of detected genes:
 cell_info$NODG <- colSums(umi_matrix > 0)
+cell_info$rank_nodg <- rank(-cell_info$NODG)
 
 # identify cells that are outliers
 cell_info$is_nodg_outlier <- scater::isOutlier(metric = cell_info$NODG,
@@ -164,32 +160,19 @@ cell_info$is_nodg_outlier <- scater::isOutlier(metric = cell_info$NODG,
 # Filter cells with hard threshold of NODG
 cell_info$nodg_lower_threshold <- cell_info$NODG < threshold_NODG
 
-# check if cell will be removed at this point
-cell_info$remove_cell_temp <- rowSums(cell_info[, c("is_doublet",
+
+###   Summarize CELL filters in temporary "remove_cell" column   ####
+
+cell_info$remove_cell <- rowSums(cell_info[, c("is_doublet",
                                                 "is_mt_outlier",
                                                 "mt_higher_threshold",
                                                 "is_nodg_outlier",
                                                 "nodg_lower_threshold")]) > 0
-### Apply cell filter to count matrix
-matrix_cells_removed <- umi_matrix[, !cell_info$remove_cell_temp, drop = FALSE]
 
-###   Show in plot ranking of cells for NODG, with threshold
-cell_info$rank_nodg <- rank(-cell_info$NODG)
 
-p_rank_nodg <- ggplot(cell_info, aes(x = rank_nodg, y = NODG)) +
-  geom_point() +
-  xlab("Cell rank") +
-  ggtitle("Cell ranking according to number of detected genes (NODG)") +
-  geom_hline(aes(yintercept = threshold_NODG, color = "red"), show.legend = T) +
-  scale_colour_manual(name = NULL,
-                      labels = "threshold for NODG filtering",
-                      values = "red") +
-  theme_bw(base_size = 13) +
-  theme(legend.position = c(0.8, 0.9))
+###   APPLY cell filter to count matrix before gene filtering   ####
 
-filename <- paste0(outdir, file_name, ".cell_ranking_nodgs.png")
-ggplot2::ggsave(filename = filename, plot = p_rank_nodg, width = 23, height = 18, units = "cm", dpi = 300)
-
+matrix_cells_removed <- umi_matrix[, !cell_info$remove_cell, drop = FALSE]
 
 # check if any cells are left after filtering
 cat("\n\nOnly continue if more than 0 cells are left after filtering.\n")
@@ -198,9 +181,13 @@ if (dim(matrix_cells_removed)[2] == 0) {
 }
 
 
-cat("\n\n\n\n#####          FILTER GENES          #####\n\n")
+###   FILTER GENES   ####
 
-glue("Total number of genes before filtering: ", {length(rownames(matrix_cells_removed))})
+cat("\n\n\n\n#####          FILTER GENES          #####\n\n")
+cat("Total number of genes before filtering: ", length(rownames(matrix_cells_removed)))
+
+
+###   Filter non-protein-coding genes   ####
 
 # check if non-protein-coding genes are filtered out
 stopifnot(is.logical(opt$protein_coding_only))
@@ -247,18 +234,23 @@ if (opt$protein_coding_only) {
 }
 
 
-###   Filter genes that are expressed in less than minimum number of cells
+###   Filter genes that are expressed in less than minimum number of cells   ####
+
 cat("\n\n\n###   Filter genes not expressed in enough cells\n")
+
 # Identify genes expressed in less than minNumberCells
 gene_info$too_few_cells_express <- rowSums(matrix_cells_removed > 0) < minNumberCells
 
 
-### Filter genes that encode for ribosomal proteins
+###   Filter genes that encode for ribosomal proteins   ####
+
 cat("\n\n###   Filter genes encoding for ribosomal proteins\n\n")
 gene_info$encodes_ribo_protein <- grepl(x = gene_info$hgnc_symbol,
                                         pattern = "^(RPL|MRPL|RPS|MRPS)")
 
-# apply gene filters
+
+###   Summarize GENE filters in "remove_gene" column   ####
+
 if (opt$protein_coding_only) {
   gene_info$remove_gene <- rowSums(gene_info[, c("is_mt",
                                                  "too_few_cells_express",
@@ -271,59 +263,130 @@ if (opt$protein_coding_only) {
                                                  "encodes_ribo_protein")]) > 0
 }
 
-# filter cells again if no counts in any of remaining genes
-cat("\n\n###   Filter cells that express none of remaining genes\n\n")
-cell_info$cell_filter_second <- colSums(umi_matrix[!gene_info$remove_gene, ]) == 0
 
-# final selection of removed cells
-cell_info$remove_cell_temp <- NULL
+###   APPLY cell and gene filter to umi_matrix before iterative gene and cell filtering   ####
+
+matrix_filtered_temp <- umi_matrix[!gene_info$remove_gene, !cell_info$remove_cell, drop = FALSE]
+
+
+###   Loop to make sure filters are applied   ####
+# for NODGs and number of cells expressing a gene
+
+# collect barcodes and gene IDs for genes and cells to be filtered
+loop_NODG_filtered_barcodes <- character()
+loop_filtered_genes <- character()
+
+# starting conditions for while loop
+dim_matrix_start <- as.integer(c(1, 1))
+dim_matrix_end <- as.integer(c(2, 2))
+
+# counter for loop to limit iterations
+counter <- 0
+max_iterations <- 1000
+
+# loop to enforce NODGs filter for cells and
+# number of cells expressing a gene for genes
+while (all(dim_matrix_start != dim_matrix_end) && counter < max_iterations) {
+  counter <- counter + 1
+
+  dim_matrix_start <- dim(matrix_filtered_temp)
+
+  NODG <- colSums(matrix_filtered_temp > 0)
+  too_few_NODG <- NODG < 400
+  table(too_few_NODG)
+  stopifnot(names(too_few_NODG) == colnames(matrix_filtered_temp))
+  loop_NODG_filtered_barcodes <- c(loop_NODG_filtered_barcodes, colnames(matrix_filtered_temp)[too_few_NODG])
+  matrix_filtered_temp <- matrix_filtered_temp[, !too_few_NODG]
+
+  number_of_cells_express <- rowSums(matrix_filtered_temp > 0)
+  too_few_cells_express <- number_of_cells_express < minNumberCells
+  table(too_few_cells_express)
+  stopifnot(names(too_few_cells_express) == rownames(matrix_filtered_temp))
+  loop_filtered_genes <- c(loop_filtered_genes, rownames(matrix_filtered_temp)[too_few_cells_express])
+  matrix_filtered_temp <- matrix_filtered_temp[!too_few_cells_express, ]
+
+  dim_matrix_end <- dim(matrix_filtered_temp)
+}
+cat("\n\n###   Number of iterations: ", counter)
+
+# Include iterative filters in gene_info and cell_info
+cell_info$nodg_lower_threshold_iterative <- cell_info$barcodes %in% loop_NODG_filtered_barcodes
+gene_info$too_few_cells_express_iterative <- gene_info$ensembl_gene_id %in% loop_filtered_genes
+
+
+###   Summarize GENE filters in "remove_gene" column   ####
+
+gene_info$remove_gene <- NULL
+if (opt$protein_coding_only) {
+  gene_info$remove_gene <- rowSums(gene_info[, c("is_mt",
+                                                 "too_few_cells_express",
+                                                 "encodes_ribo_protein",
+                                                 "non_protein_coding",
+                                                 "biomart_NA",
+                                                 "too_few_cells_express_iterative")]) > 0
+} else if (!opt$protein_coding_only) {
+  gene_info$remove_gene <- rowSums(gene_info[, c("is_mt",
+                                                 "too_few_cells_express",
+                                                 "encodes_ribo_protein",
+                                                 "too_few_cells_express_iterative")]) > 0
+}
+
+
+###   Summarize CELL filters in "remove_cell" column   ####
+
+cell_info$remove_cell <- NULL
 cell_info$remove_cell <- rowSums(cell_info[, c("is_doublet",
                                                "is_mt_outlier",
                                                "mt_higher_threshold",
                                                "is_nodg_outlier",
                                                "nodg_lower_threshold",
-                                               "cell_filter_second")]) > 0
+                                               "nodg_lower_threshold_iterative")]) > 0
+
+
+###   Export information about filtered genes and cells   ####
 
 # give out info about removed cells
-glue("\n\n\n###   Total number of cells: ", {length(cell_info$barcodes)})
-glue("\n###   Number cells removed: ", {sum(cell_info$remove_cell)})
-glue("\n###   Percentage cells removed: ", {signif((sum(cell_info$remove_cell) / length(cell_info$barcodes)) * 100, digits = 4)})
+cat("\n\n\n###   Total number of cells: ", length(cell_info$barcodes))
+cat("\n###   Number cells removed: ", sum(cell_info$remove_cell))
+cat("\n###   Percentage cells removed: ", signif((sum(cell_info$remove_cell) / length(cell_info$barcodes)) * 100, digits = 4))
 
-glue("\n\n###   Doublets: ", {sum(cell_info$is_doublet)})
-glue("\n###   MT outlier: ", {sum(cell_info$is_mt_outlier)})
-glue("\n###   MT higher than threshold: ", {sum(cell_info$mt_higher_threshold)})
-glue("\n###   NODG outlier: ", {sum(cell_info$is_nodg_outlier)})
-glue("\n###   NODG lower than threshold: ", {sum(cell_info$nodg_lower_threshold)})
-glue("\n###   No expression after gene filter: ", {sum(cell_info$cell_filter_second)})
+cat("\n\n###   Doublets: ", sum(cell_info$is_doublet))
+cat("\n###   MT outlier: ", sum(cell_info$is_mt_outlier))
+cat("\n###   MT higher than threshold: ", sum(cell_info$mt_higher_threshold))
+cat("\n###   NODG outlier: ", sum(cell_info$is_nodg_outlier))
+cat("\n###   NODG lower than threshold: ", sum(cell_info$nodg_lower_threshold))
+cat("\n###   NODG lower than threshold in iterative filter: ", sum(cell_info$nodg_lower_threshold_iterative))
 
 # Write file with full cell info
 txtname <- paste0(outdir, file_name, ".cell_info.txt")
-write.table(cell_info, txtname, sep = "\t", row.names = F, col.names = F, quote = F)
-
+write.table(cell_info, txtname, sep = "\t", row.names = F, col.names = T, quote = F)
 
 # give out info about removed genes
-glue("\n\n\n###   Total number of genes: ", {length(gene_info$ensembl_gene_id)})
-glue("\n###   Number genes removed: ", {sum(gene_info$remove_gene)})
+cat("\n\n\n###   Total number of genes: ", length(gene_info$ensembl_gene_id))
+cat("\n###   Number genes removed: ", sum(gene_info$remove_gene))
 
 cat("\n\n###   MT genes: ", sum(gene_info$is_mt))
 cat("\n###   Genes expressed in too few cells: ", sum(gene_info$too_few_cells_express))
 cat("\n###   Genes encoding ribosomal proteins: ", sum(gene_info$encodes_ribo_protein))
+cat("\n###   Genes expressed in too few cells in iterative filter: ", sum(gene_info$too_few_cells_express_iterative))
 # only relevant if protein-coding filter was applied
 if (opt$protein_coding_only) {
   cat("\n###   Non-protein-coding: ", sum(gene_info$non_protein_coding))
   cat("\n###   NA in biomart table: ", sum(gene_info$biomart_NA), "\n\n")
 }
 
-
 # Export table with info about filtered genes
 txtname <- paste0(outdir, file_name, ".gene_info.txt")
-write.table(gene_info, txtname, sep = "\t", row.names = F, col.names = F, quote = F)
+write.table(gene_info, txtname, sep = "\t", row.names = F, col.names = T, quote = F)
 
 
-# Apply cell and gene filter to umi_matrix
+###   APPLY cell and gene filter to umi_matrix   ####
+
 matrix_filtered <- umi_matrix[!gene_info$remove_gene, !cell_info$remove_cell, drop = FALSE]
 
-# filter gene and cell info
+
+###   Filter gene and cell info   ####
+
 gene_info_filtered <- gene_info[gene_info$ensembl_gene_id %in% rownames(matrix_filtered), ]
 
 # cell barcodes
@@ -335,12 +398,9 @@ fractionMTreads_out <- cell_info$fractionMTreads[cell_info$barcodes %in% output_
 rownames(matrix_filtered) <- NULL
 colnames(matrix_filtered) <- NULL
 
-cat("\n\nCheck if rownames and colnames are NULL\n")
-print(head(rownames(matrix_filtered)))
-print(head(colnames(matrix_filtered)))
 
+###   Write output hdf5 file   ####
 
-# write the output hdf5 file
 outfile <- paste0(outdir, sample, ".genes_cells_filtered.h5")
 h5createFile(outfile)
 h5createGroup(outfile, "cell_attrs")
@@ -351,7 +411,7 @@ h5write(output_cell_names, outfile, "cell_attrs/cell_names")
 h5write(fractionMTreads_out, outfile, "cell_attrs/fractionMT")
 
 # set chunk size for writing h5 to c(1000,1000) or if the matrix is smaller to its dimensions (default)
-if (dim(matrix_filtered)[1] > 1000 & dim(matrix_filtered)[2] > 1000) {
+if (dim(matrix_filtered)[1] > 1000 && dim(matrix_filtered)[2] > 1000) {
   chunks <- c(1000,1000)
 } else {
   chunks <- dim(matrix_filtered)
@@ -361,8 +421,8 @@ h5createDataset(file = outfile, dataset = "raw_counts", dims = dim(matrix_filter
 h5write(matrix_filtered, outfile, "raw_counts")
 
 
+###   Plot filtered cells   ####
 
-# plot filtered cells
 cell_info$log_library_size <- log2(colSums(umi_matrix))
 cell_info$log2_nodg <- log2(cell_info$NODG)
 
@@ -375,7 +435,7 @@ cell_info$col[cell_info$nodg_lower_threshold] <- "cyan"
 both_filters <- rowSums(cell_info[, c("is_mt_outlier", "mt_higher_threshold")]) > 0 & rowSums(cell_info[, c("is_nodg_outlier", "nodg_lower_threshold")]) > 0
 cell_info$col[both_filters] <- "orange"
 
-cell_info$col[cell_info$cell_filter_second] <- "magenta"
+cell_info$col[cell_info$nodg_lower_threshold_iterative] <- "magenta"
 cell_info$col[cell_info$is_doublet] <- "green"
 cell_info$col <- factor(cell_info$col, levels = c("black", "cyan", "green", "orange", "red", "magenta"))
 
@@ -397,11 +457,11 @@ plot_cells_filtered <- ggplot(cell_info, aes(x = log2_nodg, y = fractionMTreads,
   scale_colour_manual(values = my_cols,
                       limits = my_cols,
                       labels = c("dot size corresponds to library size",
-                                 "NODG too low",
+                                 "NODGs too low",
                                  "doublets",
                                  "filtered both criteria",
                                  "fraction MT too high",
-                                 "no genes expressed after gene filtering",
+                                 "NODGs too low after gene filtering",
                                  "absolute threshold fraction MT",
                                  "absolute threshold NODG")) +
   xlab("Log2(Number of Detected Genes)") +
@@ -431,3 +491,21 @@ plot_cells_filtered <- ggplot(cell_info, aes(x = log2_nodg, y = fractionMTreads,
 
 plotname <- paste0(outdir, file_name, ".visualize_filtered_cells.png")
 ggplot2::ggsave(filename = plotname, plot = plot_cells_filtered, width = 19, height = 14, units = "cm", dpi = 300)
+
+
+###   Plot ranking of cells for NODG, with threshold   ####
+
+p_rank_nodg <- ggplot(cell_info, aes(x = rank_nodg, y = NODG)) +
+  geom_point() +
+  xlab("Cell rank") +
+  ggtitle("Cell ranking according to number of detected genes (NODG)") +
+  geom_hline(aes(yintercept = threshold_NODG, color = "red"), show.legend = T) +
+  scale_colour_manual(name = NULL,
+                      labels = "threshold for NODG filtering",
+                      values = "red") +
+  theme_bw(base_size = 13) +
+  theme(legend.position = c(0.8, 0.9))
+
+filename <- paste0(outdir, file_name, ".cell_ranking_nodgs.png")
+ggplot2::ggsave(filename = filename, plot = p_rank_nodg, width = 23, height = 18, units = "cm", dpi = 300)
+
