@@ -106,8 +106,9 @@ stopifnot(is.logical(opt$remove_doublets))
 if (opt$remove_doublets) {
   cat("\n\n\n###   Filter doublets\n\n")
   doublet_barcodes <- read.csv(opt$doublet_barcodes,
-                               header = FALSE,
-                               stringsAsFactors = FALSE)
+    header = FALSE,
+    stringsAsFactors = FALSE
+  )
   doublet_barcodes <- doublet_barcodes$V1
   stopifnot(colnames(umi_matrix) == cell_info$barcodes)
   cell_info$is_doublet <- cell_info$barcodes %in% doublet_barcodes
@@ -135,10 +136,12 @@ print(gene_info[gene_info$is_mt, "hgnc_symbol"])
 # Calculate fraction of MT reads per cell:
 cell_info$fractionMTreads <- colSums(umi_matrix[mt, ]) / colSums(umi_matrix)
 # find outliers of MT-fraction
-cell_info$is_mt_outlier <- scater::isOutlier(metric = cell_info$fractionMTreads,
-                                             log = FALSE,
-                                             nmads = nmads_fractionMT,
-                                             type = "higher")
+cell_info$is_mt_outlier <- scater::isOutlier(
+  metric = cell_info$fractionMTreads,
+  log = FALSE,
+  nmads = nmads_fractionMT,
+  type = "higher"
+)
 
 # Filter cells with hard threshold of fraction of MT-reads
 cell_info$mt_higher_threshold <- cell_info$fractionMTreads > threshold_MT
@@ -152,10 +155,12 @@ cell_info$NODG <- colSums(umi_matrix > 0)
 cell_info$rank_nodg <- rank(-cell_info$NODG)
 
 # identify cells that are outliers
-cell_info$is_nodg_outlier <- scater::isOutlier(metric = cell_info$NODG,
-                                               log = FALSE,
-                                               type = "lower",
-                                               nmads = nmads_NODG)
+cell_info$is_nodg_outlier <- scater::isOutlier(
+  metric = cell_info$NODG,
+  log = FALSE,
+  type = "lower",
+  nmads = nmads_NODG
+)
 
 # Filter cells with hard threshold of NODG
 cell_info$nodg_lower_threshold <- cell_info$NODG < threshold_NODG
@@ -163,11 +168,13 @@ cell_info$nodg_lower_threshold <- cell_info$NODG < threshold_NODG
 
 ###   Summarize CELL filters in temporary "remove_cell" column   ####
 
-cell_info$remove_cell <- rowSums(cell_info[, c("is_doublet",
-                                                "is_mt_outlier",
-                                                "mt_higher_threshold",
-                                                "is_nodg_outlier",
-                                                "nodg_lower_threshold")]) > 0
+cell_info$remove_cell <- rowSums(cell_info[, c(
+  "is_doublet",
+  "is_mt_outlier",
+  "mt_higher_threshold",
+  "is_nodg_outlier",
+  "nodg_lower_threshold"
+)]) > 0
 
 
 ###   APPLY cell filter to count matrix before gene filtering   ####
@@ -207,11 +214,13 @@ if (opt$protein_coding_only) {
   print(mart_obj)
 
   # get table with biomart info of only protein-coding genes
-  biomart_protein_coding <- biomaRt::getBM(attributes = c("ensembl_gene_id", "entrezgene_id", "hgnc_symbol", "description"),
-                                           filters = c("ensembl_gene_id", "biotype"),
-                                           values = list(rownames(umi_matrix), "protein_coding"),
-                                           mart = mart_obj,
-                                           uniqueRows = T)
+  biomart_protein_coding <- biomaRt::getBM(
+    attributes = c("ensembl_gene_id", "entrezgene_id", "hgnc_symbol", "description"),
+    filters = c("ensembl_gene_id", "biotype"),
+    values = list(rownames(umi_matrix), "protein_coding"),
+    mart = mart_obj,
+    uniqueRows = TRUE
+  )
 
   # get mask if non-protein coding filter was applied for each gene, for exporting the information on filtered genes
   gene_info$non_protein_coding <- !(gene_info$ensembl_gene_id %in% biomart_protein_coding$ensembl_gene_id)
@@ -245,22 +254,28 @@ gene_info$too_few_cells_express <- rowSums(matrix_cells_removed > 0) < minNumber
 ###   Filter genes that encode for ribosomal proteins   ####
 
 cat("\n\n###   Filter genes encoding for ribosomal proteins\n\n")
-gene_info$encodes_ribo_protein <- grepl(x = gene_info$hgnc_symbol,
-                                        pattern = "^(RPL|MRPL|RPS|MRPS)")
+gene_info$encodes_ribo_protein <- grepl(
+  x = gene_info$hgnc_symbol,
+  pattern = "^(RPL|MRPL|RPS|MRPS)"
+)
 
 
 ###   Summarize GENE filters in "remove_gene" column   ####
 
 if (opt$protein_coding_only) {
-  gene_info$remove_gene <- rowSums(gene_info[, c("is_mt",
-                                                 "too_few_cells_express",
-                                                 "encodes_ribo_protein",
-                                                 "non_protein_coding",
-                                                 "biomart_NA")]) > 0
+  gene_info$remove_gene <- rowSums(gene_info[, c(
+    "is_mt",
+    "too_few_cells_express",
+    "encodes_ribo_protein",
+    "non_protein_coding",
+    "biomart_NA"
+  )]) > 0
 } else if (!opt$protein_coding_only) {
-  gene_info$remove_gene <- rowSums(gene_info[, c("is_mt",
-                                                 "too_few_cells_express",
-                                                 "encodes_ribo_protein")]) > 0
+  gene_info$remove_gene <- rowSums(gene_info[, c(
+    "is_mt",
+    "too_few_cells_express",
+    "encodes_ribo_protein"
+  )]) > 0
 }
 
 
@@ -318,29 +333,35 @@ gene_info$too_few_cells_express_iterative <- gene_info$ensembl_gene_id %in% loop
 
 gene_info$remove_gene <- NULL
 if (opt$protein_coding_only) {
-  gene_info$remove_gene <- rowSums(gene_info[, c("is_mt",
-                                                 "too_few_cells_express",
-                                                 "encodes_ribo_protein",
-                                                 "non_protein_coding",
-                                                 "biomart_NA",
-                                                 "too_few_cells_express_iterative")]) > 0
+  gene_info$remove_gene <- rowSums(gene_info[, c(
+    "is_mt",
+    "too_few_cells_express",
+    "encodes_ribo_protein",
+    "non_protein_coding",
+    "biomart_NA",
+    "too_few_cells_express_iterative"
+  )]) > 0
 } else if (!opt$protein_coding_only) {
-  gene_info$remove_gene <- rowSums(gene_info[, c("is_mt",
-                                                 "too_few_cells_express",
-                                                 "encodes_ribo_protein",
-                                                 "too_few_cells_express_iterative")]) > 0
+  gene_info$remove_gene <- rowSums(gene_info[, c(
+    "is_mt",
+    "too_few_cells_express",
+    "encodes_ribo_protein",
+    "too_few_cells_express_iterative"
+  )]) > 0
 }
 
 
 ###   Summarize CELL filters in "remove_cell" column   ####
 
 cell_info$remove_cell <- NULL
-cell_info$remove_cell <- rowSums(cell_info[, c("is_doublet",
-                                               "is_mt_outlier",
-                                               "mt_higher_threshold",
-                                               "is_nodg_outlier",
-                                               "nodg_lower_threshold",
-                                               "nodg_lower_threshold_iterative")]) > 0
+cell_info$remove_cell <- rowSums(cell_info[, c(
+  "is_doublet",
+  "is_mt_outlier",
+  "mt_higher_threshold",
+  "is_nodg_outlier",
+  "nodg_lower_threshold",
+  "nodg_lower_threshold_iterative"
+)]) > 0
 
 
 ###   Export information about filtered genes and cells   ####
@@ -412,7 +433,7 @@ h5write(fractionMTreads_out, outfile, "cell_attrs/fractionMT")
 
 # set chunk size for writing h5 to c(1000,1000) or if the matrix is smaller to its dimensions (default)
 if (dim(matrix_filtered)[1] > 1000 && dim(matrix_filtered)[2] > 1000) {
-  chunks <- c(1000,1000)
+  chunks <- c(1000, 1000)
 } else {
   chunks <- dim(matrix_filtered)
 }
@@ -440,54 +461,64 @@ cell_info$col[cell_info$is_doublet] <- "green"
 cell_info$col <- factor(cell_info$col, levels = c("black", "cyan", "green", "orange", "red", "magenta"))
 
 # for manual colour scale
-my_cols <- c("black" = "black",
-             "cyan" = "cyan",
-             "green" = "green",
-             "orange" = "orange",
-             "red" = "red",
-             "magenta" = "magenta",
-             "test" = "tomato3",
-             "test2" = "turquoise3")
+my_cols <- c(
+  "black" = "black",
+  "cyan" = "cyan",
+  "green" = "green",
+  "orange" = "orange",
+  "red" = "red",
+  "magenta" = "magenta",
+  "test" = "tomato3",
+  "test2" = "turquoise3"
+)
 
 # have size of point that represents cell be dependent on library size of the cell
-point_size <-  0.4 + (cell_info$log_library_size - min(cell_info$log_library_size)) / diff(range(cell_info$log_library_size))
+point_size <- 0.4 + (cell_info$log_library_size - min(cell_info$log_library_size)) / diff(range(cell_info$log_library_size))
 
 plot_cells_filtered <- ggplot(cell_info, aes(x = log2_nodg, y = fractionMTreads, alpha = 0.5)) +
   geom_point(aes(colour = col), size = point_size) +
-  scale_colour_manual(values = my_cols,
-                      limits = my_cols,
-                      labels = c("dot size corresponds to library size",
-                                 "NODGs too low",
-                                 "doublets",
-                                 "filtered both criteria",
-                                 "fraction MT too high",
-                                 "NODGs too low after gene filtering",
-                                 "absolute threshold fraction MT",
-                                 "absolute threshold NODG")) +
+  scale_colour_manual(
+    values = my_cols,
+    limits = my_cols,
+    labels = c(
+      "dot size corresponds to library size",
+      "NODGs too low",
+      "doublets",
+      "filtered both criteria",
+      "fraction MT too high",
+      "NODGs too low after gene filtering",
+      "absolute threshold fraction MT",
+      "absolute threshold NODG"
+    )
+  ) +
   xlab("Log2(Number of Detected Genes)") +
   ylab("Fraction of MT reads") +
   ggtitle("Cell filtering based on number of detected genes and fraction of reads mapping to MT- genes") +
   geom_hline(aes(yintercept = threshold_MT), color = "tomato3", show.legend = T) +
   geom_vline(aes(xintercept = log2(threshold_NODG)), color = "turquoise3", show.legend = F) +
   guides(
-         colour = guide_legend(title = NULL,
-           override.aes = list(
-           colour = my_cols,
-           shape  = c(rep(16, 6), NA, NA),
-           linetype = c(rep(0, 6), 1, 1),
-           size = c(rep(3, 6), 1.3, 1.3)
-           )),
-         size = "none",
-         alpha = "none") +
+    colour = guide_legend(
+      title = NULL,
+      override.aes = list(
+        colour = my_cols,
+        shape = c(rep(16, 6), NA, NA),
+        linetype = c(rep(0, 6), 1, 1),
+        size = c(rep(3, 6), 1.3, 1.3)
+      )
+    ),
+    size = "none",
+    alpha = "none"
+  ) +
   theme_bw(base_size = 11.5) +
-  theme(legend.position = c(0.8, 0.86),
-        legend.margin = margin(t = 0, r = 0, b = 0, l = 0, unit = "pt"),
-        legend.key.size = unit(.4, 'cm'),
-        legend.text = element_text(size = 9),
-        title = element_text(size = 9),
-        axis.text = element_text(size = 10),
-        axis.title = element_text(size = 10)
-        )
+  theme(
+    legend.position = c(0.8, 0.86),
+    legend.margin = margin(t = 0, r = 0, b = 0, l = 0, unit = "pt"),
+    legend.key.size = unit(.4, "cm"),
+    legend.text = element_text(size = 9),
+    title = element_text(size = 9),
+    axis.text = element_text(size = 10),
+    axis.title = element_text(size = 10)
+  )
 
 plotname <- paste0(outdir, file_name, ".visualize_filtered_cells.png")
 ggplot2::ggsave(filename = plotname, plot = plot_cells_filtered, width = 19, height = 14, units = "cm", dpi = 300)
@@ -500,12 +531,13 @@ p_rank_nodg <- ggplot(cell_info, aes(x = rank_nodg, y = NODG)) +
   xlab("Cell rank") +
   ggtitle("Cell ranking according to number of detected genes (NODG)") +
   geom_hline(aes(yintercept = threshold_NODG, color = "red"), show.legend = T) +
-  scale_colour_manual(name = NULL,
-                      labels = "threshold for NODG filtering",
-                      values = "red") +
+  scale_colour_manual(
+    name = NULL,
+    labels = "threshold for NODG filtering",
+    values = "red"
+  ) +
   theme_bw(base_size = 13) +
   theme(legend.position = c(0.8, 0.9))
 
 filename <- paste0(outdir, file_name, ".cell_ranking_nodgs.png")
 ggplot2::ggsave(filename = filename, plot = p_rank_nodg, width = 23, height = 18, units = "cm", dpi = 300)
-
