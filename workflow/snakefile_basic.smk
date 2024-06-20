@@ -20,7 +20,7 @@ configfile: "config/config.yaml"
 
 
 # Include report functionality
-# report: "../report/workflow.rst"
+report: "report/workflow.rst"
 
 
 # This file includes common functions used in the pipeline

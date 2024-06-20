@@ -9,6 +9,17 @@ from snakemake.utils import validate
 samples_table = pd.read_table(config["inputOutput"]["sample_map"], header=0)
 sample_map = samples_table.set_index("sample_name", drop=False)
 sample_ids = samples_table["sample_name"].tolist()
+# if samples specified in config, process only those
+if "samples" in config:
+    if isinstance(config["samples"], str):
+        config["samples"]=[config["samples"]]
+    assert all(sa in sample_ids for sa in config["samples"]),"specified samples in config which are not present in sample table"
+    assert sample_ids, "empty sample ids list specified"
+    sample_ids=config["samples"]
+    sample_map=sample_map.loc[sample_ids]
+# for the reporting, we need the samples in the config dict.
+config["samples"]=sample_ids
+
 file_stem_dict=dict(sample_map['file_stem'])
 sample_name_dict={v:k for k,v in file_stem_dict.items()}
 
@@ -19,62 +30,34 @@ validate(sample_map, "../schema/sample_map.schema.yaml")
 ###  Check config file for missing values
 #########################################
 
-fail_instantly = False
-
-# define error object and message
-class Error(object):
-    def __init__(self, key, name):
-        self.__key = key
-        self.__name = name
-
-    def __add__(self, other):
-        return self
-
-    def __call__(self, wildcards=None):
-        sys.exit(
-            """
-            ===============================================
-            You have not specified '{}' for '{}'
-            ===============================================
-            """.format(
-                self.__key, self.__name
-            )
-        )
-
-    def __getitem__(self, value):
-        return Error(key=self.__key, name=self.__name)
-
-
-# define config object
-class Config(object):
+# Define config object
+# it behaves like a dict, but prints a helpfull error message if something is missing
+class Config:
     def __init__(self, kwargs, name="Config"):
         self.__name = name
         self.__members = {}
-        for (key, value) in kwargs.items():
+        for key, value in kwargs.items():
             if isinstance(value, dict):
-                self.__members[key] = Config(kwargs=value, name=key)
+                self.__members[key] = Config(kwargs=value, name=f'{self.__name}->{key}')
             else:
                 self.__members[key] = value
 
+    def print_error(self, key):
+        msg=f'You have not specified "{key}" for "{self.__name}"'
+        logger.error(f"""
+                ===============================================
+                {msg}
+                ===============================================
+                """)
+        return f'config entry "{key}" not found'
     def __getitem__(self, key):
         if key in self.__members:
             return self.__members[key]
         else:
-            if fail_instantly:
-                sys.exit(
-                    """
-                    ===============================================
-                    You have not specified '{}' for '{}'
-                    ===============================================
-                    """.format(
-                        key, self.__name
-                    )
-                )
-            else:
-                return Error(key=key, name=self.__name)
-
-
-# check with the above class definitions if the config file contains all necessary values
+            raise KeyError(self.print_error(key))
+    def __setitem__(self, key, value):
+        self.__members[key]=value
+# Check with the above class definitions if the config file contains all necessary values
 config = Config(config)
 
 

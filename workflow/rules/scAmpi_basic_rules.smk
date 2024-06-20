@@ -1,5 +1,9 @@
-from snakemake import logger
-# Retrieve the fastqs directory name (ie. uses cellranger sample name) corresponding to a given sample
+try:
+    from snakemake import logger
+except ImportError:
+    # change in sm8
+    from snakemake.logging import logger# Retrieve the fastqs directory name (ie. uses cellranger sample name) corresponding to a given sample
+
 def get_fastq_dir(wildcards):
     "return fastq directory of one sample"
     sample = wildcards.sample
@@ -8,7 +12,7 @@ def get_fastq_dir(wildcards):
     return sample_fastq_dir
 
 
-# cellranger call to process the raw samples
+# make symlinks to fastq files that work with cellranger
 rule fastq_symlinks:
     input:
         lambda w: f"{config['inputOutput']['input_fastqs']}/{get_input_fastq(w)}"
@@ -18,7 +22,7 @@ rule fastq_symlinks:
     shell:
         "ln -s {input} {output.target}"
 
-
+# cellranger call to process the raw samples
 rule cellranger_count:
     input:
         #fastqs_dir=config["inputOutput"]["input_fastqs"],
@@ -245,14 +249,19 @@ rule filter_genes_and_cells:
         "--outDir {params.outDir} "
         "&> {log} "
 
+def get_sctransform_param(wildcards, param):
+    if wildcards.sample.split('_')[-1]=='seacells':
+        return config["tools"]["sctransform_preprocessing"][param+'_metacells']
+    else:
+        return config["tools"]["sctransform_preprocessing"][param]
 
 # perform normalisation, cell cycle correction and other preprocessing using sctransform
 rule sctransform_preprocessing:
     input:
         hdf5_file="results/counts_filtered/{sample}.genes_cells_filtered.h5",
     output:
-        outfile="results/counts_corrected/{sample}.corrected.RDS",
-        highly_variable="results/counts_corrected/{sample}.corrected.variable_genes.h5",
+        outfile="results/counts_corrected/{sample, '^(?!.*_seacells$).+'}.corrected.RDS",
+        highly_variable="results/counts_corrected/{sample, '^(?!.*_seacells$).+'}.corrected.variable_genes.h5",
     params:
         sample="{sample}",
         number_genes=config["tools"]["sctransform_preprocessing"]["number_genes"],
@@ -358,6 +367,7 @@ rule celltyping:
     output:
         outfile="results/celltyping/{sample}.celltyping.phenograph_celltype_association.txt",
         out_sce="results/celltyping/{sample}.celltyping.RDS",
+        out_barcodes="results/celltyping/{sample}.cts_final.txt",
     params:
         min_genes=config["tools"]["celltyping"]["min_genes"],
         celltype_lists=config["resources"]["celltype_lists"],
@@ -394,6 +404,7 @@ rule remove_atypical_cells:
     output:
         out_sce="results/atypical_removed/{sample}.atypical_removed.RDS",
         out_table="results/atypical_removed/{sample}.atypical_removed.phenograph_celltype_association.txt",
+        out_h5file="results/atypical_removed/{sample}.atypical_removed.h5",
     params:
         celltype_config=config["resources"]["celltype_config"],
         outputDirec="results/atypical_removed/",
@@ -494,7 +505,7 @@ rule gene_exp:
     input:
         sce_in="results/atypical_removed/{sample}.atypical_removed.RDS",
     output:
-        out="results/gene_exp/{sample}.gene_expression_per_cluster.tsv",
+        out="results/gene_exp/{sample, '^(?!.*_seacells$).+'}.gene_expression_per_cluster.tsv",
     params:
         sampleName="{sample}",
         outpath="results/gene_exp/",
@@ -587,7 +598,7 @@ checkpoint diff_exp_analysis:
         sce_in="results/atypical_removed/{sample}.atypical_removed.RDS",
         cell_types="results/atypical_removed/{sample}.atypical_removed.phenograph_celltype_association.txt",
     output:
-        output=directory("results/diff_exp_analysis/{sample}"),
+        output=directory("results/diff_exp_analysis/{sample, '^(?!.*_seacells$).+'}"),
     params:
         sampleName="{sample}",
         malignant=config["inputOutput"]["malignant_cell_type"],
@@ -605,7 +616,7 @@ checkpoint diff_exp_analysis:
     conda:
         "../envs/diff_exp_analysis.yaml"
     resources:
-        mem_mb=config["computingResources"]["mem_mb"]["medium"],
+        mem_mb=config["computingResources"]["mem_mb"]["high"],
         runtime=config["computingResources"]["runtime"]["high"],
     threads: config["computingResources"]["threads"]["medium"]
     log:
