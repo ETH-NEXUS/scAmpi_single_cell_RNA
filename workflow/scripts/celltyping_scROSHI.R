@@ -12,12 +12,15 @@
 f_pck_load <- function(x) {
   suppressWarnings(
     suppressMessages(
-      require(x, character.only = T, warn.conflicts = F, quietly = T))
+      require(x, character.only = T, warn.conflicts = F, quietly = T)
+    )
   )
 }
 # Load packages
-lby <- c("optparse", "reshape2", "scran", "limma", "uwot", "igraph", "Hmisc",
-         "pheatmap", "RColorBrewer", "cowplot", "scROSHI")
+lby <- c(
+  "optparse", "reshape2", "scran", "limma", "uwot", "igraph", "Hmisc",
+  "pheatmap", "RColorBrewer", "cowplot", "scROSHI"
+)
 resp <- lapply(lby, f_pck_load)
 if (!all(unlist(resp))) {
   print(resp)
@@ -86,23 +89,25 @@ minor_types <- minor_types[idx > 0]
 print("str(minor_types):")
 print(str(minor_types))
 
-#####################################################scROSHI
+##################################################### scROSHI
 
-sce_data <- scROSHI(sce_data = sce_data,
-                    celltype_lists = opt$celltype_lists,
-                    type_config = type_config,
-                    count_data = "normcounts",
-                    gene_symbol = "SYMBOL",
-                    cell_scores = TRUE,
-                    min_genes = opt$min_genes,
-                    min_var = 1.5,
-                    n_top_genes = 2000,
-                    n_nn = 5,
-                    thresh_unknown = 0.05,
-                    thresh_uncert = 0.1,
-                    thresh_uncert_second = 0.8)
+sce_data <- scROSHI(
+  sce_data = sce_data,
+  celltype_lists = opt$celltype_lists,
+  type_config = type_config,
+  count_data = "normcounts",
+  gene_symbol = "SYMBOL",
+  cell_scores = TRUE,
+  min_genes = opt$min_genes,
+  min_var = 1.5,
+  n_top_genes = 2000,
+  n_nn = 5,
+  thresh_unknown = 0.05,
+  thresh_uncert = 0.1,
+  thresh_uncert_second = 0.8
+)
 
-#####################################################scROSHI
+##################################################### scROSHI
 
 # keep sce object including cluster 0
 sce_data_incl_cluster0 <- sce_data
@@ -158,8 +163,10 @@ if (length(minor_types) > 0) {
   }
 }
 # loop over all phenograph clusters. Need not be continuous or numeric but unique
-clu.pu <- data.frame("Cluster" = rownames(tab[seq(left), ]), "Dominant.celltype" = NA,
-                     "Celltype composition" = NA, stringsAsFactors = F, check.names = F)
+clu.pu <- data.frame(
+  "Cluster" = rownames(tab[seq(left), ]), "Dominant.celltype" = NA,
+  "Celltype composition" = NA, stringsAsFactors = F, check.names = F
+)
 for (ii in unique(res$phenograph_clusters)) {
   # ii = unique(res$phenograph_clusters)[1]
   rowid <- which(rownames(tab) == ii)
@@ -206,8 +213,9 @@ clu.pu <- merge(tmp, clu.pu, sort = F)
 # # confidence intervals for proportions (Wilson)
 # round(binconf(0, 4446, method="wilson")*100,1)
 tab.ci <- binconf(tab[nrow(tab) - 1, seq(ncol(tab) - 1)],
-                  rep(tab[nrow(tab) - 1, ncol(tab)], ncol(tab) - 1),
-                  method = "wilson") * 100
+  rep(tab[nrow(tab) - 1, ncol(tab)], ncol(tab) - 1),
+  method = "wilson"
+) * 100
 tab.ci <- apply(tab.ci, 2, function(x) as.character(signif(x, 2)))
 tab.ci <- apply(tab.ci, 1, function(x) sprintf("%s (%s;%s)", x[1], x[2], x[3]))
 clu.pu[nrow(clu.pu), 1 + seq(length(tab.ci))] <- tab.ci
@@ -243,4 +251,3 @@ print(dom_types)
 saveRDS(sce_data, path %&% ".celltyping.RDS")
 # also save sce_data object that including the cells that are in cluster 0
 saveRDS(sce_data_incl_cluster0, path %&% ".celltyping.all_cells.RDS")
-
