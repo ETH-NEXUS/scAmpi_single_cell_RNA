@@ -38,6 +38,7 @@ tools:
 I automated this step, to this end the sample map must contain the "file_stem" original file names without the '_S1_L001_I1_001.fastq.gz' part, 
 and "sample_name", which is used for cell ranger.
 
+## Original Readme
 
 ## General overview
 
