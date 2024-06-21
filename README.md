@@ -1,6 +1,42 @@
 # scAmpi - Single Cell Analysis mRNA pipeline
-### Adaptions
-* cell ranger is critical with file names (contain only letters, digits, underscores, and dashes), which can be worked around with links. I automated this step, to this end the sample map must contain the "file_stem" original file names without the '_S1_L001_I1_001.fastq.gz' part, and "sample_name", which is used for cell ranger.
+## Implementation of metacell Approaches
+Metacell approaches take the filtered single cell count matrix ([...]genes_cells_filtered.h5) and calculate a metacell count matrix ([...]genes_cells_filtered_<metacell_approach>.h5).
+This metacell count matrix is then processed just like the cell count matrix, and called cell types of metacells are compared to single cell calls. 
+### SeaCell
+* snakefile: snakefile_seacells.smk
+* container: docker://mlienhard/seacells
+* config adaptations:
+```yaml
+tools:
+  metacells:
+    seacells:
+      container: "docker://mlienhard/seacells"
+      # number of metacells etc need to be set here
+      # increased number of metacells to 200 (default:90) since sctransform wants to calculate 100 dim pca
+      params: "--n_cells=200" 
+  sctransform_preprocessing:
+    # parameters used with metacells
+    number_genes_metacells: "2000"
+    min_var_metacells: "1.5"
+    n_nn_metacells: "5"
+
+```
+### MetaCells2 
+* snakefile: snakefile_metacells2.smk
+* container: docker://mlienhard/metacells2
+* config adaptations:
+```yaml
+tools:
+  metacells:
+    metacells2:
+      container: "docker://mlienhard/metacells2"
+```
+
+
+## further adaptations
+* cell ranger is critical with file names (contain only letters, digits, underscores, and dashes), which can be worked around with links. 
+I automated this step, to this end the sample map must contain the "file_stem" original file names without the '_S1_L001_I1_001.fastq.gz' part, 
+and "sample_name", which is used for cell ranger.
 
 
 ## General overview
