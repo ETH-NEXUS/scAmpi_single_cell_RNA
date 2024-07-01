@@ -18,7 +18,7 @@ rule fastq_symlinks:
         lambda w: f"{config['inputOutput']['input_fastqs']}/{get_input_fastq(w)}"
     output:
         # attempt to check whether the filename is cellranger conform 
-        target="results/input_fastq/{link_filename,[a-zA-Z0-9_-]+\.fastq\.gz}"
+        target="results/input_fastq/{link_filename,[a-zA-Z0-9_-]+\\.fastq\\.gz}"
     shell:
         "ln -s {input} {output.target}"
 

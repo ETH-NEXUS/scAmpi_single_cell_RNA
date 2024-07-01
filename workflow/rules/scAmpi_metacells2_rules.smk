@@ -1,29 +1,29 @@
 
-# this rule gets a raw h5 file and runs seacells to aggreate cells to metacells
+# this rule gets a raw h5 file and runs metacells2 to aggreate cells to metacells
 # it returns an h5 file with aggregated counts
-rule seacells:
+rule metacells2:
     input:
         counts="results/counts_filtered/{sample}.genes_cells_filtered.h5",
         celltypes="results/celltyping/{sample}.cts_final.txt",
     output:
-        counts="results/metacells/{sample}.genes_cells_filtered_seacells.h5",
-        barcodes="results/metacells/{sample}.genes_cells_filtered_seacells_assignment.tsv", 
+        counts="results/metacells/{sample}.genes_cells_filtered_metacells2.h5",
+        barcodes="results/metacells/{sample}.genes_cells_filtered_metacells2_assignment.tsv", 
         #dont care about soft mappings for now
     params:
         prefix="{sample}.genes_cells_filtered",
         outdir="results/metacells/",
-        custom_script="workflow/scripts/metacell_run_seacells.py",
-        various_params=config["tools"]["metacells"]["seacells"]["params"]
+        custom_script="workflow/scripts/metacell_run_metacells2.py",
+        various_params=config["tools"]["metacells"]["metacells2"]["params"]
     container:
-        config["tools"]["metacells"]["seacells"]["container"]
+        config["tools"]["metacells"]["metacells2"]["container"]
     resources:
         mem_mb=config["computingResources"]["mem_mb"]["medium"],
         runtime=config["computingResources"]["runtime"]["low"],
     threads: config["computingResources"]["threads"]["medium"]
     log:
-        "logs/metacells/{sample}.genes_cells_filtered_seacells.log",
+        "logs/metacells/{sample}.genes_cells_filtered_metacells2.log",
     benchmark:
-        "logs/benchmark/metacells/{sample}.genes_cells_filtered_seacells.benchmark"
+        "logs/benchmark/metacells/{sample}.genes_cells_filtered_metacells2.benchmark"
     shell:
         """
         python {params.custom_script} \
@@ -35,16 +35,16 @@ rule seacells:
             &> {log}
         """
 
-# for other rules inbetween, wildcard {sample} becomes {sample}.genes_cells_filtered_seacells    
+# for other rules inbetween, wildcard {sample} becomes {sample}.genes_cells_filtered_metacells2    
  
-use rule sctransform_preprocessing as sctransform_preprocessing_filtered_seacells with:
+use rule sctransform_preprocessing as sctransform_preprocessing_filtered_metacells2 with:
     input:
-        hdf5_file="results/metacells/{sample}.genes_cells_filtered_seacells.h5",
+        hdf5_file="results/metacells/{sample}.genes_cells_filtered_metacells2.h5",
     output:
-        outfile="results/counts_corrected/{sample}_seacells.corrected.RDS",
-        highly_variable="results/counts_corrected/{sample}_seacells.corrected.variable_genes.h5",
+        outfile="results/counts_corrected/{sample}_metacells2.corrected.RDS",
+        highly_variable="results/counts_corrected/{sample}_metacells2.corrected.variable_genes.h5",
     params:
-        sample="{sample}_seacells",
+        sample="{sample}_metacells2",
         number_genes=config["tools"]["sctransform_preprocessing"]["number_genes_metacells"],
         min_var=config["tools"]["sctransform_preprocessing"]["min_var_metacells"],
         n_nn=config["tools"]["sctransform_preprocessing"]["n_nn_metacells"],
@@ -52,19 +52,20 @@ use rule sctransform_preprocessing as sctransform_preprocessing_filtered_seacell
         custom_script=workflow.source_path("../scripts/sctransform_preprocessing.R"),
 
 
-rule evaluate_seacells:
+rule evaluate_metacells2:
     input:
         celltypes="results/celltyping/{sample}.cts_final.txt",
-        metacelltypes="results/celltyping/{sample}_seacells.cts_final.txt",
-        assignment="results/metacells/{sample}.genes_cells_filtered_seacells_assignment.tsv",
+        metacelltypes="results/celltyping/{sample}_metacells2.cts_final.txt",
+        assignment="results/metacells/{sample}.genes_cells_filtered_metacells2_assignment.tsv",
     output:
-        table="results/metacells/{sample}_seacells_celltype_counts.tsv",
-        plot="results/metacells/{sample}_seacells_celltype_dens.png",
-        report="workflow/report/rules/seacells/{sample}_celltyping_summary.rst"
+        table="results/metacells/{sample}_metacells2_celltype_counts.tsv",
+        plot="results/metacells/{sample}_metacells2_celltype_dens.png",
+        report="workflow/report/rules/metacells2/{sample}_celltyping_summary.rst"
     params:
-        prefix="{sample}_seacells",
+        prefix="{sample}_metacells2",
         outdir="results/metacells/",
-        custom_script="workflow/scripts/metacell_cmp_celltypes.py",        
+        custom_script="workflow/scripts/metacell_cmp_celltypes.py",
+        
     container:
         config["tools"]["metacells"]["seacells"]["container"]
     resources:
@@ -72,9 +73,9 @@ rule evaluate_seacells:
         runtime=config["computingResources"]["runtime"]["low"],
     threads: config["computingResources"]["threads"]["low"]
     log:
-        "logs/metacells/{sample}_metacell_evaluation_seacells.log",
+        "logs/metacells/{sample}_metacell_evaluation_metacells2.log",
     benchmark:
-        "logs/benchmark/metacells/{sample}_metacell_evaluation_seacells.benchmark",
+        "logs/benchmark/metacells/{sample}_metacell_evaluation_metacells2.benchmark",
     shell:
         """
         python {params.custom_script} \

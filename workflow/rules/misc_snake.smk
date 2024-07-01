@@ -20,6 +20,8 @@ if "samples" in config:
 # for the reporting, we need the samples in the config dict.
 config["samples"]=sample_ids
 
+logger.info(f'processing {len(sample_ids)} samples: {', '.join(sample_ids)}')
+
 file_stem_dict=dict(sample_map['file_stem'])
 sample_name_dict={v:k for k,v in file_stem_dict.items()}
 

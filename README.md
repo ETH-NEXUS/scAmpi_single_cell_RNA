@@ -3,8 +3,22 @@
 Metacell approaches take the filtered single cell count matrix ([...]genes_cells_filtered.h5) and calculate a metacell count matrix ([...]genes_cells_filtered_<metacell_approach>.h5).
 This metacell count matrix is then processed just like the cell count matrix, and called cell types of metacells are compared to single cell calls. 
 ### SeaCell
+Snakemake command (snakemake8)
+```bash
+SINGULARITY_ARGS="--bind \
+/path/to/workflow"
+snakemake -s workflow/snakefile_seacells.smk \
+    --configfile config/config.yaml \
+    --profile workflow/profile/profile_dir \
+    --use-conda --conda-prefix /path/to/conda/envs/ \
+    --use-apptainer --apptainer-prefix /path/to/container/images \
+    --apptainer-args "$SINGULARITY_ARGS" 
+```
+
 * snakefile: snakefile_seacells.smk
 * container: docker://mlienhard/seacells
+* paper: https://www.nature.com/articles/s41587-023-01716-9
+* github: https://github.com/dpeerlab/SEACells
 * config adaptations:
 ```yaml
 tools:
@@ -24,6 +38,10 @@ tools:
 ### MetaCells2 
 * snakefile: snakefile_metacells2.smk
 * container: docker://mlienhard/metacells2
+* paper: https://genomebiology.biomedcentral.com/articles/10.1186/s13059-022-02667-1
+* github: https://github.com/tanaylab/metacells
+* PyPI: https://pypi.org/project/metacells/
+* docs: https://metacells.readthedocs.io/en/latest/
 * config adaptations:
 ```yaml
 tools:
