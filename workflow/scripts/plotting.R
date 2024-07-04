@@ -44,7 +44,6 @@ print(opt)
 cat("\n\n")
 
 
-
 # convenience function for string concatenation
 "%&%" <- function(a, b) paste(a, b, sep = "")
 
@@ -81,7 +80,7 @@ col.pal <- colorRampPalette(rev(brewer.pal(11, "RdBu")))(255)
 
 # read in sce object from RDS file
 my_sce <- readRDS(opt$sce_in)
-print("my_sce:")
+cat("\nmy_sce:\n\n")
 print(my_sce)
 
 
@@ -112,17 +111,11 @@ cell_attributes <- plyr::join(as.data.frame(colData(my_sce)), umap_coord)
 
 # have cell types ordered alphabetically
 levels_alpha <- sort(levels(cell_attributes$celltype_final), decreasing = FALSE)
-print("levels_alpha:")
-print(levels_alpha)
 cell_attributes$celltype_final <- factor(cell_attributes$celltype_final,
   levels = levels_alpha
 )
 
 cell_attributes$phenograph_clusters <- factor(cell_attributes$phenograph_clusters)
-print("head(cell_attributes):")
-print(head(cell_attributes))
-print("str(cell_attributes):")
-print(str(cell_attributes))
 
 # read in cell type colours
 config <- read.csv(opt$colour_config, sep = "\t", stringsAsFactors = FALSE)
@@ -139,8 +132,7 @@ id.final.ct
 
 # Make width of plot dependent of the number of columns in the legend
 # second cell type
-print("Number of second cell types:")
-print(length(all.cell.types))
+cat("\n###   Number of second cell types:", length(all.cell.types), "\n")
 if (length(all.cell.types) > 18) {
   width_second <- 25
 } else if (length(all.cell.types) > 36) {
@@ -149,8 +141,7 @@ if (length(all.cell.types) > 18) {
   width_second <- 20
 }
 # first cell type
-print("Number of first cell types:")
-print(length(levels(cell_attributes$celltype_major)))
+cat("\n###   Number of first cell types:", length(levels(cell_attributes$celltype_major)), "\n")
 if (length(levels(cell_attributes$celltype_major)) > 16) {
   width_first <- 25
 } else if (length(levels(cell_attributes$celltype_major)) > 32) {
@@ -159,8 +150,7 @@ if (length(levels(cell_attributes$celltype_major)) > 16) {
   width_first <- 20
 }
 # Number phenograph clusters
-print("Number of phenograph clusters found:")
-print(length(unique(cell_attributes$phenograph_clusters)))
+cat("\n###   Number of phenograph clusters found:", length(unique(cell_attributes$phenograph_clusters)), "\n")
 if (length(unique(cell_attributes$phenograph_clusters)) > 16) {
   width_pheno <- 25
 } else if (length(unique(cell_attributes$phenograph_clusters)) > 32) {
@@ -178,7 +168,7 @@ p_tirosh_ct <- ggplot(cell_attributes, aes(x = umap1, y = umap2, color = celltyp
   scale_color_manual(name = "Cell type", values = ct.color[id.first.ct], drop = F) +
   coord_fixed(ratio = 1)
 p_tirosh_ct_fix <- set_panel_size(p_tirosh_ct, width = unit(12, "cm"), height = unit(12, "cm"))
-# p_tirosh_ct
+
 ggsave(path %&% ".first_celltype.png", p_tirosh_ct_fix,
   width = width_first, height = 15, units = "cm", dpi = 300
 )
@@ -192,7 +182,7 @@ p_final_ct <- ggplot(cell_attributes, aes(x = umap1, y = umap2, color = celltype
   scale_color_manual(name = "Cell type", values = ct.color[id.final.ct], drop = F) +
   coord_fixed(ratio = 1)
 p_final_ct_fix <- set_panel_size(p_final_ct, width = unit(12, "cm"), height = unit(12, "cm"))
-# p_final_ct
+
 ggsave(path %&% ".second_celltype.png", p_final_ct_fix,
   width = width_second, height = 15, units = "cm", dpi = 300
 )
@@ -208,7 +198,7 @@ p_umap_pc <- ggplot(cell_attributes, aes(x = umap1, y = umap2, color = as.factor
   theme(plot.title = element_text(size = 12)) +
   coord_fixed(ratio = 1)
 p_umap_pc_fix <- set_panel_size(p_umap_pc, width = unit(12, "cm"), height = unit(12, "cm"))
-# p_umap_pc
+
 ggsave(path %&% ".phenograph.png", p_umap_pc_fix,
   width = width_pheno, height = 15, units = "cm", dpi = 300
 )
@@ -223,7 +213,7 @@ p_umap_ng <- ggplot(cell_attributes, aes(x = umap1, y = umap2, color = n_gene)) 
   theme(plot.title = element_text(size = 12)) +
   coord_fixed(ratio = 1)
 p_umap_ng_fix <- set_panel_size(p_umap_ng, width = unit(12, "cm"), height = unit(12, "cm"))
-# p_umap_ng_fix
+
 ggsave(path_qc %&% ".NrGenes.png", p_umap_ng_fix,
   width = 20, height = 15, units = "cm", dpi = 300
 )
@@ -239,7 +229,7 @@ p_umap_ls <- ggplot(cell_attributes, aes(x = umap1, y = umap2, color = log10_umi
   theme(plot.title = element_text(size = 12)) +
   coord_fixed(ratio = 1)
 p_umap_ls_fix <- set_panel_size(p_umap_ls, width = unit(12, "cm"), height = unit(12, "cm"))
-# p_umap_ls
+
 ggsave(path_qc %&% ".LibSize_log.png", p_umap_ls_fix,
   width = 20, height = 15, units = "cm", dpi = 300
 )
@@ -254,7 +244,7 @@ p_umap_lsn <- ggplot(cell_attributes, aes(x = umap1, y = umap2, color = n_umi)) 
   theme(plot.title = element_text(size = 12)) +
   coord_fixed(ratio = 1)
 p_umap_lsn_fix <- set_panel_size(p_umap_lsn, width = unit(12, "cm"), height = unit(12, "cm"))
-# p_umap_lsn
+
 ggsave(path_qc %&% ".LibSize.png", p_umap_lsn_fix,
   width = 20, height = 15, units = "cm", dpi = 300
 )
@@ -269,7 +259,7 @@ p_umap_ccphase <- ggplot(cell_attributes, aes(x = umap1, y = umap2, color = cycl
   theme(plot.title = element_text(size = 12)) +
   coord_fixed(ratio = 1)
 p_umap_ccphase_fix <- set_panel_size(p_umap_ccphase, width = unit(12, "cm"), height = unit(12, "cm"))
-# p_umap_ccphase
+
 ggsave(path_qc %&% ".ccphase.png", p_umap_ccphase_fix,
   width = 20, height = 15, units = "cm", dpi = 300
 )
@@ -284,7 +274,7 @@ p_umap_sscore <- ggplot(cell_attributes, aes(x = umap1, y = umap2, color = s_sco
   theme(plot.title = element_text(size = 12)) +
   coord_fixed(ratio = 1)
 p_umap_sscore_fix <- set_panel_size(p_umap_sscore, width = unit(12, "cm"), height = unit(12, "cm"))
-# p_umap_sscore
+
 ggsave(path_qc %&% ".s_score.png", p_umap_sscore_fix,
   width = 20, height = 15, units = "cm", dpi = 300
 )
@@ -299,7 +289,7 @@ p_umap_g2m <- ggplot(cell_attributes, aes(x = umap1, y = umap2, color = g2m_scor
   theme(plot.title = element_text(size = 12)) +
   coord_fixed(ratio = 1)
 p_umap_g2m_fix <- set_panel_size(p_umap_g2m, width = unit(12, "cm"), height = unit(12, "cm"))
-# p_umap_g2m
+
 ggsave(path_qc %&% ".g2m_score.png", p_umap_g2m_fix,
   width = 20, height = 15, units = "cm", dpi = 300
 )
@@ -314,7 +304,7 @@ p_umap_MT <- ggplot(cell_attributes, aes(x = umap1, y = umap2, color = fractionM
   theme(plot.title = element_text(size = 12)) +
   coord_fixed(ratio = 1)
 p_umap_MT_fix <- set_panel_size(p_umap_MT, width = unit(12, "cm"), height = unit(12, "cm"))
-# p_umap_MT
+
 ggsave(path_qc %&% ".fractionMT.png", p_umap_MT_fix,
   width = 20, height = 15, units = "cm", dpi = 300
 )
@@ -330,7 +320,7 @@ p_umap_uc <- ggplot(cell_attributes, aes(x = umap1, y = umap2, color = as.factor
   theme(plot.title = element_text(size = 12)) +
   coord_fixed(ratio = 1)
 p_umap_uc_fix <- set_panel_size(p_umap_uc, width = unit(12, "cm"), height = unit(12, "cm"))
-# p_umap_uc
+
 ggsave(path %&% ".umap_clustering.png", p_umap_uc_fix,
   width = 20, height = 15, units = "cm", dpi = 300
 )
@@ -454,7 +444,7 @@ gene.list.all <- tapply(gene.list.all$SYMBOL, gene.list.all$group, c)
 # sort gene names alphabetically for better overview in plot
 gene.list <- lapply(gene.list, sort)
 gene.list.all <- lapply(gene.list.all, sort)
-print("head(gene.list):")
+cat("\n\n###   head(gene.list) (list of categories of selected genes for expression plots)\n\n")
 print(head(gene.list))
 # get indices of genes in matrix
 list_groups <- lapply(seq_along(gene.list), function(x) {
@@ -462,17 +452,13 @@ list_groups <- lapply(seq_along(gene.list), function(x) {
   indices
 })
 names(list_groups) <- names(gene.list)
-print("str(list_groups):")
-print(str(list_groups))
+
 # sort by position in matrix, do sanity check with old list
 list_groups_sorted <- lapply(list_groups, sort)
 list_groups_orig <- limma::ids2indices(gene.list, rownames(normcounts_all.zero.removed), remove.empty = F)
-print("str(list_groups_orig):")
-print(str(list_groups_orig))
-# stopifnot(all.equal(list_groups_sorted, list_groups_orig))
 
 
-# loop over groups of marker genes to plot gene expression on tSNEs with one png file per group
+# loop over groups of marker genes to plot gene expression on UMAP with one png file per group
 
 fontsize <- theme(axis.text = element_text(size = 3), axis.title = element_text(size = 3))
 theme_set(theme_bw(4) + fontsize)
@@ -481,7 +467,6 @@ p_final_ref <- ggplot(cell_attributes, aes(x = umap1, y = umap2, color = celltyp
   scale_color_manual(name = "Cell type", values = ct.color[id.final.ct], drop = F) +
   geom_point(size = 0.0001) +
   theme(aspect.ratio = 1) +
-  # coord_fixed(ratio = 1) +
   xlab("UMAP 1") +
   ylab("UMAP 2") +
   theme(legend.position = "none")
@@ -494,19 +479,16 @@ p_legend_ref <- ggplot(cell_attributes, aes(x = umap1, y = umap2, color = cellty
   guides(colour = guide_legend(override.aes = list(size = 0.8, shape = 15), nrow = 17)) +
   theme(
     legend.key.width = unit(0.05, "line"),
-    legend.key.height = unit(0.001, "line"), # ,
-    # legend.text = element_text(size = 3.5),
+    legend.key.height = unit(0.001, "line"),
     legend.spacing.y = unit(0.001, "line"),
     legend.spacing.x = unit(0.25, "line")
   )
 
 legend_ref <- cowplot::get_legend(p_legend_ref)
-# ggsave(path_single_plots %&% ".legend_ct_colours_reference.png", legend_ref, dpi = 600, width = 3.5, height = 4, units = "cm")
 
 for (group in seq(length(gene.list.all))) {
   group_name <- names(gene.list.all[group])
-  print("group:")
-  print(group_name)
+  cat("\n\n###   group: ", group_name, "\n")
 
   # get all genes that have zero counts in all cells
   mask.not.expressed <- !(gene.list.all[[group]] %in% rownames(normcounts_all.zero.removed[list_groups[[group_name]], , drop = F]))
@@ -525,7 +507,6 @@ for (group in seq(length(gene.list.all))) {
   } else {
     genes.not.expressed.split <- NULL
   }
-  # genes.not.expressed.split <- split(genes.not.expressed, ceiling(seq_along(genes.not.expressed)/split_by))
   genes.not.expressed.split.collapsed <- lapply(seq_along(genes.not.expressed.split), function(x) {
     paste(genes.not.expressed.split[[x]], collapse = ", ")
   })
@@ -548,7 +529,6 @@ for (group in seq(length(gene.list.all))) {
       aspect.ratio = 1
     )
   # plot_missed
-  # ggsave(path_single_plots %&% "." %&% group_name %&% "_genes_not_expressed.png", plot_missed, dpi = 600, width = 3.5, height = 4, units = "cm")
   # check if there are genes expressed and a submatrix can be generated
   if (length(list_groups[[group_name]]) > 0) {
     # get matrix with all cells and all genes of the respective group
@@ -567,12 +547,8 @@ for (group in seq(length(gene.list.all))) {
       # combine cell_attributes with expression of current gene
       cell_attributes_gene <- cell_attributes
       cell_attributes_gene$normcounts <- matrix_group[gene, ]
-      # print("table(cell_attributes_gene$normcounts < 0):")
-      # print(table(cell_attributes_gene$normcounts < 0))
       # set all values below 0 to 0 for the plotting:
       cell_attributes_gene$normcounts[cell_attributes_gene$normcounts < 0] <- 0
-      print("table(cell_attributes_gene$normcounts < 0):")
-      print(table(cell_attributes_gene$normcounts < 0))
       # maximum count found for current gene
       max_count <- max(cell_attributes_gene$normcounts)
       # upper limit of gene expression colour scale is either maximum count or 3
@@ -589,8 +565,6 @@ for (group in seq(length(gene.list.all))) {
         geom_point(aes(color = normcounts), size = rel(0.001)) +
         xlab("UMAP 1") +
         ylab("UMAP 2") +
-        #        scale_color_distiller(name="", palette = "Spectral", direction = -1,
-        #        scale_color_viridis(option = "plasma", name = "",
         scale_color_gradientn(
           name = "", colours = c(
             "slateblue4", "royalblue1",
@@ -606,7 +580,6 @@ for (group in seq(length(gene.list.all))) {
           plot.title = element_text(face = "bold", hjust = 0.5, size = 4),
           plot.margin = margin(1, 1, 1, 1, "pt"),
           plot.background = element_rect(fill = "white", colour = "black", size = 0.2),
-          # legend.text = element_text(size = 8),
           legend.key.size = unit(0.3, "line"),
           legend.text = element_text(size = rel(0.7)),
           legend.margin = margin(0.2, 0.2, 0.2, 0.2),
@@ -614,8 +587,7 @@ for (group in seq(length(gene.list.all))) {
           aspect.ratio = 1
         )
       merged_plots[["expr"]]
-      # ggsave(path_single_plots %&% "." %&% group_name %&% "." %&% legend %&% "_expression_umap.png", merged_plots[["expr"]], dpi = 600, width = 3.5, height = 2.8, units = "cm")
-      # scale_color_distiller(palette="RdBu")
+
       # plot violin plot
       merged_plots[["violin"]] <- ggplot(cell_attributes_gene, aes(x = factor(phenograph_clusters), y = normcounts)) +
         xlab("Phenograph cluster ID") +
@@ -634,21 +606,20 @@ for (group in seq(length(gene.list.all))) {
           axis.text = element_text(size = 3),
           axis.title = element_text(size = 3.5)
         )
-      # ggsave(path_single_plots %&% "." %&% group_name %&% "." %&% legend %&% "_expression_violin.png", merged_plots[["violin"]], dpi = 600, width = 3.5, height = 1.2, units = "cm")
+
       # combine expression plot and violin plot of current gene to one plot
       plot_gene[[gene]] <- cowplot::plot_grid(plotlist = merged_plots, ncol = 1, rel_heights = c(2.1, .9))
-      # add combined plot to list that aggregates plots of all genes of the current group
-      # plot_gene[[gene]]
     }
   }
   names(plot_gene) <- rownames(matrix_group)
   plot_gene <- c(list(plot_missed, p_final_ref, legend_ref), plot_gene)
   nr.cols <- min(6, 2 * (length(list_groups[[group_name]]) + 3))
   nr.rows <- ceiling((length(list_groups[[group_name]]) + 3) / nr.cols)
-  plots_group <- cowplot::plot_grid(plotlist = plot_gene, ncol = nr.cols)
+  plots_group <- cowplot::plot_grid(plotlist = plot_gene, ncol = nr.cols) +
+    theme(plot.background = element_rect(fill = "white", colour = NA))
   # save png for each group
   ggsave(path_gene_expr %&% "." %&% group_name %&% "_gene_expression.png", plots_group, dpi = 600, width = 20, height = 4 * nr.rows, units = "cm")
-  print(paste0("Gene expression plot of group ", group_name, " plotted."))
+  cat("\n###   Gene expression plot of group ", group_name, " plotted.")
 }
 
 
