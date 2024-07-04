@@ -161,7 +161,7 @@ if (length(unique(cell_attributes$phenograph_clusters)) > 16) {
 
 # plot UMAP (based on highly variable genes), colours = major cell type
 p_tirosh_ct <- ggplot(cell_attributes, aes(x = umap1, y = umap2, color = celltype_major)) +
-  geom_point(alpha = 0.7, size = 0.8) +
+  geom_point(alpha = 0.7, size = 0.8, show.legend = T) +
   xlab("UMAP 1") +
   ylab("UMAP 2") +
   guides(colour = guide_legend(override.aes = list(size = 3, shape = 15), nrow = 16)) +
@@ -175,7 +175,7 @@ ggsave(path %&% ".first_celltype.png", p_tirosh_ct_fix,
 
 # plot UMAP (based on highly variable genes), colours = final cell type
 p_final_ct <- ggplot(cell_attributes, aes(x = umap1, y = umap2, color = celltype_final)) +
-  geom_point(alpha = 0.7, size = 0.8) +
+  geom_point(alpha = 0.7, size = 0.8, show.legend = T) +
   xlab("UMAP 1") +
   ylab("UMAP 2") +
   guides(colour = guide_legend(override.aes = list(size = 2, shape = 15), nrow = 18)) +
@@ -189,7 +189,7 @@ ggsave(path %&% ".second_celltype.png", p_final_ct_fix,
 
 # plot UMAP (based on highly variable genes), colours = phenograph clusters
 p_umap_pc <- ggplot(cell_attributes, aes(x = umap1, y = umap2, color = as.factor(phenograph_clusters))) +
-  geom_point(alpha = 0.7, size = 0.8) +
+  geom_point(alpha = 0.7, size = 0.8, show.legend = T) +
   xlab("UMAP 1") +
   ylab("UMAP 2") +
   guides(colour = guide_legend(override.aes = list(size = 2, shape = 15), nrow = 16)) +
@@ -205,7 +205,7 @@ ggsave(path %&% ".phenograph.png", p_umap_pc_fix,
 
 # plot UMAP (based on highly variable genes), colours = number of detected genes
 p_umap_ng <- ggplot(cell_attributes, aes(x = umap1, y = umap2, color = n_gene)) +
-  geom_point(alpha = 0.7, size = 0.8) +
+  geom_point(alpha = 0.7, size = 0.8, show.legend = T) +
   xlab("UMAP 1") +
   ylab("UMAP 2") +
   scale_colour_distiller(name = "Nr genes", palette = "RdBu") +
@@ -221,7 +221,7 @@ ggsave(path_qc %&% ".NrGenes.png", p_umap_ng_fix,
 # plot UMAP (based on highly variable genes), colours = library size (number UMI counts per cell)
 cell_attributes$log10_umi <- log10(cell_attributes$n_umi)
 p_umap_ls <- ggplot(cell_attributes, aes(x = umap1, y = umap2, color = log10_umi)) +
-  geom_point(alpha = 0.7, size = 0.8) +
+  geom_point(alpha = 0.7, size = 0.8, show.legend = T) +
   xlab("UMAP 1") +
   ylab("UMAP 2") +
   scale_colour_distiller(name = "log10 of library size", palette = "RdBu") +
@@ -236,7 +236,7 @@ ggsave(path_qc %&% ".LibSize_log.png", p_umap_ls_fix,
 
 # plot UMAP (based on highly variable genes), colours = log of library size (number UMI counts per cell)
 p_umap_lsn <- ggplot(cell_attributes, aes(x = umap1, y = umap2, color = n_umi)) +
-  geom_point(alpha = 0.7, size = 0.8) +
+  geom_point(alpha = 0.7, size = 0.8, show.legend = T) +
   xlab("UMAP 1") +
   ylab("UMAP 2") +
   scale_colour_distiller(name = "Library size", palette = "RdBu") +
@@ -251,7 +251,7 @@ ggsave(path_qc %&% ".LibSize.png", p_umap_lsn_fix,
 
 # plot UMAP (based on highly variable genes), colours = cell cycle phase
 p_umap_ccphase <- ggplot(cell_attributes, aes(x = umap1, y = umap2, color = cycle_phase)) +
-  geom_point(alpha = 0.7, size = 0.8) +
+  geom_point(alpha = 0.7, size = 0.8, show.legend = T) +
   xlab("UMAP 1") +
   ylab("UMAP 2") +
   scale_color_manual(name = "Cell cycle phase", values = cols33) +
@@ -266,7 +266,7 @@ ggsave(path_qc %&% ".ccphase.png", p_umap_ccphase_fix,
 
 # plot UMAP (based on highly variable genes), colours = s_score)
 p_umap_sscore <- ggplot(cell_attributes, aes(x = umap1, y = umap2, color = s_score)) +
-  geom_point(alpha = 0.7, size = 0.8) +
+  geom_point(alpha = 0.7, size = 0.8, show.legend = T) +
   xlab("UMAP 1") +
   ylab("UMAP 2") +
   scale_colour_distiller(name = "s_score", palette = "RdBu") +
@@ -281,7 +281,7 @@ ggsave(path_qc %&% ".s_score.png", p_umap_sscore_fix,
 
 # plot UMAP (based on highly variable genes), colours = g2m_score)
 p_umap_g2m <- ggplot(cell_attributes, aes(x = umap1, y = umap2, color = g2m_score)) +
-  geom_point(alpha = 0.7, size = 0.8) +
+  geom_point(alpha = 0.7, size = 0.8, show.legend = T) +
   xlab("UMAP 1") +
   ylab("UMAP 2") +
   scale_colour_distiller(name = "g2m_score", palette = "RdBu") +
@@ -296,7 +296,7 @@ ggsave(path_qc %&% ".g2m_score.png", p_umap_g2m_fix,
 
 # plot UMAP (based on highly variable genes), colours = fraction MT genes)
 p_umap_MT <- ggplot(cell_attributes, aes(x = umap1, y = umap2, color = fractionMT)) +
-  geom_point(alpha = 0.7, size = 0.8) +
+  geom_point(alpha = 0.7, size = 0.8, show.legend = T) +
   xlab("UMAP 1") +
   ylab("UMAP 2") +
   scale_colour_distiller(name = "fractionMT", palette = "RdBu") +
@@ -311,7 +311,7 @@ ggsave(path_qc %&% ".fractionMT.png", p_umap_MT_fix,
 
 # plot UMAP (based on highly variable genes), colours = umap clusters
 p_umap_uc <- ggplot(cell_attributes, aes(x = umap1, y = umap2, color = as.factor(umap_cl))) +
-  geom_point(alpha = 0.7, size = 0.8) +
+  geom_point(alpha = 0.7, size = 0.8, show.legend = T) +
   xlab("UMAP 1") +
   ylab("UMAP 2") +
   guides(colour = guide_legend(override.aes = list(size = 2, shape = 15), nrow = 16)) +
@@ -335,7 +335,7 @@ stopifnot(length(normcounts_all.zero.removed[, 1]) == sum(apply(normcounts_all.z
 
 # plot ridge plot fraction MT vs celltypes
 ridge1 <- ggplot(cell_attributes, aes(x = fractionMT, y = celltype_final, fill = celltype_final)) +
-  geom_density_ridges(alpha = 0.82, jittered_points = TRUE, point_alpha = 0.4, point_size = 0.4) +
+  geom_density_ridges(alpha = 0.82, jittered_points = TRUE, point_alpha = 0.4, point_size = 0.4, show.legend = T) +
   scale_fill_manual(name = "Cell type", values = ct.color[id.final.ct], drop = F) +
   guides(fill = guide_legend(nrow = 18))
 ggsave(path_qc %&% ".ridge_fractionMT_per_final_celltype.png", ridge1,
@@ -344,14 +344,14 @@ ggsave(path_qc %&% ".ridge_fractionMT_per_final_celltype.png", ridge1,
 
 # plot ridge plot fraction MT vs clusters
 ridge2 <- ggplot(cell_attributes, aes(x = fractionMT, y = phenograph_clusters, fill = phenograph_clusters)) +
-  geom_density_ridges(alpha = 0.82, jittered_points = TRUE, point_alpha = 0.4, point_size = 0.4)
+  geom_density_ridges(alpha = 0.82, jittered_points = TRUE, point_alpha = 0.4, point_size = 0.4, show.legend = T)
 ggsave(path_qc %&% ".ridge_fractionMT_per_cluster.png", ridge2,
   dpi = 300
 )
 
 # plot ridge plot log_umi vs celltype
 ridge3 <- ggplot(cell_attributes, aes(x = log_umi, y = celltype_final, fill = celltype_final)) +
-  geom_density_ridges(alpha = 0.82, jittered_points = TRUE, point_alpha = 0.4, point_size = 0.4) +
+  geom_density_ridges(alpha = 0.82, jittered_points = TRUE, point_alpha = 0.4, point_size = 0.4, show.legend = T) +
   scale_fill_manual(name = "Cell type", values = ct.color[id.final.ct], drop = F) +
   guides(fill = guide_legend(nrow = 18))
 ggsave(path_qc %&% ".ridge_logUMI_per_final_celltype.png", ridge3,
@@ -360,14 +360,14 @@ ggsave(path_qc %&% ".ridge_logUMI_per_final_celltype.png", ridge3,
 
 # plot ridge plot log_umi vs cluster
 ridge4 <- ggplot(cell_attributes, aes(x = log_umi, y = phenograph_clusters, fill = phenograph_clusters)) +
-  geom_density_ridges(alpha = 0.82, jittered_points = TRUE, point_alpha = 0.4, point_size = 0.4)
+  geom_density_ridges(alpha = 0.82, jittered_points = TRUE, point_alpha = 0.4, point_size = 0.4, show.legend = T)
 ggsave(path_qc %&% ".ridge_logUMI_per_cluster.png", ridge4,
   dpi = 300
 )
 
 # plot ridge plot n_gene vs celltype
 ridge5 <- ggplot(cell_attributes, aes(x = n_gene, y = celltype_final, fill = celltype_final)) +
-  geom_density_ridges(alpha = 0.82, jittered_points = TRUE, point_alpha = 0.4, point_size = 0.4) +
+  geom_density_ridges(alpha = 0.82, jittered_points = TRUE, point_alpha = 0.4, point_size = 0.4, show.legend = T) +
   scale_fill_manual(name = "Cell type", values = ct.color[id.final.ct], drop = F) +
   guides(fill = guide_legend(nrow = 18))
 ggsave(path_qc %&% ".ridge_n.gene_per_final_celltype.png", ridge5,
@@ -376,14 +376,14 @@ ggsave(path_qc %&% ".ridge_n.gene_per_final_celltype.png", ridge5,
 
 # plot ridge plot n_gene vs cluster
 ridge6 <- ggplot(cell_attributes, aes(x = n_gene, y = phenograph_clusters, fill = phenograph_clusters)) +
-  geom_density_ridges(alpha = 0.82, jittered_points = TRUE, point_alpha = 0.4, point_size = 0.4)
+  geom_density_ridges(alpha = 0.82, jittered_points = TRUE, point_alpha = 0.4, point_size = 0.4, show.legend = T)
 ggsave(path_qc %&% ".ridge_n.gene_per_cluster.png", ridge6,
   dpi = 300
 )
 
 # plot ridge plot s_score vs celltype
 ridge7 <- ggplot(cell_attributes, aes(x = s_score, y = celltype_final, fill = celltype_final)) +
-  geom_density_ridges(alpha = 0.82, jittered_points = TRUE, point_alpha = 0.4, point_size = 0.4) +
+  geom_density_ridges(alpha = 0.82, jittered_points = TRUE, point_alpha = 0.4, point_size = 0.4, show.legend = T) +
   scale_fill_manual(name = "Cell type", values = ct.color[id.final.ct], drop = F) +
   guides(fill = guide_legend(nrow = 18))
 ggsave(path_qc %&% ".ridge_s.score_per_final_celltype.png", ridge7,
@@ -392,14 +392,14 @@ ggsave(path_qc %&% ".ridge_s.score_per_final_celltype.png", ridge7,
 
 # plot ridge plot s_score vs cluster
 ridge8 <- ggplot(cell_attributes, aes(x = s_score, y = phenograph_clusters, fill = phenograph_clusters)) +
-  geom_density_ridges(alpha = 0.82, jittered_points = TRUE, point_alpha = 0.4, point_size = 0.4)
+  geom_density_ridges(alpha = 0.82, jittered_points = TRUE, point_alpha = 0.4, point_size = 0.4, show.legend = T)
 ggsave(path_qc %&% ".ridge_s.score_per_cluster.png", ridge8,
   dpi = 300
 )
 
 # plot ridge plot g2m_score vs celltype
 ridge9 <- ggplot(cell_attributes, aes(x = g2m_score, y = celltype_final, fill = celltype_final)) +
-  geom_density_ridges(alpha = 0.82, jittered_points = TRUE, point_alpha = 0.4, point_size = 0.4) +
+  geom_density_ridges(alpha = 0.82, jittered_points = TRUE, point_alpha = 0.4, point_size = 0.4, show.legend = T) +
   scale_fill_manual(name = "Cell type", values = ct.color[id.final.ct], drop = F) +
   guides(fill = guide_legend(nrow = 18))
 ggsave(path_qc %&% ".ridge_g2m.score_per_final_celltype.png", ridge9,
@@ -408,7 +408,7 @@ ggsave(path_qc %&% ".ridge_g2m.score_per_final_celltype.png", ridge9,
 
 # plot ridge plot s_score vs cluster
 ridge10 <- ggplot(cell_attributes, aes(x = g2m_score, y = phenograph_clusters, fill = phenograph_clusters)) +
-  geom_density_ridges(alpha = 0.82, jittered_points = TRUE, point_alpha = 0.4, point_size = 0.4)
+  geom_density_ridges(alpha = 0.82, jittered_points = TRUE, point_alpha = 0.4, point_size = 0.4, show.legend = T)
 ggsave(path_qc %&% ".ridge_g2m.score_per_cluster.png", ridge10,
   dpi = 300
 )
@@ -473,7 +473,7 @@ p_final_ref <- ggplot(cell_attributes, aes(x = umap1, y = umap2, color = celltyp
 
 p_legend_ref <- ggplot(cell_attributes, aes(x = umap1, y = umap2, color = celltype_final)) +
   scale_color_manual(name = "Cell type", values = ct.color[id.final.ct], drop = F) +
-  geom_point(size = 1) +
+  geom_point(size = 1, show.legend = T) +
   xlab("UMAP 1") +
   ylab("UMAP 2") +
   guides(colour = guide_legend(override.aes = list(size = 0.8, shape = 15), nrow = 17)) +
@@ -653,7 +653,7 @@ p_bar <- ggplot(t.plot, aes(x = x, y = value, fill = Celltypes)) +
   xlab("") +
   ylab("Percent") +
   guides(fill = guide_legend(nrow = 22)) +
-  geom_bar(stat = "identity") +
+  geom_bar(stat = "identity", show.legend = T) +
   scale_fill_manual(name = "Cell type", values = ct.color[id.bar.ct], drop = F) +
   ggtitle(label = "Celltype composition")
 # p_bar
