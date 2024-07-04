@@ -13,23 +13,12 @@ suppressPackageStartupMessages({
   library(ggplot2)
   library(egg)
   library(ggridges)
-  #  library(viridis)
+  library(RColorBrewer)
+  library(limma)
+  library(cowplot)
+  library(SingleCellExperiment)
+  library(SummarizedExperiment)
 })
-
-## packages
-lby <- c(
-  "limma", "scater", "scran", "Rtsne", "rhdf5", "pheatmap", "Hmisc",
-  "RColorBrewer", "cowplot", "reshape2", "igraph", "org.Hs.eg.db", "GSVA", "aroma.light",
-  "class", "ggrepel"
-)
-resp <- lapply(lby, require, character.only = T, warn.conflicts = F, quietly = T)
-if (!all(unlist(resp))) stop("Could not load one or more packages")
-rm(resp, lby)
-
-# give out session Info
-cat("\n\n\nPrint sessionInfo:\n\n")
-print(sessionInfo())
-cat("\n\n\n\n")
 
 # parse command line arguments
 option_list <- list(
@@ -42,6 +31,19 @@ option_list <- list(
 )
 opt_parser <- OptionParser(option_list = option_list)
 opt <- parse_args(opt_parser)
+
+
+# give out session Info
+cat("\n\n")
+print(Sys.time())
+cat("\n\n\nPrint sessionInfo:\n\n")
+print(sessionInfo())
+cat("\n\n\n")
+cat("\nInput files:\n\n")
+print(opt)
+cat("\n\n")
+
+
 
 # convenience function for string concatenation
 "%&%" <- function(a, b) paste(a, b, sep = "")
@@ -464,7 +466,7 @@ print("str(list_groups):")
 print(str(list_groups))
 # sort by position in matrix, do sanity check with old list
 list_groups_sorted <- lapply(list_groups, sort)
-list_groups_orig <- ids2indices(gene.list, rownames(normcounts_all.zero.removed), remove.empty = F)
+list_groups_orig <- limma::ids2indices(gene.list, rownames(normcounts_all.zero.removed), remove.empty = F)
 print("str(list_groups_orig):")
 print(str(list_groups_orig))
 # stopifnot(all.equal(list_groups_sorted, list_groups_orig))
@@ -634,7 +636,7 @@ for (group in seq(length(gene.list.all))) {
         )
       # ggsave(path_single_plots %&% "." %&% group_name %&% "." %&% legend %&% "_expression_violin.png", merged_plots[["violin"]], dpi = 600, width = 3.5, height = 1.2, units = "cm")
       # combine expression plot and violin plot of current gene to one plot
-      plot_gene[[gene]] <- plot_grid(plotlist = merged_plots, ncol = 1, rel_heights = c(2.1, .9))
+      plot_gene[[gene]] <- cowplot::plot_grid(plotlist = merged_plots, ncol = 1, rel_heights = c(2.1, .9))
       # add combined plot to list that aggregates plots of all genes of the current group
       # plot_gene[[gene]]
     }
@@ -643,7 +645,7 @@ for (group in seq(length(gene.list.all))) {
   plot_gene <- c(list(plot_missed, p_final_ref, legend_ref), plot_gene)
   nr.cols <- min(6, 2 * (length(list_groups[[group_name]]) + 3))
   nr.rows <- ceiling((length(list_groups[[group_name]]) + 3) / nr.cols)
-  plots_group <- plot_grid(plotlist = plot_gene, ncol = nr.cols)
+  plots_group <- cowplot::plot_grid(plotlist = plot_gene, ncol = nr.cols)
   # save png for each group
   ggsave(path_gene_expr %&% "." %&% group_name %&% "_gene_expression.png", plots_group, dpi = 600, width = 20, height = 4 * nr.rows, units = "cm")
   print(paste0("Gene expression plot of group ", group_name, " plotted."))
@@ -687,3 +689,4 @@ p_bar <- ggplot(t.plot, aes(x = x, y = value, fill = Celltypes)) +
 ggsave(path %&% ".celltype_barplot.png", p_bar,
   width = 16, height = 18, units = "cm", dpi = 600
 )
+
