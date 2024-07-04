@@ -163,7 +163,7 @@ rule identify_doublets:
     input:
         infile="results/counts_raw/{sample}.h5",
     output:
-        outfile="results/counts_filtered/{sample}.doublet_barcodes.txt",
+        outfile="results/identify_doublets/{sample}.doublet_barcodes.txt",
     params:
         sample="{sample}",
         outdir="results/counts_filtered/",
@@ -192,7 +192,7 @@ rule identify_doublets:
 rule filter_genes_and_cells:
     input:
         infile="results/counts_raw/{sample}.h5",
-        doublets="results/counts_filtered/{sample}.doublet_barcodes.txt",
+        doublets="results/identify_doublets/{sample}.doublet_barcodes.txt",
     output:
         outfile="results/counts_filtered/{sample}.genes_cells_filtered.h5",
     params:

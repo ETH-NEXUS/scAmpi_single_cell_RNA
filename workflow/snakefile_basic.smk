@@ -43,7 +43,7 @@ rule scAmpi_basic:
         #        expand("results/cellranger_run/{sample}.features.tsv", sample = sample_ids),
         expand("results/counts_raw/{sample}.h5", sample=sample_ids),
         expand(
-            "results/counts_filtered/{sample}.doublet_barcodes.txt", sample=sample_ids
+            "results/identify_doublets/{sample}.doublet_barcodes.txt", sample=sample_ids
         ),
         expand(
             "results/counts_raw/{sample}.raw.histogram_library_sizes.png",
