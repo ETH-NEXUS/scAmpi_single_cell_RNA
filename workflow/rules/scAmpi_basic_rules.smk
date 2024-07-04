@@ -166,7 +166,7 @@ rule identify_doublets:
         outfile="results/identify_doublets/{sample}.doublet_barcodes.txt",
     params:
         sample="{sample}",
-        outdir="results/counts_filtered/",
+        outdir="results/identify_doublets/",
         custom_script=workflow.source_path("../scripts/identify_doublets.R"),
     conda:
         "../envs/identify_doublets.yaml"
