@@ -92,10 +92,11 @@ all.cell.types <- c(sort(cell.types), "uncertain", "unknown")
 cols33 <- c(
   "red2", "green4", "blue2", "cyan2", "yellow1", "purple", "brown",
   "chocolate1", "chartreuse2", "darkgoldenrod3", "steelblue1", "slateblue3", "olivedrab4", "gold2",
-  "violetred3", "darkcyan", "orchid3", "darksalmon", "darkslategrey", "khaki", "indianred2", "magenta", "slategray2",
-  "olivedrab1", "mediumaquamarine", "hotpink", "yellow3",
-  "bisque4", "darkseagreen1", "dodgerblue3",
-  "deeppink4", "sienna4", "mediumorchid4"
+  "violetred3", "darkcyan", "orchid3", "darksalmon", "darkslategrey", "khaki", "indianred2",
+  "magenta", "slategray2", "olivedrab1", "mediumaquamarine", "hotpink", "yellow3", "bisque4",
+  "darkseagreen1", "dodgerblue3", "deeppink4", "sienna4", "mediumorchid4", "sandybrown", "skyblue4",
+  "lightskyblue2", "seagreen4", "palevioletred3", "aquamarine", "thistle2", "springgreen1", "lightgoldenrod4",
+  "azure4"
 )
 
 # get UMAP coordinates into data frame
