@@ -27,21 +27,23 @@ report: "report/workflow.rst"
 include: "rules/misc_snake.smk"
 # Include rules
 include: "rules/scAmpi_basic_rules.smk"
-include: "rules/scAmpi_metacells2_rules.smk"
+include: "rules/scAmpi_seacells_rules.smk"
 
 
 # include local rules
 localrules:
-    scAmpi_metacells2,
+    scAmpi_seacells,
 
 
 # final rule of pipeline
 # defines output of scampi seacells
-rule scAmpi_metacells2:
+rule scAmpi_seacells:
     input:       
         expand("results/plotting/{sample}.celltype_barplot.png", sample=sample_ids),
+        expand("results/plotting/{sample}_seacells.celltype_barplot.png", sample=sample_ids),
         expand("results/gsva/{sample}.gsetscore_hm.png", sample=sample_ids),
         expand("results/diff_exp_analysis/{sample}/", sample=sample_ids),
-        # expand("results/plotting/{sample}_seacells.celltype_barplot.png", sample=sample_ids),
-        expand("workflow/report/rules/metacells2/{sample}_celltyping_summary.rst", sample=sample_ids),
+        expand("workflow/report/rules/seacells/{sample}_celltyping_summary.rst", sample=sample_ids),
+        expand("results/gsva/{sample}_seacells.gsetscore_hm.png", sample=sample_ids),
+        expand("results/gsva/{sample}.gsetscore_hm.png", sample=sample_ids),
 

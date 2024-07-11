@@ -42,9 +42,8 @@ rule scAmpi_metacells2:
         expand("results/plotting/{sample}.celltype_barplot.png", sample=sample_ids),
         expand("results/gsva/{sample}.gsetscore_hm.png", sample=sample_ids),
         expand("results/diff_exp_analysis/{sample}/", sample=sample_ids),
-        # expand("results/plotting/{sample}_metacells2.celltype_barplot.png", sample=sample_ids),
+        expand("results/plotting/{sample}_metacells2.celltype_barplot.png", sample=sample_ids),
         expand("workflow/report/rules/metacells2/{sample}_celltyping_summary.rst", sample=sample_ids),
-    output:
-        "results/completed_metacells2.txt"
-    shell:
-        "echo $(date) > {output}"
+        expand("results/gsva/{sample}_metacells2.gsetscore_hm.png", sample=sample_ids),
+        expand("results/gsva/{sample}.gsetscore_hm.png", sample=sample_ids),
+   

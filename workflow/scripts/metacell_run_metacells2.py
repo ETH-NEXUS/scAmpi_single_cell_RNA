@@ -5,7 +5,7 @@ import numpy as np               # For array/matrix operations
 import pandas as pd              # For data frames
 import os                        # For filesystem operations
 import seaborn as sns             # For plotting
-from scipy.sparse import csr_matrix
+from scipy.sparse import csr_matrix, vstack
 from scanpy import AnnData
 # from math import hypot           # For plotting
 import argparse
@@ -52,13 +52,33 @@ def main(h5file, out_dir, out_prefix,celltype_mapping_file,target_metacell_umis,
     metacells= mc.pl.collect_metacells(cells, name=f"{sample}.one-pass.metacells", random_seed=42)
     print(f'found {metacells.shape[0]} metacells')
     assign_df=get_assignment(cells)
+    
     assign_df.to_csv(f'{out_dir}/{out_prefix}_metacells2_assignment.tsv', sep='\t')
+    assign_df['UMI_counts'] =  cells.X.sum(axis=1).A1
+    assign_df['fractionMT'] = cells.obs['fractionMT'].reindex(assign_df['cell_barcode']).values
+    metacell_fractionMT = (assign_df.groupby('metacell1_id')[['fractionMT', 'UMI_counts']]
+                            .apply(lambda x: np.average(x['fractionMT'], weights=x['UMI_counts'])))
+    metacells.obs['fractionMT']=metacell_fractionMT
+
+
     # create metecells adata object
     h5_out=f'{out_dir}/{out_prefix}_metacells2.h5'
     #write to file
     export_metacells( metacells, h5_out)
     #h5_out=f'{out_dir}/{out_prefix}_seacells_soft.h5'
     #export_seacells(SEACell_ad, gene_dict, h5_out)
+
+def aggregate_metacell_counts(assign_df, cells):
+    barcode_df=dict(assign_df['metacell1_id'])
+    cell_metacell_ids=np.array([barcode_df[bc] for bc in cells.obs.index])
+    metacell_ids=sorted(set(cell_metacell_ids))
+    metacell_ids.remove('Outliers')
+    aggregated_counts=[csr_matrix(cells.X[cell_metacell_ids==mid].sum(0)) for mid in metacell_ids]
+    aggregated_counts = vstack(aggregated_counts, format='csr')
+    metacell_obs = pd.DataFrame( {'total_umis':aggregated_counts.sum(1).A1},index=metacell_ids)
+    metacell_var=cells.var['gene_ids']
+    aggregated_metacells=AnnData(X=aggregated_counts, obs=metacell_obs, var=metacell_var)
+    return aggregated_metacells
 
 def h5_to_ad(h5file, celltype_mapping_file=None):
     "import the h5 file"
@@ -75,8 +95,11 @@ def h5_to_ad(h5file, celltype_mapping_file=None):
         # Load gene names
         gene_names = f['gene_attrs/gene_names'][:]
         gene_names = [name.decode('utf-8') for name in gene_names]
+        # Load fractionMT
+        fractionMT = f['cell_attrs/fractionMT'][:]
     # Create AnnData object with sparse matrix representation
     adata = AnnData(X=counts, obs=pd.DataFrame(index=cell_names), var=pd.DataFrame({'gene_ids':gene_ids},index=gene_names))
+    adata.obs['fractionMT'] = fractionMT
     if celltype_mapping_file is not None:
         celltype_mapping = dict(pd.read_csv(celltype_mapping_file, sep='\t').set_index('barcodes')['celltype_final'])
         if not set(celltype_mapping.keys()).issubset(set(adata.obs_names)):
@@ -113,6 +136,9 @@ def export_metacells(metacells, h5_out=None):
             # Save gene names
             gene_ids = metacells.var.gene_ids.values.astype('S')
             f.create_dataset('gene_attrs/gene_ids', data=gene_ids)
+            # save the fractionMT
+            fraction_mt=metacells.obs['fractionMT'].values
+            f.create_dataset('cell_attrs/fractionMT', data=fraction_mt)
             # Indicate that cells are on rows
             f.create_dataset('cell_attrs/cells_on_rows', data=np.array(True))
     

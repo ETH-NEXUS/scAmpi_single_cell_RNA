@@ -49,7 +49,14 @@ use rule sctransform_preprocessing as sctransform_preprocessing_filtered_seacell
         min_var=config["tools"]["sctransform_preprocessing"]["min_var_metacells"],
         n_nn=config["tools"]["sctransform_preprocessing"]["n_nn_metacells"],
         outDir="results/counts_corrected/",
-        custom_script=workflow.source_path("../scripts/sctransform_preprocessing.R"),
+        #custom_script=workflow.source_path("../scripts/sctransform_preprocessing.R"),
+        custom_script="workflow/scripts/sctransform_preprocessing.R",
+        smooth_pc="20",
+        min_cells_per_gene="10",
+        max_count="0"
+
+    log:
+        "logs/sctransform_preprocessing/{sample}_seacells.log",
 
 
 rule evaluate_seacells:
@@ -64,7 +71,8 @@ rule evaluate_seacells:
     params:
         prefix="{sample}_seacells",
         outdir="results/metacells/",
-        custom_script="workflow/scripts/metacell_cmp_celltypes.py",        
+        custom_script="workflow/scripts/metacell_cmp_celltypes.py",     
+        ct_config=config["resources"]["celltype_config"],   
     container:
         config["tools"]["metacells"]["seacells"]["container"]
     resources:
@@ -81,6 +89,7 @@ rule evaluate_seacells:
             -i {input.celltypes} \
             -m {input.metacelltypes} \
             -a {input.assignment} \
+            -c {params.ct_config} \
             -o {params.outdir} \
             -p {params.prefix} \
             -r {output.report} \

@@ -268,7 +268,11 @@ rule sctransform_preprocessing:
         min_var=config["tools"]["sctransform_preprocessing"]["min_var"],
         n_nn=config["tools"]["sctransform_preprocessing"]["n_nn"],
         outDir="results/counts_corrected/",
-        custom_script=workflow.source_path("../scripts/sctransform_preprocessing.R"),
+        #custom_script=workflow.source_path("../scripts/sctransform_preprocessing.R"),
+        custom_script="workflow/scripts/sctransform_preprocessing.R",
+        smooth_pc="100", # default value
+        max_count="0", # no effect
+        min_cells_per_gene="0" # do not filter
     conda:
         "../envs/sctransform_preprocessing.yaml"
     resources:
@@ -286,6 +290,9 @@ rule sctransform_preprocessing:
         "--number_genes {params.number_genes} "
         "--min_var {params.min_var} "
         "--n_nn {params.n_nn} "
+        "--max_pc_smooth {params.smooth_pc} "
+        "--max_count {params.max_count} "
+        "--min_cells_per_gene {params.min_cells_per_gene} "
         "--outdir {params.outDir} "
         "&> {log} "
 
@@ -395,6 +402,11 @@ rule celltyping:
         "--outputDirec {params.outputDirec} "
         "&> {log} "
 
+def get_atypical_params(wildcard, key):
+    what='cells'  
+    if '_seacells' in wildcard['sample'] or '_metacells2' in wildcard['sample']:
+        what = 'metacells'
+    return config["tools"]["remove_atypical_cells"][what][key]
 
 # filter out atypical cells from sce object
 rule remove_atypical_cells:
@@ -409,9 +421,9 @@ rule remove_atypical_cells:
         celltype_config=config["resources"]["celltype_config"],
         outputDirec="results/atypical_removed/",
         sample_name="{sample}",
-        threshold_filter=config["tools"]["remove_atypical_cells"]["threshold_filter"],
-        min_threshold=config["tools"]["remove_atypical_cells"]["min_threshold"],
-        threshold_type=config["tools"]["remove_atypical_cells"]["threshold_type"],
+        threshold_filter=lambda w:get_atypical_params(w,"threshold_filter"),
+        min_threshold=lambda w:get_atypical_params(w,"min_threshold"),
+        threshold_type=lambda w:get_atypical_params(w,"threshold_type"),
         custom_script=workflow.source_path("../scripts/remove_atypical_cells.R"),
     conda:
         "../envs/remove_atypical_cells.yaml"
@@ -423,7 +435,7 @@ rule remove_atypical_cells:
         "logs/remove_atypical_cells/{sample}.log",
     benchmark:
         "logs/benchmark/remove_atypical_cells/{sample}.benchmark"
-    shell:
+    shell: 
         "Rscript {params.custom_script} "
         "--sce_in {input.infile} "
         "--cluster_table {input.cluster_table} "

@@ -309,7 +309,7 @@ if (length(minor_types) > 0) {
   names(minor_types) <- gsub("([^_]+)_.*", "\\1", names(minor_types))
   # add major type also to minor type column (as it can be final cell type as well)
   minor_types <- sapply(names(minor_types), simplify = FALSE, function(x) {
-    minor_types[x] <- c(minor_types[[x]], x)
+    c(minor_types[[x]], x)
   })
   major_minor_dict <- melt(minor_types)
   names(major_minor_dict) <- c("minor", "major")
@@ -322,7 +322,7 @@ if (length(minor_types) > 0) {
   }
 }
 # loop over all phenograph clusters. Need not be continuous or numeric but unique
-clu.pu <- data.frame("Cluster" = rownames(tab[seq(left), ]), "Dominant.celltype" = NA,
+clu.pu <- data.frame("Cluster" = rownames(tab[seq(left), ,drop=FALSE]), "Dominant.celltype" = NA,
   "Celltype composition" = NA, stringsAsFactors = F, check.names = F)
 for (ii in unique(res$phenograph_clusters)) {
   # ii = unique(res$phenograph_clusters)[1]

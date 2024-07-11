@@ -63,23 +63,40 @@ def main(h5file, out_dir, out_prefix, celltype_mapping_file, n_SEACells, n_pc, n
     hard_df.to_csv(f'{out_dir}/{out_prefix}_seacells_hard_assignment.tsv', sep='\t')
     soft_df=get_assignment(model, hard=False)
     soft_df.to_csv(f'{out_dir}/{out_prefix}_seacells_assignment.tsv', sep='\t')
+    soft_df['UMI_counts'] =  adata.obs['n_counts']
+
+    soft_df['fractionMT'] = adata.obs['fractionMT'].reindex(soft_df.index).values
+    metacell_fractionMT = (soft_df.groupby('metacell1_id')[['fractionMT', 'UMI_counts']]
+                            .apply(lambda x: np.average(x['fractionMT'], weights=x['UMI_counts'])))
     #  aggregate output matrix: raw counts for each metacell
     SEACell_ad = SEACells.core.summarize_by_SEACell(adata, SEACells_label='SEACell', summarize_layer='raw')
+    SEACell_ad.obs['fractionMT']=metacell_fractionMT
+    SEACell_ad=prepare_seacells(SEACell_ad,  n_topvar_genes, n_pc, n_neighbors)
+
+    sc.pl.scatter(SEACell_ad, basis='umap', frameon=False, color='n_counts')
+    plt.savefig(f'{out_dir}/{out_prefix}_seacells_umap_metacells_ncounts.png')
+
     # alternatively, "soft" (weighted) assignment
     SEACell_soft_ad = SEACells.core.summarize_by_soft_SEACell(adata, model.A_, summarize_layer='raw', minimum_weight=0.05)
+    SEACell_soft_ad.obs.index=SEACell_ad.obs.index
+    SEACell_soft_ad.obs['fractionMT']=metacell_fractionMT
+    SEACell_soft_ad=prepare_seacells(SEACell_soft_ad,  n_topvar_genes, n_pc, n_neighbors)
+    sc.pl.scatter(SEACell_soft_ad, basis='umap', frameon=False, color='n_counts')
+    plt.savefig(f'{out_dir}/{out_prefix}_seacells_umap_metacells_soft_ncounts.png')
+
     # export to h5 files
     gene_dict=dict(adata.var["gene_names"]) # gene names are lost in the process and have to be added here
     h5_out=f'{out_dir}/{out_prefix}_seacells.h5'
     export_seacells( SEACell_ad, gene_dict, h5_out)
-    h5_out=f'{out_dir}/{out_prefix}_seacells_soft.h5'
-    export_seacells(SEACell_soft_ad, gene_dict, h5_out)
+    # h5_out=f'{out_dir}/{out_prefix}_seacells_soft.h5'
+    # export_seacells(SEACell_soft_ad, gene_dict, h5_out)
 
 def h5_to_ad(h5file, celltype_mapping_file=None):
     "import the h5 file"
     # Open the HDF5 file and read the counts data
     with h5py.File(h5file, 'r') as f:
         # Load counts data
-        counts = csr_matrix(f['raw_counts'][:])
+        counts = csr_matrix(f['raw_counts'][:], dtype=np.float32)
         # Load cell names
         cell_names = f['cell_attrs/cell_names'][:]
         cell_names = [name.decode('utf-8') for name in cell_names]
@@ -89,8 +106,11 @@ def h5_to_ad(h5file, celltype_mapping_file=None):
         # Load gene names
         gene_names = f['gene_attrs/gene_names'][:]
         gene_names = [name.decode('utf-8') for name in gene_names]
+        # Load fractionMT
+        fractionMT = f['cell_attrs/fractionMT'][:]
     # Create AnnData object with sparse matrix representation
     adata = sc.AnnData(X=counts, obs=pd.DataFrame(index=cell_names), var=pd.DataFrame({'gene_names':gene_names},index=gene_ids))
+    adata.obs['fractionMT'] = fractionMT
     if celltype_mapping_file is not None:
         celltype_mapping = dict(pd.read_csv(celltype_mapping_file, sep='\t').set_index('barcodes')['celltype_final'])
         if not set(celltype_mapping.keys()).issubset(set(adata.obs_names)):
@@ -102,9 +122,9 @@ def h5_to_ad(h5file, celltype_mapping_file=None):
     return adata
 
 def prepare_seacells(adata, n_topvar_genes, n_pc, n_neighbors):
-    "add the required normalisation and variable genes"
+    "basic scanpy preprocessing for umap"
     # copy the data to .raw
-    raw_ad = sc.AnnData(adata.X)
+    raw_ad = sc.AnnData(adata.X, dtype=np.float32)
     raw_ad.obs_names, raw_ad.var_names = adata.obs_names, adata.var_names
     adata.raw = raw_ad 
     # Normalize cells, log transform and compute highly variable genes
@@ -155,7 +175,7 @@ def get_assignment(model, hard=True):
             table.append(row_data)
         # Convert the table to a DataFrame
         df = pd.DataFrame(table, columns=['cell_barcode'] + 
-                                 [f'metacell{i+1}_{v}' for i in range(5)  for v in ('id', 'bc', 'weight') ] )
+                                 [f'metacell{i+1}_{v}' for i in range(5)  for v in ('id', 'bc', 'weight') ] ).set_index('cell_barcode')
     return df
 
 
@@ -164,7 +184,7 @@ def export_seacells(seacells_obj,gene_dict, h5_out=None):
     if h5_out is not None:
         with h5py.File(h5_out, 'w') as f:
             # Save counts
-            f.create_dataset('raw_counts', data=seacells_obj.X.toarray())
+            f.create_dataset('raw_counts', data=seacells_obj.layers['raw'].toarray())
             # Save cell names (metacell names)
             metacell_names = np.array(seacells_obj.obs_names, dtype='S')
             f.create_dataset('cell_attrs/cell_names', data=metacell_names)
@@ -174,6 +194,9 @@ def export_seacells(seacells_obj,gene_dict, h5_out=None):
             # Save gene names
             gene_names = np.array([gene_dict[gid] for gid in seacells_obj.var_names], dtype='S')
             f.create_dataset('gene_attrs/gene_names', data=gene_names)
+            # save the fractionMT
+            fraction_mt=seacells_obj.obs['fractionMT'].values
+            f.create_dataset('cell_attrs/fractionMT', data=fraction_mt)
             # Indicate that cells are on rows
             f.create_dataset('cell_attrs/cells_on_rows', data=np.array(True))
     

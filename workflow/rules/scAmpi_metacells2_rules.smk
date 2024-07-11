@@ -13,7 +13,7 @@ rule metacells2:
         prefix="{sample}.genes_cells_filtered",
         outdir="results/metacells/",
         custom_script="workflow/scripts/metacell_run_metacells2.py",
-        various_params=config["tools"]["metacells"]["metacells2"]["params"]
+        various_params=config["tools"]["metacells"]["metacells2"]["params"],
     container:
         config["tools"]["metacells"]["metacells2"]["container"]
     resources:
@@ -49,7 +49,13 @@ use rule sctransform_preprocessing as sctransform_preprocessing_filtered_metacel
         min_var=config["tools"]["sctransform_preprocessing"]["min_var_metacells"],
         n_nn=config["tools"]["sctransform_preprocessing"]["n_nn_metacells"],
         outDir="results/counts_corrected/",
-        custom_script=workflow.source_path("../scripts/sctransform_preprocessing.R"),
+        #custom_script=workflow.source_path("../scripts/sctransform_preprocessing.R"),
+        custom_script="workflow/scripts/sctransform_preprocessing.R",
+        smooth_pc="20",
+        max_count="0", # no 
+        min_cells_per_gene="10"
+    log:
+        "logs/sctransform_preprocessing/{sample}_metacells2.log",
 
 
 rule evaluate_metacells2:
@@ -65,7 +71,7 @@ rule evaluate_metacells2:
         prefix="{sample}_metacells2",
         outdir="results/metacells/",
         custom_script="workflow/scripts/metacell_cmp_celltypes.py",
-        
+        ct_config=config["resources"]["celltype_config"],
     container:
         config["tools"]["metacells"]["seacells"]["container"]
     resources:
@@ -82,6 +88,7 @@ rule evaluate_metacells2:
             -i {input.celltypes} \
             -m {input.metacelltypes} \
             -a {input.assignment} \
+            -c {params.ct_config} \
             -o {params.outdir} \
             -p {params.prefix} \
             -r {output.report} \

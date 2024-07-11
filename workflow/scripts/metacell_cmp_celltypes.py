@@ -4,6 +4,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 matplotlib.use('Agg')  # Use Agg backend for rendering plots
 import argparse
+import re
 import warnings
 
 
@@ -15,8 +16,9 @@ import warnings
 # metacell_assignment=f"results/metacells/{sample}.genes_cells_filtered_seacells_assignment.tsv"
 # main(celltypes, metacelltypes, metacell_assignment, "metacell_tests/SEACells/cmp", sample)
 
-def main(celltype_file, metacelltype_file, assignment_file, out_dir, out_prefix, reportfile):
-    metacell_counts=get_metacell_counts(celltype_file, metacelltype_file, assignment_file)
+def main(celltype_file, metacelltype_file, assignment_file, celltype_config_file, out_dir, out_prefix, reportfile):
+    subcell_dict=get_subcell_dict(celltype_config_file)
+    metacell_counts=get_metacell_counts(celltype_file, metacelltype_file, assignment_file, subcell_dict)
     metacell_counts.to_csv(f"{out_dir}/{out_prefix}_celltype_counts.tsv", sep='\t', index=False)
     with open(reportfile, 'w') as f:
         f.write(get_report(metacell_counts))
@@ -35,7 +37,17 @@ def main(celltype_file, metacelltype_file, assignment_file, out_dir, out_prefix,
     plt.xlabel('Purity')
     plt.ylabel('Density')
     plt.savefig(f'{out_dir}/{out_prefix}_celltype_dens.png')
-  
+
+def get_subcell_dict(celltype_config_file):
+    celltype_config=pd.read_csv(celltype_config_file, sep='\t').set_index('Major')
+    # this should be equivalent to the R code
+    #regex = re.compile(r"([^_]+)_.*")
+    #celltype_dict={regex.sub(r"\1", m):[regex.sub(r"\1", s) for s in sl.split(',')] for m,sl in celltype_config['Subtype'].items()}
+    # simpler version:
+    celltype_dict={m.split('_',1)[0]:[s.split('_',1)[0] for s in sl.split(',')] for m,sl in celltype_config['Subtype'].items()}
+    subcelltype_dict={v:k  for k,vl in celltype_dict.items() for v in vl if v != 'none'}
+    return subcelltype_dict
+
 def get_report(metacell_counts):
     # print some statistics for the logfile
     n=len(metacell_counts) # number of metacells
@@ -58,7 +70,7 @@ def get_report(metacell_counts):
     return report
 
 
-def get_metacell_counts(celltype_file, metacelltype_file, assignment_file):
+def get_metacell_counts(celltype_file, metacelltype_file, assignment_file, subcell_dict=None):
     """ 
     Get a metacell count table
 
@@ -132,6 +144,7 @@ if __name__=="__main__":
     parser.add_argument("-i", metavar='individual_celltypes.cts_final.txt', required=True, help="celltypes called for individual cells from celltyping.R (rule celltyping)")
     parser.add_argument("-m", metavar='metacelltypes.cts_final.txt', required=True, help="celltypes called for aggregated metacells from celltyping.R (rule celltyping)")
     parser.add_argument("-a", metavar="metacell_assignment.tsv", required=True, help="table with cell to metacell assignment from metacell_run_[method].py")
+    parser.add_argument("-c", metavar="celltype_config.tsv", required=True, help="table with major celltype to subcelltype assignment")
     parser.add_argument("-o", metavar="output_dir", required=True, help="output_directory")
     parser.add_argument("-p", metavar="prefix", required=True, help="prefix used for output files")
     parser.add_argument("-r", metavar="path/to/reportfile.rst",help="report is written to this file", required=False, default=None)
@@ -144,5 +157,6 @@ if __name__=="__main__":
     out_dir=args.o
     out_prefix=args.p
     reportfile=args.r
-    main(celltype_file, metacelltype_file, assignment_file, out_dir, out_prefix, reportfile)
+    celltype_config_file=args.c
+    main(celltype_file, metacelltype_file, assignment_file,celltype_config_file, out_dir, out_prefix, reportfile)
 
