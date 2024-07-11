@@ -719,30 +719,32 @@ get_model_pars_nonreg <- function(genes, bin_size, model_pars_fit, regressor_dat
                     FUN = function(gene) {
                         fam <- negative.binomial(theta = model_pars_fit[gene, 'theta'], link = 'log')
                         y <- umi_bin[gene, ]
-                        offs <- mu[gene, ]
-                        fit <- tryCatch({
-                            glm(as.formula(model_str_nonreg), data = cell_attr, family = fam, offset=offs)
-                        },
-                        error = function(e) { # Print summary of y when glm fails
-                            msg=paste0("FATAL ERROR occurred in get_model_pars_nonreg  when calling glm() for gene:", gene, "\n" ,
-                                "UMI counts are 0 for ",sum(y==0),"/",length(y),' cells\n',
-                                round(sum(y< 10)/length(y)*100,1),"% of the cells are below 10\n",
-                                round(sum(y>100)/length(y)*100,1),"% of the cells are above 100\n",
-                                "90% percentile is ",quantile(y,.9),"\n",
-                                "Cell ",which.max(y)," has max counts (",max(y)," UMIs)\n")
-                            
-                            return(list(coefficients=default_coef,
-                                warning=msg) ) # Return default values 0
-                        },
-                        warning = function(w){                             
-                            fit_w <- glm(as.formula(model_str_nonreg), data = cell_attr, family = fam, offset=offs)
-                            fit_w$warning <- as.character(w)
-                            return(fit_w)
-                        }
+                        offs <- mu[gene, ]                        
+                        fit <- tryCatch(
+                            {   
+                                warn_msg=''
+                                withCallingHandlers(
+                                    fit <- glm(as.formula(model_str_nonreg), data = cell_attr, family = fam, offset=offs),
+                                    warning = function(w){                             
+                                        warn_msg<<-paste(warn_msg,conditionMessage(w))
+                                        invokeRestart("muffleWarning")
+                                    })                            
+                                fit$warning=warn_msg
+                                fit
+                            },
+                            error = function(e) { # Print summary of y when glm fails
+                                msg=paste0("FATAL ERROR occurred in get_model_pars_nonreg  when calling glm() for gene:", gene, "\n" ,
+                                    "UMI counts are 0 for ",sum(y==0),"/",length(y),' cells\n',
+                                    round(sum(y< 10)/length(y)*100,1),"% of the cells are below 10\n",
+                                    round(sum(y>100)/length(y)*100,1),"% of the cells are above 100\n",
+                                    "90% percentile is ",quantile(y,.9),"\n",
+                                    "Cell ",which.max(y)," has max counts (",max(y)," UMIs)\n")                                
+                                return(list(coefficients=default_coef, warning=msg) ) # Return default values 0
+                            }
                       )
                       return(list(
                                 coefficients=fit$coefficients, 
-                                warning=ifelse("warning" %in% names(fit),fit$warning, "")))
+                                warning=fit$warning))
                     },
                     future.seed = TRUE)
     if (verbosity > 1) {
