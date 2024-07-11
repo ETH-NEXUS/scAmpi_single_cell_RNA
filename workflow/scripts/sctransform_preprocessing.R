@@ -5,6 +5,7 @@
 #### R Version: 4.0
 ##################################################
 
+
 suppressPackageStartupMessages({
   library(optparse)
   library(rhdf5)
@@ -15,6 +16,18 @@ suppressPackageStartupMessages({
   library(uwot)
   library(igraph)
 })
+cat('using patched version of vst, with exception handling\n')
+# Get command line arguments
+args <- commandArgs(trailingOnly = FALSE)
+# Find the argument containing the script path
+script_arg <- grep("--file=", args, value = TRUE)
+# Extract the script path from the argument
+script_path <- sub("--file=", "", script_arg)
+# Normalize the script path
+script_path <- normalizePath(script_path)
+# Get the directory of the script
+script_dir <- dirname(script_path)
+source(file.path(script_dir, 'vst_check.R'))
 
 # give out session Info
 cat("\n\n\nPrint sessionInfo:\n\n")
@@ -48,6 +61,7 @@ if (any(!(A > 0)) || any(!(B > 0))) {
   stop("The data seems to be unfiltered! Make sure the input of this script is a filtered count matrix.")
 }
 
+dat = dat[!is.na(A) & A , B]
 # cell description table
 cell_desc <- as.data.frame(h5read(opt$inHDF5, "cell_attrs"))
 colnames(cell_desc)[colnames(cell_desc) == "cell_names"] <- "barcodes"
@@ -58,6 +72,32 @@ gene_desc <- as.data.frame(h5read(opt$inHDF5, "gene_attrs"))
 gene_desc$SYMBOL <- gene_desc$gene_names
 str(gene_desc)
 
+# cap at max_count
+max_count=as.numeric(strsplit(opt$max_count, 'x', fixed=T)[[1]])
+do_capping=TRUE
+if (length(max_count) > 1){
+  cat(paste0('\nCapping count matrix at ',max_count[1],' quantile x ',max_count[2]))
+  rpm=t(t(dat)/colSums(dat))*1e6
+  rpm[rpm==0]=NA
+  max_rpm=apply(rpm,MAR=1, FUN = quantile, na.rm=TRUE, names=FALSE, probs=max_count[1] )
+  max_count=ceiling(max_rpm %*% t(colSums(dat))/1e6)*max_count[2]
+  cat(paste0(' (',min(max_count),' to ',max(max_count),' UMIs)\n/n'))
+} else if( max_count>0){
+  cat(paste0('\nCapping count matrix at ',max_count,' UMIs\n\n'))
+} else {
+  cat('\n--max_count <= 0 - disable capping of count matrix\n\n')
+  do_capping=FALSE
+}
+if (do_capping){
+  n_cap=sum(rowSums(dat>max_count)>0)
+  if (n_cap>0){
+    cat(paste0('Capping counts for ',n_cap,' genes:\n'))
+    cap_genes=gene_desc$SYMBOL[rowSums(dat>max_count)>0]
+    cat(cap_genes,sep=', ')
+    cat('\n')
+    dat = pmin(dat, max_count)
+  }
+}
 
 # exclude duplicated gene symbols
 if (length(which(duplicated(gene_desc$SYMBOL))) > 0) warning("Some gene symbols are duplicated. Only the first is kept.")
@@ -84,15 +124,14 @@ cell_desc$s_score <- cecy$normalized.scores$S
 cell_desc$cycle_phase <- cecy$phases
 ## variance stabilizing transformation:
 set.seed(44)
-print("Start performing sctransform::vst: ")
-vst_out <- sctransform::vst(dat,
-  cell_attr = cell_desc, method = "nb_fast",
-  latent_var = c("log_umi"),
-  latent_var_nonreg = c("g2m_score", "s_score"),
-  return_gene_attr = T, return_cell_attr = T
-)
+print("Start performing patched  version of vst: ")
+vst_out = vst(dat, cell_attr = cell_desc, method="nb_fast",
+                           latent_var = c('log_umi'),
+                           latent_var_nonreg = c("g2m_score", "s_score"),
+                           return_gene_attr = T, return_cell_attr = T)
+# potentially concerning warnings about iteration limit reached/ glm.fit algorithm did not converge
 print("Start performing sctransform::smooth_via_pca: ")
-y_smooth <- sctransform::smooth_via_pca(vst_out$y, do_plot = FALSE)
+y_smooth = sctransform::smooth_via_pca(vst_out$y, do_plot = FALSE, max_pc=opt$max_pc_smooth)
 print("Start performing sctransform::correct: ")
 dat_cor <- sctransform::correct(vst_out,
   data = y_smooth,
