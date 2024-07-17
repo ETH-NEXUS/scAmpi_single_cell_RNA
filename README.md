@@ -39,18 +39,18 @@ For a test run the freely available 10X Genomics data from PBMC cells can be use
 
 ### Before running the pipeline
 
-- **internet connection**
+- **internet connection**  
 Some steps of the scAmpi workflow perform online queries. Please make sure that this is possible on your computing system, e.g. by loading the respective modules to enable the proxy connection. (Most systems will have this enabled per default).
 
-- **config file**
+- **config file**  
   - input directory  
-    Before running the pipeline the `config.yaml` file needs to be adapted to contain the **full path to input fastq files** for the intended analysis. It is provided in the
-    first section (`inputOutput`) of the config file.
+    Before running the pipeline the `config.yaml` file needs to be adapted to contain the **full path to input FASTQ files** for the intended analysis. It is provided in the
+    first section (`inputOutput`) of the config file. Cellranger expects one sub-directory per sample.
   - resource information  
     In addition to the input path, further resource information must be provided in the section `resources`. This information is primarily specifying
     input required for the cell type classification and the genomic reference used for the cellranger mapping. An example `config.yaml` file ready for adaptation, as
     well as a brief description of the relevant config blocks, is provided in the directory `config/`.
-- **sample map**
+- **sample map**  
 Provide a "sample_map", i.e. a tab delimited text file listing all samples that should be analysed (one row per sample).
 The sample map must contain a column with the header `sample` (see example below). This ID will be used to name files and identify the sample throughout the pipeline.
 An example file ready for adaptation is provided in the directory `config/`.
@@ -62,6 +62,24 @@ sample
 SAMPLE-1_scR
 SAMPLE-2_scR
 ```
+
+- **raw FASTQ input**  
+Cellranger expects the input FASTQ files to follow a specific structure:  
+/path/to/input_fastqs_gex/SAMPLE-1_scR/SAMPLE-1_scR_S[Number]\_L00[Lane Number]\_[Read Type]_001.fastq.gz  
+
+    Where Read Type is one of:  
+    - I1: Sample index read (optional)
+    - I2: Sample index read (optional)
+    - R1: Read 1
+    - R2: Read 2
+
+    For very detailed information and example scenarios see the [10X Cellranger documentation](https://www.10xgenomics.com/support/software/cell-ranger/latest/analysis/inputs/cr-specifying-fastqs).
+     - **Cellranger version < 8**
+       
+     - **Cellranger version >= 8**
+       A sub-directory per sample is expected by cellranger.
+ 
+
 
 ### Running scAmpi
 
