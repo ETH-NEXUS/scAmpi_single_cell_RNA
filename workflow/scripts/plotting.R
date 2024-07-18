@@ -89,7 +89,7 @@ print(my_sce)
 # major and subtypes
 cell.types <- metadata(my_sce)$all_celltypes
 all.cell.types <- c(sort(cell.types), "uncertain", "unknown")
-cols33 <- c(
+my_colours <- c(
   "red2", "green4", "blue2", "cyan2", "yellow1", "purple", "brown",
   "chocolate1", "chartreuse2", "darkgoldenrod3", "steelblue1", "slateblue3", "olivedrab4", "gold2",
   "violetred3", "darkcyan", "orchid3", "darksalmon", "darkslategrey", "khaki", "indianred2",
@@ -151,11 +151,16 @@ if (length(levels(cell_attributes$celltype_major)) > 16) {
   width_first <- 20
 }
 # Number phenograph clusters
-cat("\n###   Number of phenograph clusters found:", length(unique(cell_attributes$phenograph_clusters)), "\n")
-if (length(unique(cell_attributes$phenograph_clusters)) > 16) {
+number_of_clusters <- length(unique(cell_attributes$phenograph_clusters))
+cat("\n###   Number of phenograph clusters found:", number_of_clusters, "\n")
+if (number_of_clusters > 16) {
   width_pheno <- 25
-} else if (length(unique(cell_attributes$phenograph_clusters)) > 32) {
+} else if (number_of_clusters > 32) {
   width_pheno <- 30
+} else if (number_of_clusters > 43) {
+  width_pheno <- 40
+  color <- grDevices::colors()[grep('gr(a|e)y', grDevices::colors(), invert = T)]
+  my_colours <- sample(color, number_of_clusters)
 } else {
   width_pheno <- 20
 }
@@ -194,7 +199,7 @@ p_umap_pc <- ggplot(cell_attributes, aes(x = umap1, y = umap2, color = as.factor
   xlab("UMAP 1") +
   ylab("UMAP 2") +
   guides(colour = guide_legend(override.aes = list(size = 2, shape = 15), nrow = 16)) +
-  scale_color_manual(name = "Phenograph", values = cols33) +
+  scale_color_manual(name = "Phenograph", values = my_colours) +
   ggtitle(paste("Phenograph clustering. Modularity score: ", metadata(my_sce)$modularity_score)) +
   theme(plot.title = element_text(size = 12)) +
   coord_fixed(ratio = 1)
@@ -255,7 +260,7 @@ p_umap_ccphase <- ggplot(cell_attributes, aes(x = umap1, y = umap2, color = cycl
   geom_point(alpha = 0.7, size = 0.8, show.legend = T) +
   xlab("UMAP 1") +
   ylab("UMAP 2") +
-  scale_color_manual(name = "Cell cycle phase", values = cols33) +
+  scale_color_manual(name = "Cell cycle phase", values = my_colours) +
   ggtitle("Cell cycle phase") +
   theme(plot.title = element_text(size = 12)) +
   coord_fixed(ratio = 1)
@@ -316,7 +321,7 @@ p_umap_uc <- ggplot(cell_attributes, aes(x = umap1, y = umap2, color = as.factor
   xlab("UMAP 1") +
   ylab("UMAP 2") +
   guides(colour = guide_legend(override.aes = list(size = 2, shape = 15), nrow = 16)) +
-  scale_color_manual(name = "Umap clusters", values = cols33) +
+  scale_color_manual(name = "Umap clusters", values = my_colours) +
   ggtitle(paste("Umap clustering. Modularity score: ", round(metadata(my_sce)$umap_modularity, digits = 4))) +
   theme(plot.title = element_text(size = 12)) +
   coord_fixed(ratio = 1)
