@@ -1,4 +1,3 @@
-
 # Retrieve the fastqs directory name (ie. uses cellranger sample name) corresponding to a given sample
 def get_fastq_dir(wildcards):
     "return fastq directory of one sample"
@@ -40,7 +39,6 @@ rule cellranger_count:
         "{params.variousParams} "
         " 2>&1 | tee ../../{log} ; "
         "date > {wildcards.sample}_success_cellranger.txt ) "
-
 
 
 # Run cellranger v8. Some new parameters are required (e.g. --create-bam)
@@ -506,10 +504,10 @@ rule generate_qc_plots_raw:
     input:
         infile="results/counts_raw/{sample}.h5",
     output:
-        out="results/counts_raw/{sample}.raw.histogram_library_sizes.png",
+        out="results/qc_plots/raw/{sample}.raw.histogram_library_sizes.png",
     params:
         custom_script=workflow.source_path("../scripts/generate_QC_plots.R"),
-        outdir="results/counts_raw/",
+        outdir="results/qc_plots/raw/",
         sample_status="raw",
     conda:
         "../envs/generate_qc_plots.yaml"
@@ -535,10 +533,10 @@ rule generate_qc_plots_filtered:
     input:
         infile="results/counts_filtered/{sample}.genes_cells_filtered.h5",
     output:
-        out="results/counts_filtered/{sample}.genes_cells_filtered.histogram_library_sizes.png",
+        out="results/qc_plots/filtered/{sample}.genes_cells_filtered.histogram_library_sizes.png",
     params:
         custom_script=workflow.source_path("../scripts/generate_QC_plots.R"),
-        outdir="results/counts_filtered/",
+        outdir="results/qc_plots/filtered/",
         sample_status="genes_cells_filtered",
     conda:
         "../envs/generate_qc_plots.yaml"
