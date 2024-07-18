@@ -38,10 +38,15 @@ opt <- parse_args(opt_parser)
 
 
 dat <- h5read(opt$inHDF5, "raw_counts")
+
+# For each gene, sum of counts
 A <- rowSums(dat)
+# For each cell, sum of counts
 B <- colSums(dat)
-C <- apply(dat, 2, function(x) length(which(x > 0)))
-dat <- dat[!is.na(A) & A > 0, B > 0 & C > 0]
+# Check if there are all-zero columns or rows. If yes, do not proceed.
+if (any(!(A > 0)) || any(!(B > 0))) {
+  stop("The data seems to be unfiltered! Make sure the input of this script is a filtered count matrix.")
+}
 
 # cell description table
 cell_desc <- as.data.frame(h5read(opt$inHDF5, "cell_attrs"))

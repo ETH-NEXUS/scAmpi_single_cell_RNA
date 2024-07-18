@@ -10,6 +10,10 @@
   in the snakefile must be adapted.
 
 ### Fixed
+- fix `sctransform_preprocessing.R`  
+  Filtering of raw input files is not applied to row and column names.  
+  This issue should have had no effect as long as filtered input data was provided (with minimum of QC on genes and cells).  
+  Changed to a check that stops the script if unfiltered input is detected.
 
 ## [2.0.7] - 2023-03-20
 
