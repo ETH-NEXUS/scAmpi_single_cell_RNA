@@ -1,18 +1,33 @@
 # Changelog
 
-## [2.0.7] - 2023-03-20
+## [2.1.0] - 2024-07-XX
+
 ### Changed
+
+- update cellranger rules  
+  have new `cellranger_count_8` rule that includes syntax changes of cellranger v8. The new rule is the default, if an older version of cellranger should be used with the rule `cellranger_count` the  
+  `ruleorder: cellranger_count > cellranger_count_8`  
+  in the snakefile must be adapted.
+
+### Fixed
+
+## [2.0.7] - 2023-03-20
+
+### Changed
+
 - specify which library should be used for the function `ggsave` to avoid conflict between the R packages `ggplot2` and `cowplot`
 
 ## [2.0.6] - 2023-02-14
 
 ### Fixed
+
 - adapt script `query_civic_expr.py` to changed syntax in python package `civicpy` version 3.0. The script no longer works as is with previous versions of the package.
 - adapt installation instructions for `civicpy` to require version 3.0
 
 ## [2.0.5] - 2023-01-11
 
 ### Fixed
+
 - adapt script `query_civic_expr.py` to changed syntax in python package `civicpy` version 2.0. The script no longer works as is with previous versions of the package.
 - adapt installation instructions for `civicpy` to require version 2.0
 
@@ -33,6 +48,7 @@
 ## [2.0.3] - 2023-03-20
 
 ### Changed
+
 - specify which library should be used for the function ggsave to avoid conflict between ggplot2 and cowplot
 
 ## [2.0.2] - 2022-08-31

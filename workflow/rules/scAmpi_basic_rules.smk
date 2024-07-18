@@ -1,20 +1,22 @@
+
+# Retrieve the fastqs directory name (ie. uses cellranger sample name) corresponding to a given sample
+def get_fastq_dir(wildcards):
+    "return fastq directory of one sample"
+    sample = wildcards.sample
+    fastqs_dir = config["inputOutput"]["input_fastqs"]
+    sample_fastq_dir = fastqs_dir + sample
+    return sample_fastq_dir
+
+
 # cellranger call to process the raw samples
 rule cellranger_count:
     input:
-        fastqs_dir=config["inputOutput"]["input_fastqs"],
         reference=config["resources"]["reference_transcriptome"],
     output:
-        features_file="results/cellranger_run/{sample}.features.tsv",
-        matrix_file="results/cellranger_run/{sample}.matrix.mtx",
-        barcodes_file="results/cellranger_run/{sample}.barcodes.tsv",
+        success="results/cellranger_run/{sample}_success_cellranger.txt",
     params:
         cr_out="results/cellranger_run/",
         local_cores=config["tools"]["cellranger_count"]["local_cores"],
-        metrics_summary="results/cellranger_run/{sample}.metrics_summary.csv",
-        web_summary="results/cellranger_run/{sample}.web_summary.html",
-        # {sample} needs to be the prefix of all fastq files that belong to this sample.
-        # NOTE: no dots are allowed in sample names!
-        mySample="{sample}",
         variousParams=config["tools"]["cellranger_count"]["variousParams"],
     resources:
         mem_mb=config["tools"]["cellranger_count"]["mem_mb"],
@@ -29,32 +31,16 @@ rule cellranger_count:
     shell:
         "(cd {params.cr_out}; "
         "{config[tools][cellranger_count][call]} count "
-        "--id={params.mySample} "
-        "--sample={params.mySample} "
+        "--id={wildcards.sample} "
+        "--sample={wildcards.sample} "
         "--transcriptome={input.reference} "
         "--localcores={params.local_cores} "
         "--fastqs={input.fastqs_dir} "
         "--nosecondary "
         "{params.variousParams} "
-        " 2>&1 | tee ../../{log} ) ; "
-        "pwd ; "
-        "gunzip {params.cr_out}{params.mySample}/outs/filtered_feature_bc_matrix/features.tsv.gz ; "
-        "gunzip {params.cr_out}{params.mySample}/outs/filtered_feature_bc_matrix/barcodes.tsv.gz ; "
-        "gunzip {params.cr_out}{params.mySample}/outs/filtered_feature_bc_matrix/matrix.mtx.gz ; "
-        'ln -sr "{params.cr_out}{params.mySample}/outs/filtered_feature_bc_matrix/features.tsv" "{output.features_file}"; '
-        'ln -sr "{params.cr_out}{params.mySample}/outs/filtered_feature_bc_matrix/matrix.mtx" "{output.matrix_file}"; '
-        'ln -sr "{params.cr_out}{params.mySample}/outs/filtered_feature_bc_matrix/barcodes.tsv" "{output.barcodes_file}" ; '
-        'ln -sr "{params.cr_out}{params.mySample}/outs/web_summary.html" "{params.web_summary}" ; '
-        'ln -sr "{params.cr_out}{params.mySample}/outs/metrics_summary.csv" "{params.metrics_summary}" '
+        " 2>&1 | tee ../../{log} ; "
+        "date > {wildcards.sample}_success_cellranger.txt ) "
 
-
-# Retrieve the fastqs directory name (ie. uses cellranger sample name) corresponding to a given sample
-def get_fastq_dir(wildcards):
-    "return fastq directory of one sample"
-    sample = wildcards.sample
-    fastqs_dir = config["inputOutput"]["input_fastqs"]
-    sample_fastq_dir = fastqs_dir + sample
-    return sample_fastq_dir
 
 
 # Run cellranger v8. Some new parameters are required (e.g. --create-bam)

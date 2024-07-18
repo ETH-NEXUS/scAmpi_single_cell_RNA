@@ -29,7 +29,9 @@ include: "rules/misc_snake.smk"
 include: "rules/scAmpi_basic_rules.smk"
 
 # run up-to-date cellranger_8 rule
-ruleorder: gunzip_and_link_cellranger > cellranger_count
+# if cellranger version earlier than 8 is used, have instead "ruleorder: cellranger_count > cellranger_count_8"
+ruleorder: cellranger_count > cellranger_count_8
+
 
 # include local rules
 localrules:

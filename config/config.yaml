@@ -60,7 +60,7 @@ tools:
   cellranger_count:
     call: cellranger
     local_cores: 12
-    mem_mb: 6000
+    mem_mb: 40000
     runtime: 1440
     create_bam: "true"
     variousParams: ""
