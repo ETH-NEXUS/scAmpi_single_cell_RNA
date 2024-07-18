@@ -7,7 +7,31 @@
 - update cellranger rules  
   have new `cellranger_count_8` rule that includes syntax changes of cellranger v8. The new rule is the default, if an older version of cellranger should be used with the rule `cellranger_count` the  
   `ruleorder: cellranger_count > cellranger_count_8`  
-  in the snakefile must be adapted.
+  in the snakefile must be adapted.  
+  Also, add new rule `gunzip_and_link_cellranger` and separate these steps from the cellranger rule.
+
+- update conda environments
+
+  - `celltyping.yaml`
+  - `identify_doublets.yaml`
+  - `sctransform_preprocessing.yaml`
+
+- update `identify_doublets` output  
+  have results of `identify_doublets` rule in own subdirectory instead of the `counts_filtered` directory.
+
+- update `filter_genes_and_cells.R`
+
+  - have iterative filtering to make sure the selected thrsholds for genes and cells apply to all genes/cells of the downstream analyses
+  - clean up script
+
+- update `plotting.R`
+
+  - add more colours for clusters. Make sure even with a high number of clusters, enough colours are provided.
+  - make sure all cell types that are not found in a sample are still shown in the legend (with `show.legend = T`, adapt to new ggplot2 default settings)
+  - clean up script
+
+- update `create_hdf5.py`
+  - make sure the script can work with Human and also Mouse data. Mouse Ensembl gene IDs are longer than 16 characters, and cannot be of type `dtype='S16'`.
 
 ### Fixed
 - fix `sctransform_preprocessing.R`  
