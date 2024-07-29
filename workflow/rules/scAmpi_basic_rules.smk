@@ -98,7 +98,7 @@ rule gunzip_and_link_cellranger:
         runtime=config["computingResources"]["runtime"]["low"],
     threads: config["computingResources"]["threads"]["low"]
     benchmark:
-        "logs/benchmarks/gunzip_and_link_cellranger/{sample}.benchmark"
+        "logs/benchmark/gunzip_and_link_cellranger/{sample}.benchmark"
     log:
         "logs/rules/gunzip_and_link_cellranger/{sample}.log",
     # unzip and symlink raw cellranger features file
