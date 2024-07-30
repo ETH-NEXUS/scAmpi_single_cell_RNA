@@ -31,7 +31,7 @@ include: "rules/scAmpi_basic_rules.smk"
 
 # run up-to-date cellranger_8 rule
 # if cellranger version earlier than 8 is used, have instead "ruleorder: cellranger_count > cellranger_count_8"
-ruleorder: cellranger_count > cellranger_count_8
+ruleorder: cellranger_count_8 > cellranger_count
 
 
 # include local rules
