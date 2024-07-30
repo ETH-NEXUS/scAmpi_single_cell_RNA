@@ -1,14 +1,16 @@
 # Changelog
 
-## [2.1.0] - 2024-07-XX
+## [2.1.0] - 2024-07-30
 
 ### Changed
 
 - update cellranger rules  
-  have new `cellranger_count_8` rule that includes syntax changes of cellranger v8. The new rule is the default, if an older version of cellranger should be used with the rule `cellranger_count` the  
+  have new `cellranger_count_8` rule that includes syntax changes of cellranger v8. The new rule is the default; if an older version of cellranger should be used with the rule `cellranger_count` the  
   `ruleorder: cellranger_count > cellranger_count_8`  
-  in the snakefile must be adapted.  
+  in the Snakefile must be adapted.  
   Also, add new rule `gunzip_and_link_cellranger` and separate these steps from the cellranger rule.
+
+- update and describe in main README how cellranger expects to find the raw FASTQ files.
 
 - update conda environments
 
@@ -16,28 +18,38 @@
   - `identify_doublets.yaml`
   - `sctransform_preprocessing.yaml`
 
-- update `identify_doublets` output  
-  have results of `identify_doublets` rule in own subdirectory instead of the `counts_filtered` directory.
+- update `identify_doublets` output
+
+  - Have results of `identify_doublets` rule in own subdirectory instead of the `counts_filtered` directory.
+
+- update `generate_qc_plots_*`
+
+  - have resulting QC plots written in own subdirectory instead of same directory as count files.
+  - Improve memory usage.
+  - Clean up script.
 
 - update `filter_genes_and_cells.R`
 
-  - have iterative filtering to make sure the selected thrsholds for genes and cells apply to all genes/cells of the downstream analyses
-  - clean up script
+  - implement iterative filtering to make sure the selected thresholds for genes and cells apply to all genes/cells of the downstream analyses
+  - Clean up script.
 
 - update `plotting.R`
 
   - add more colours for clusters. Make sure even with a high number of clusters, enough colours are provided.
   - make sure all cell types that are not found in a sample are still shown in the legend (with `show.legend = T`, adapt to new ggplot2 default settings)
-  - clean up script
+  - Clean up script.
 
 - update `create_hdf5.py`
   - make sure the script can work with Human and also Mouse data. Mouse Ensembl gene IDs are longer than 16 characters, and cannot be of type `dtype='S16'`.
 
 ### Fixed
-- fix `sctransform_preprocessing.R`  
-  Filtering of raw input files is not applied to row and column names.  
-  This issue should have had no effect as long as filtered input data was provided (with minimum of QC on genes and cells).  
-  Changed to a check that stops the script if unfiltered input is detected.
+
+- fix `sctransform_preprocessing.R`
+
+  - Filtering of raw input files is not applied to row and column names. This issue should have had no effect as long as filtered input data was provided (with minimum of QC on genes and cells).  
+  - Changed to a check that stops the script if unfiltered input is detected.
+  - Script linting.
+
 
 ## [2.0.7] - 2023-03-20
 
