@@ -91,6 +91,7 @@ rule clinical_only:
 
 ### Adaptation specific for clinical-only run
 
+
 # parse the *.dgidb.txt.CompleteTable.ClinicalTrials.txt files of all clusters
 # and generate table that shows for each Drug the clusters that can be targeted by this drug
 # and the weight of the drug for calculating minimum set cover
