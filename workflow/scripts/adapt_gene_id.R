@@ -9,6 +9,7 @@ option_list <- list(
               help = "Path to the input feature barcode matrix file (.mtx)", metavar = "MATRIX"),
   make_option(c("-f", "--features"), type = "character", default = NULL, 
               help = "Path to the input feature file", metavar = "FEATURES")
+
 )
 
 # Parse command line arguments

@@ -50,5 +50,8 @@ rule adapt_gene_id:
     benchmark:
         "logs/benchmark/adapt_gene_id/{sample}.benchmark"
     shell:
-        "{params.singularity} {params.call} Rscript workflow/scripts/adapt_gene_id.R -f {input.features_file} -m {input.matrix_file}"
-        "&> {log} "
+       # "{params.singularity} {params.call} Rscript workflow/scripts/adapt_gene_id.R -f {input.features_file} -m {input.matrix_file}"
+        "cp {input.features_file} {output.features_file}; "
+        "cp {input.matrix_file} {output.matrix_file}; "
+        "touch {output.unmatched}"
+#        "&> {log} "

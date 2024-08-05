@@ -60,9 +60,10 @@ rule scAmpi_basic:
         ),
         expand("results/counts_corrected/{sample}.corrected.RDS", sample=sample_ids),
         expand("results/clustering/{sample}.clusters_phenograph.csv", sample=sample_ids),
-        expand(
-            "results/atypical_removed/{sample}.atypical_removed.RDS", sample=sample_ids
-        ),
+# Removing atypical cells should not be standard in many situations
+       # expand(
+       #     "results/atypical_removed/{sample}.atypical_removed.RDS", sample=sample_ids
+       # ),
         expand(
             "results/gene_exp/{sample}.gene_expression_per_cluster.tsv",
             sample=sample_ids,

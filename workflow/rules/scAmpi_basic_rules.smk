@@ -303,6 +303,12 @@ rule celltyping:
 
 # generate a summary table with the number of cells per cell type and sample
 # currently uses the same env as the plotting since it has all required packages
+def generate_files_string(wildcards):
+    files = expand("results/celltyping/{sample}.cts_final.txt", sample=sample_ids)
+    files_string = ",".join(files)
+    return files_string
+
+
 rule celltype_summary_table:
     input:
         expand("results/celltyping/{sample}.cts_final.txt", sample=sample_ids)
@@ -310,6 +316,7 @@ rule celltype_summary_table:
         "results/celltyping/cells_per_celltype_and_sample.txt"
     params:
         custom_script=workflow.source_path("../scripts/celltype_summary.R"),
+        files_string=generate_files_string
     resources:
         mem_mb=config["computingResources"]["mem_mb"]["low"],
         runtime=config["computingResources"]["runtime"]["low"],
@@ -319,51 +326,48 @@ rule celltype_summary_table:
     conda:
         "../envs/plotting.yaml"
     shell:
-        "Rscript {params.custom_script} "
-        "--input {input} "
-        "--output {output} "
-        "&> {log}"
+        "Rscript {params.custom_script} --input {params.files_string} --output {output} &> {log}"
 
 
 
 # Todo: Clearify in a bigger group if this should be part of the default 
 # filter out atypical cells from sce object
-rule remove_atypical_cells:
-    input:
-        infile="results/celltyping/{sample}.celltyping.RDS",
-        cluster_table="results/celltyping/{sample}.celltyping.phenograph_celltype_association.txt",
-    output:
-        out_sce="results/atypical_removed/{sample}.atypical_removed.RDS",
-        out_table="results/atypical_removed/{sample}.atypical_removed.phenograph_celltype_association.txt",
-    params:
-        celltype_config=config["resources"]["celltype_config"],
-        outputDirec="results/atypical_removed/",
-        sample_name="{sample}",
-        threshold_filter=config["tools"]["remove_atypical_cells"]["threshold_filter"],
-        min_threshold=config["tools"]["remove_atypical_cells"]["min_threshold"],
-        threshold_type=config["tools"]["remove_atypical_cells"]["threshold_type"],
-        custom_script=workflow.source_path("../scripts/remove_atypical_cells.R"),
-    conda:
-        "../envs/remove_atypical_cells.yaml"
-    resources:
-        mem_mb=config["computingResources"]["mem_mb"]["medium"],
-        runtime=config["computingResources"]["runtime"]["low"],
-    threads: config["computingResources"]["threads"]["medium"]
-    log:
-        "logs/remove_atypical_cells/{sample}.log",
-    benchmark:
-        "logs/benchmark/remove_atypical_cells/{sample}.benchmark"
-    shell:
-        "Rscript {params.custom_script} "
-        "--sce_in {input.infile} "
-        "--cluster_table {input.cluster_table} "
-        "--celltype_config {params.celltype_config} "
-        "--threshold_filter {params.threshold_filter} "
-        "--min_threshold {params.min_threshold} "
-        "--threshold_type {params.threshold_type} "
-        "--outDir {params.outputDirec} "
-        "--sample_name {params.sample_name} "
-        "&> {log} "
+#rule remove_atypical_cells:
+#    input:
+#        infile="results/celltyping/{sample}.celltyping.RDS",
+#        cluster_table="results/celltyping/{sample}.celltyping.phenograph_celltype_association.txt",
+#    output:
+#        out_sce="results/atypical_removed/{sample}.atypical_removed.RDS",
+#        out_table="results/atypical_removed/{sample}.atypical_removed.phenograph_celltype_association.txt",
+#    params:
+#        celltype_config=config["resources"]["celltype_config"],
+#        outputDirec="results/atypical_removed/",
+#        sample_name="{sample}",
+#        threshold_filter=config["tools"]["remove_atypical_cells"]["threshold_filter"],
+#        min_threshold=config["tools"]["remove_atypical_cells"]["min_threshold"],
+#        threshold_type=config["tools"]["remove_atypical_cells"]["threshold_type"],
+#        custom_script=workflow.source_path("../scripts/remove_atypical_cells.R"),
+#    conda:
+#        "../envs/remove_atypical_cells.yaml"
+#    resources:
+#        mem_mb=config["computingResources"]["mem_mb"]["medium"],
+##        runtime=config["computingResources"]["runtime"]["low"],
+#    threads: config["computingResources"]["threads"]["medium"]
+#    log:
+#        "logs/remove_atypical_cells/{sample}.log",
+#    benchmark:
+#        "logs/benchmark/remove_atypical_cells/{sample}.benchmark"
+#    shell:
+#        "Rscript {params.custom_script} "
+#        "--sce_in {input.infile} "
+#        "--cluster_table {input.cluster_table} "
+#        "--celltype_config {params.celltype_config} "
+#        "--threshold_filter {params.threshold_filter} "
+#        "--min_threshold {params.min_threshold} "
+#        "--threshold_type {params.threshold_type} "
+#        "--outDir {params.outputDirec} "
+#        "--sample_name {params.sample_name} "
+#        "&> {log} "
 
 
 # perform gsva gene set analysis
@@ -399,7 +403,8 @@ rule gsva:
 # generate plots about sample composition and gene expression
 rule plotting:
     input:
-        infile="results/atypical_removed/{sample}.atypical_removed.RDS",
+#        infile="results/atypical_removed/{sample}.atypical_removed.RDS",
+        infile="results/celltyping/{sample}.celltyping.RDS"
     output:
         outfile="results/plotting/{sample}.celltype_barplot.png",
     params:

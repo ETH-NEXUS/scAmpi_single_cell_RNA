@@ -22,14 +22,14 @@ cat("\n\n\n\n")
 
 # parse command line arguments
 option_list <- list(
-  make_option("--input", type = "character", help = "List of all input files", multiple = TRUE),
+  make_option("--input", type = "character", help = "List of all input files"),
   make_option("--output", type = "character", help = "Output filename")
 )
 opt_parser <- OptionParser(option_list = option_list)
 opt <- parse_args(opt_parser)
 
+infiles <- strsplit(opt$input, ",")[[1]]
 
-infiles <- opt$input
 print("these are my input files")
 print(infiles)
 
@@ -38,13 +38,13 @@ cells_per_sample <- lapply(infiles,
                             header = TRUE,
                             sep = "\t")
 
-names(cells_per_sample) <- lapply(cells_per_sample, function(x) {
+names(cells_per_sample) <- lapply(infiles, function(x) {
   filename <- basename(x)
   filename <- sub("\\.cts_final.txt$", "", filename)
   return(filename)
 })
 
-print(names(cells_per_sample))
+#print(names(cells_per_sample))
 
 # Summarize the counts
 count_cell_types <- function(df) {
@@ -63,6 +63,6 @@ for(sample in names(counts_per_sample)){
 summary_table_long <- counts_per_sample %>%
   do.call("rbind", .)
 summary_table_wide <- reshape(summary_table_long, idvar = "celltype_final", timevar = "sample", direction = "wide")
-write.table(summary_table, opt$output, row.names = FALSE, quote = FALSE, sep = "\t")
+write.table(summary_table_wide, opt$output, row.names = FALSE, quote = FALSE, sep = "\t")
 
 
