@@ -29,6 +29,11 @@ include: "rules/misc_snake.smk"
 include: "rules/scAmpi_basic_rules.smk"
 
 
+# run up-to-date cellranger_8 rule
+# if cellranger version earlier than 8 is used, have instead "ruleorder: cellranger_count > cellranger_count_8"
+ruleorder: cellranger_count_8 > cellranger_count
+
+
 # include local rules
 localrules:
     scAmpi_basic,
@@ -41,14 +46,15 @@ rule scAmpi_basic:
         #        expand("results/cellranger_run/{sample}.features.tsv", sample = sample_ids),
         expand("results/counts_raw/{sample}.h5", sample=sample_ids),
         expand(
-            "results/counts_filtered/{sample}.doublet_barcodes.txt", sample=sample_ids
-        ),
-        expand(
-            "results/counts_raw/{sample}.raw.histogram_library_sizes.png",
+            "results/identify_doublets/{sample}.doublet_barcodes.txt",
             sample=sample_ids,
         ),
         expand(
-            "results/counts_filtered/{sample}.genes_cells_filtered.histogram_library_sizes.png",
+            "results/qc_plots/raw/{sample}.raw.histogram_library_sizes.png",
+            sample=sample_ids,
+        ),
+        expand(
+            "results/qc_plots/filtered/{sample}.genes_cells_filtered.histogram_library_sizes.png",
             sample=sample_ids,
         ),
         expand("results/counts_corrected/{sample}.corrected.RDS", sample=sample_ids),

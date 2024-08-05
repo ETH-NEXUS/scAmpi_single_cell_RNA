@@ -1,18 +1,73 @@
 # Changelog
 
-## [2.0.7] - 2023-03-20
+## [2.1.0] - 2024-07-30
+
 ### Changed
+
+- update cellranger rules  
+  have new `cellranger_count_8` rule that includes syntax changes of cellranger v8. The new rule is the default; if an older version of cellranger should be used with the rule `cellranger_count` the  
+  `ruleorder: cellranger_count > cellranger_count_8`  
+  in the Snakefile must be adapted.  
+  Also, add new rule `gunzip_and_link_cellranger` and separate these steps from the cellranger rule.
+
+- update and describe in main README how cellranger expects to find the raw FASTQ files.
+
+- update conda environments
+
+  - `celltyping.yaml`
+  - `identify_doublets.yaml`
+  - `sctransform_preprocessing.yaml`
+
+- update `identify_doublets` output
+
+  - Have results of `identify_doublets` rule in own subdirectory instead of the `counts_filtered` directory.
+
+- update `generate_qc_plots_*`
+
+  - have resulting QC plots written in own subdirectory instead of same directory as count files.
+  - Improve memory usage.
+  - Clean up script.
+
+- update `filter_genes_and_cells.R`
+
+  - implement iterative filtering to make sure the selected thresholds for genes and cells apply to all genes/cells of the downstream analyses
+  - Clean up script.
+
+- update `plotting.R`
+
+  - add more colours for clusters. Make sure even with a high number of clusters, enough colours are provided.
+  - make sure all cell types that are not found in a sample are still shown in the legend (with `show.legend = T`, adapt to new ggplot2 default settings)
+  - Clean up script.
+
+- update `create_hdf5.py`
+  - make sure the script can work with Human and also Mouse data. Mouse Ensembl gene IDs are longer than 16 characters, and cannot be of type `dtype='S16'`.
+
+### Fixed
+
+- fix `sctransform_preprocessing.R`
+
+  - Filtering of raw input files is not applied to row and column names. This issue should have had no effect as long as filtered input data was provided (with minimum of QC on genes and cells).  
+  - Changed to a check that stops the script if unfiltered input is detected.
+  - Script linting.
+
+
+## [2.0.7] - 2023-03-20
+
+### Changed
+
 - specify which library should be used for the function `ggsave` to avoid conflict between the R packages `ggplot2` and `cowplot`
 
 ## [2.0.6] - 2023-02-14
 
 ### Fixed
+
 - adapt script `query_civic_expr.py` to changed syntax in python package `civicpy` version 3.0. The script no longer works as is with previous versions of the package.
 - adapt installation instructions for `civicpy` to require version 3.0
 
 ## [2.0.5] - 2023-01-11
 
 ### Fixed
+
 - adapt script `query_civic_expr.py` to changed syntax in python package `civicpy` version 2.0. The script no longer works as is with previous versions of the package.
 - adapt installation instructions for `civicpy` to require version 2.0
 
@@ -33,6 +88,7 @@
 ## [2.0.3] - 2023-03-20
 
 ### Changed
+
 - specify which library should be used for the function ggsave to avoid conflict between ggplot2 and cowplot
 
 ## [2.0.2] - 2022-08-31

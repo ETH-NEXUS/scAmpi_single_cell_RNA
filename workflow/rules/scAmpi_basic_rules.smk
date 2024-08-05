@@ -1,20 +1,21 @@
+# Retrieve the fastqs directory name (ie. uses cellranger sample name) corresponding to a given sample
+def get_fastq_dir(wildcards):
+    "return fastq directory of one sample"
+    sample = wildcards.sample
+    fastqs_dir = config["inputOutput"]["input_fastqs"]
+    sample_fastq_dir = fastqs_dir + sample
+    return sample_fastq_dir
+
+
 # cellranger call to process the raw samples
 rule cellranger_count:
     input:
-        fastqs_dir=config["inputOutput"]["input_fastqs"],
         reference=config["resources"]["reference_transcriptome"],
     output:
-        features_file="results/cellranger_run/{sample}.features.tsv",
-        matrix_file="results/cellranger_run/{sample}.matrix.mtx",
-        barcodes_file="results/cellranger_run/{sample}.barcodes.tsv",
+        success="results/cellranger_run/{sample}_success_cellranger.txt",
     params:
         cr_out="results/cellranger_run/",
         local_cores=config["tools"]["cellranger_count"]["local_cores"],
-        metrics_summary="results/cellranger_run/{sample}.metrics_summary.csv",
-        web_summary="results/cellranger_run/{sample}.web_summary.html",
-        # {sample} needs to be the prefix of all fastq files that belong to this sample.
-        # NOTE: no dots are allowed in sample names!
-        mySample="{sample}",
         variousParams=config["tools"]["cellranger_count"]["variousParams"],
     resources:
         mem_mb=config["tools"]["cellranger_count"]["mem_mb"],
@@ -29,23 +30,87 @@ rule cellranger_count:
     shell:
         "(cd {params.cr_out}; "
         "{config[tools][cellranger_count][call]} count "
-        "--id={params.mySample} "
-        "--sample={params.mySample} "
+        "--id={wildcards.sample} "
+        "--sample={wildcards.sample} "
         "--transcriptome={input.reference} "
         "--localcores={params.local_cores} "
         "--fastqs={input.fastqs_dir} "
         "--nosecondary "
         "{params.variousParams} "
-        " 2>&1 | tee ../../{log} ) ; "
-        "pwd ; "
-        "gunzip {params.cr_out}{params.mySample}/outs/filtered_feature_bc_matrix/features.tsv.gz ; "
-        "gunzip {params.cr_out}{params.mySample}/outs/filtered_feature_bc_matrix/barcodes.tsv.gz ; "
-        "gunzip {params.cr_out}{params.mySample}/outs/filtered_feature_bc_matrix/matrix.mtx.gz ; "
-        'ln -sr "{params.cr_out}{params.mySample}/outs/filtered_feature_bc_matrix/features.tsv" "{output.features_file}"; '
-        'ln -sr "{params.cr_out}{params.mySample}/outs/filtered_feature_bc_matrix/matrix.mtx" "{output.matrix_file}"; '
-        'ln -sr "{params.cr_out}{params.mySample}/outs/filtered_feature_bc_matrix/barcodes.tsv" "{output.barcodes_file}" ; '
-        'ln -sr "{params.cr_out}{params.mySample}/outs/web_summary.html" "{params.web_summary}" ; '
-        'ln -sr "{params.cr_out}{params.mySample}/outs/metrics_summary.csv" "{params.metrics_summary}" '
+        " 2>&1 | tee ../../{log} ; "
+        "date > {wildcards.sample}_success_cellranger.txt ) "
+
+
+# Run cellranger v8. Some new parameters are required (e.g. --create-bam)
+rule cellranger_count_8:
+    input:
+        fastqs_dir=get_fastq_dir,
+        reference=config["resources"]["reference_transcriptome"],
+    output:
+        # the cellranger output cannot be specified directly because this would trigger Snakemake
+        # to create the directory before cellranger starts.
+        # Cellranger needs to create the directory itself (otherwise gives pipestance error and aborts).
+        success="results/cellranger_run/{sample}_success_cellranger.txt",
+    params:
+        cr_out="results/cellranger_run/{sample}/",
+        local_cores=config["tools"]["cellranger_count"]["local_cores"],
+        metrics_summary="results/cellranger_run/{sample}.metrics_summary.csv",
+        web_summary="results/cellranger_run/{sample}.web_summary.html",
+        create_bam=config["tools"]["cellranger_count"]["create_bam"],
+        # NOTE: no dots are allowed in sample names!
+        variousParams=config["tools"]["cellranger_count"]["variousParams"],
+    resources:
+        mem_mb=config["tools"]["cellranger_count"]["mem_mb"],
+        runtime=config["tools"]["cellranger_count"]["runtime"],
+    threads: config["tools"]["cellranger_count"]["local_cores"]
+    log:
+        "logs/cellranger_count/{sample}.log",
+    benchmark:
+        "logs/benchmark/cellranger_run/{sample}.benchmark"
+    shell:
+        "{config[tools][cellranger_count][call]} count "
+        "--id={wildcards.sample} "
+        "--transcriptome={input.reference} "
+        "--localcores={params.local_cores} "
+        "--fastqs={input.fastqs_dir} "
+        "--nosecondary "
+        "--create-bam={params.create_bam} "
+        "--output-dir={params.cr_out} "
+        "{params.variousParams} "
+        " 2>&1 | tee {log} ; "
+        "date > {output}"
+
+
+# get sample ID to output files
+rule gunzip_and_link_cellranger:
+    input:
+        success="results/cellranger_run/{sample}_success_cellranger.txt",
+    output:
+        features_file="results/cellranger_run/{sample}.features.tsv",
+        matrix_file="results/cellranger_run/{sample}.matrix.mtx",
+        barcodes_file="results/cellranger_run/{sample}.barcodes.tsv",
+    params:
+        cr_out="results/cellranger_run/{sample}/",
+        metrics_summary="results/cellranger_run/{sample}.metrics_summary.csv",
+        web_summary="results/cellranger_run/{sample}.web_summary.html",
+    resources:
+        mem_mb=config["computingResources"]["mem_mb"]["low"],
+        runtime=config["computingResources"]["runtime"]["low"],
+    threads: config["computingResources"]["threads"]["low"]
+    benchmark:
+        "logs/benchmark/gunzip_and_link_cellranger/{sample}.benchmark"
+    log:
+        "logs/rules/gunzip_and_link_cellranger/{sample}.log",
+    # unzip and symlink raw cellranger features file
+    shell:
+        "gunzip --keep {params.cr_out}/outs/filtered_feature_bc_matrix/features.tsv.gz 2>> {log} ; "
+        "gunzip --keep {params.cr_out}/outs/filtered_feature_bc_matrix/barcodes.tsv.gz 2>> {log} ; "
+        "gunzip --keep {params.cr_out}/outs/filtered_feature_bc_matrix/matrix.mtx.gz 2>> {log} ; "
+        'ln -sr "{params.cr_out}/outs/filtered_feature_bc_matrix/features.tsv" "{output.features_file}" 2>> {log} ; '
+        'ln -sr "{params.cr_out}/outs/filtered_feature_bc_matrix/matrix.mtx" "{output.matrix_file}" 2>> {log} ; '
+        'ln -sr "{params.cr_out}/outs/filtered_feature_bc_matrix/barcodes.tsv" "{output.barcodes_file}" 2>> {log} ; '
+        'ln -sr "{params.cr_out}/outs/web_summary.html" "{params.web_summary}" 2>> {log} ; '
+        'ln -sr "{params.cr_out}/outs/metrics_summary.csv" "{params.metrics_summary}" 2>> {log} '
 
 
 # create hdf5 from count matrix, genes, and cell barcodes file
@@ -82,10 +147,10 @@ rule identify_doublets:
     input:
         infile="results/counts_raw/{sample}.h5",
     output:
-        outfile="results/counts_filtered/{sample}.doublet_barcodes.txt",
+        outfile="results/identify_doublets/{sample}.doublet_barcodes.txt",
     params:
         sample="{sample}",
-        outdir="results/counts_filtered/",
+        outdir="results/identify_doublets/",
         custom_script=workflow.source_path("../scripts/identify_doublets.R"),
     conda:
         "../envs/identify_doublets.yaml"
@@ -111,7 +176,7 @@ rule identify_doublets:
 rule filter_genes_and_cells:
     input:
         infile="results/counts_raw/{sample}.h5",
-        doublets="results/counts_filtered/{sample}.doublet_barcodes.txt",
+        doublets="results/identify_doublets/{sample}.doublet_barcodes.txt",
     output:
         outfile="results/counts_filtered/{sample}.genes_cells_filtered.h5",
     params:
@@ -439,10 +504,10 @@ rule generate_qc_plots_raw:
     input:
         infile="results/counts_raw/{sample}.h5",
     output:
-        out="results/counts_raw/{sample}.raw.histogram_library_sizes.png",
+        out="results/qc_plots/raw/{sample}.raw.histogram_library_sizes.png",
     params:
         custom_script=workflow.source_path("../scripts/generate_QC_plots.R"),
-        outdir="results/counts_raw/",
+        outdir="results/qc_plots/raw/",
         sample_status="raw",
     conda:
         "../envs/generate_qc_plots.yaml"
@@ -468,10 +533,10 @@ rule generate_qc_plots_filtered:
     input:
         infile="results/counts_filtered/{sample}.genes_cells_filtered.h5",
     output:
-        out="results/counts_filtered/{sample}.genes_cells_filtered.histogram_library_sizes.png",
+        out="results/qc_plots/filtered/{sample}.genes_cells_filtered.histogram_library_sizes.png",
     params:
         custom_script=workflow.source_path("../scripts/generate_QC_plots.R"),
-        outdir="results/counts_filtered/",
+        outdir="results/qc_plots/filtered/",
         sample_status="genes_cells_filtered",
     conda:
         "../envs/generate_qc_plots.yaml"

@@ -12,8 +12,8 @@ def cellranger_to_hdf5 (genes, matrix_file, barcodes, out_path):
     matrix = mmread(matrix_file.__str__()).astype("float32").todense().T
     matrix = np.asarray(matrix)
 
-    gene_ids = np.genfromtxt(genes.__str__(), dtype='S16')[:,0]
-    gene_names = np.genfromtxt(genes.__str__(), dtype='S16')[:, 1]
+    gene_ids = np.genfromtxt(genes.__str__(), dtype='S32')[:,0]
+    gene_names = np.genfromtxt(genes.__str__(), dtype='S32')[:, 1]
     cell_names = np.genfromtxt(barcodes.__str__(), dtype='S16')
 
     # removing all-zero-genes accross all cells
