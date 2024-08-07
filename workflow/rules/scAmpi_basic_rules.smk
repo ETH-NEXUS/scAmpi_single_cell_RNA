@@ -55,8 +55,8 @@ rule cellranger_count:
         "--fastqs={params.fastqs_dir} "
         "--nosecondary "
         "{params.variousParams} "
-        " 2>&1 | tee ../../{log} ; "
-        "date > {wildcards.sample}_success_cellranger.txt ) "
+        " 2>&1 | tee ../../{log}); "
+        "date > {output.success} "
 
 
 # Run cellranger v8. Some new parameters are required (e.g. --create-bam)
@@ -129,16 +129,8 @@ rule gunzip_and_link_cellranger:
         'ln -sr "{params.cr_out}/outs/filtered_feature_bc_matrix/barcodes.tsv" "{output.barcodes_file}" 2>> {log} ; '
         'ln -sr "{params.cr_out}/outs/web_summary.html" "{params.web_summary}" 2>> {log} ; '
         'ln -sr "{params.cr_out}/outs/metrics_summary.csv" "{params.metrics_summary}" 2>> {log} '
-        " 2>&1 | tee ../../{log} ) ; "
-        "pwd ; " # we should be back in working directory
-        "gunzip {params.cr_out}{params.mySample}/outs/filtered_feature_bc_matrix/features.tsv.gz ; "
-        "gunzip {params.cr_out}{params.mySample}/outs/filtered_feature_bc_matrix/barcodes.tsv.gz ; "
-        "gunzip {params.cr_out}{params.mySample}/outs/filtered_feature_bc_matrix/matrix.mtx.gz ; "
-        'ln -sr "{params.cr_out}{params.mySample}/outs/filtered_feature_bc_matrix/features.tsv" "{output.features_file}"; '
-        'ln -sr "{params.cr_out}{params.mySample}/outs/filtered_feature_bc_matrix/matrix.mtx" "{output.matrix_file}"; '
-        'ln -sr "{params.cr_out}{params.mySample}/outs/filtered_feature_bc_matrix/barcodes.tsv" "{output.barcodes_file}" ; '
-        'ln -sr "{params.cr_out}{params.mySample}/outs/web_summary.html" "{params.web_summary}" ; '
-        'ln -sr "{params.cr_out}{params.mySample}/outs/metrics_summary.csv" "{params.metrics_summary}" '
+
+        
 
 
 # create hdf5 from count matrix, genes, and cell barcodes file

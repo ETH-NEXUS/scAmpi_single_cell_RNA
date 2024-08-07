@@ -33,8 +33,9 @@ use-apptainer: True
 #conda-prefix: DIR
 #conda-frontend: {conda,mamba}
 
-#default-storage-provider: fs
+# depends on a plugin: Error: Error loading Snakemake plugin fs: The package snakemake-storage-plugin-fs is not installed.
+# default-storage-provider: fs
 # set scratch folder for login node
-#local-storage-prefix: /local/work/$USER/snakemake-scratch
+# local-storage-prefix: /scratch/$USER/snakemake-scratch
 # and for compute node
-#remote-job-local-storage-prefix: "<your node local storage prefix>"
+# remote-job-local-storage-prefix: /scratch/$USER/snakemake-scratch
