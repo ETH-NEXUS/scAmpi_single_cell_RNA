@@ -43,6 +43,7 @@ option_list <- list(
   make_option("--number_genes", type = "character", help = "Number of genes with the highest variance in the residuals that will be used for the calculation of umap coordinates and given out into an hdf5 file for the phenograph clustering."),
   make_option("--min_var", type = "character", help = "Minimum variance of the residuals for a gene to be used for the calculation of umap coordinates and given out into an hdf5 file for the phenograph clustering."),
   make_option("--n_nn", type = "character", help = "Number of nearest neighbours for the UMAP calculation."),
+  make_option("--max_pc_smooth", type = "int", help = "Number of principle components for the smooth_via_pca step", default=100)
   make_option("--outdir", type = "character", help = "Path to output directory.")
 )
 
