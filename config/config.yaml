@@ -55,12 +55,12 @@ computingResources:
 
 tools:
   # Cellranger cannot be installed through Conda currently.
-  # It needs to be installed manually & the call in both cellranger rules needs to be adapted.
+  # we use container
   # variousParams can be set as described in the Cellranger documentation
   cellranger_count:
-    call: cellranger
+    version: "8.0.1"
     local_cores: 12
-    mem_mb: 40000
+    mem_mb: 60000
     runtime: 1440
     create_bam: "true"
     variousParams: ""

@@ -1,12 +1,11 @@
 $schema: "https://json-schema.org/draft/2020-12/schema"
 description: an entry in the sample sheet
 properties:
-    sample_name:
+    sample:
         type: string
         description: sample name/identifier - must contain only letters, digits, underscores, and dashes.
     file_stem:
         type: string
         description: fastq file name without the '_S1_L001_I1_001.fastq.gz' suffix 
 required:
-    - sample_name
-    - file_stem
+    - sample

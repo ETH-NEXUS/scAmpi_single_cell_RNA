@@ -1,102 +1,103 @@
+from os.path import join, dirname, abspath
+
 try:
     from snakemake import logger
 except ImportError:
     # change in sm8
-    from snakemake.logging import logger# Retrieve the fastqs directory name (ie. uses cellranger sample name) corresponding to a given sample
-
-def get_fastq_dir(wildcards):
-    "return fastq directory of one sample"
-    sample = wildcards.sample
-    fastqs_dir = config["inputOutput"]["input_fastqs"]
-    sample_fastq_dir = fastqs_dir + sample
-    return sample_fastq_dir
+    from snakemake.logging import logger # Retrieve the fastqs directory name (ie. uses cellranger sample name) corresponding to a given sample
 
 
 # make symlinks to fastq files that work with cellranger
+# requires a file_stem column in the sample map that matches all fastqs for the sample
 rule fastq_symlinks:
     input:
-        lambda w: f"{config['inputOutput']['input_fastqs']}/{get_input_fastq(w)}"
+        lambda w: fq_link_dict[w.link_name]
     output:
-        # attempt to check whether the filename is cellranger conform 
-        target="results/input_fastq/{link_filename,[a-zA-Z0-9_-]+\\.fastq\\.gz}"
+        target="results/input_fastq/{sample}/{link_name}"
     shell:
         "ln -s {input} {output.target}"
 
 # cellranger call to process the raw samples
-rule cellranger_count:
-    input:
-        #fastqs_dir=config["inputOutput"]["input_fastqs"],
-        fastq_files=lambda w: [f'results/input_fastq/{fn}' for fn in get_symlink_names(w)],
-        reference=config["resources"]["reference_transcriptome"],
-    output:
-        success="results/cellranger_run/{sample}_success_cellranger.txt",
-    params:
-        fastqs_dir="../input_fastq/", # needs to be relative to cr_out
-        cr_out="results/cellranger_run/",
-        local_cores=config["tools"]["cellranger_count"]["local_cores"],
-        variousParams=config["tools"]["cellranger_count"]["variousParams"],
-    resources:
-        mem_mb=config["tools"]["cellranger_count"]["mem_mb"],
-        runtime=config["tools"]["cellranger_count"]["runtime"],
-    threads: config["tools"]["cellranger_count"]["local_cores"]
-    log:
-        "logs/cellranger_count/{sample}.log",
-    benchmark:
-        "logs/benchmark/cellranger_run/{sample}.benchmark"
-    # NOTE: cellranger count function cannot specify the output directory, the output is the path you call it from.
-    # Therefore, a subshell is used here.
-    shell:
-        "(cd {params.cr_out}; "
-        "{config[tools][cellranger_count][call]} count "
-        "--id={wildcards.sample} "
-        "--sample={wildcards.sample} "
-        "--transcriptome={input.reference} "
-        "--localcores={params.local_cores} "
-        "--fastqs={params.fastqs_dir} "
-        "--nosecondary "
-        "{params.variousParams} "
-        " 2>&1 | tee ../../{log}); "
-        "date > {output.success} "
+if config['tools']['cellranger_count']['version']=="7.1.0":
+    rule cellranger_count_7_1:
+        input:
+            #fastqs_dir=config["inputOutput"]["input_fastqs"],
+            fastqs=get_fastq_links,
+            reference=config["resources"]["reference_transcriptome"],
+        output:
+            success="results/cellranger_run/{sample}_success_cellranger.txt",
+        params:
+            cr_out="results/cellranger_run/",
+            fastq_dir=lambda wildcards, input: dirname(abspath(input.fastqs[0])),
+            local_cores=config["tools"]["cellranger_count"]["local_cores"],
+            variousParams=config["tools"]["cellranger_count"]["variousParams"],
+        resources:
+            mem_mb=config["tools"]["cellranger_count"]["mem_mb"],
+            runtime=config["tools"]["cellranger_count"]["runtime"],
+        threads: config["tools"]["cellranger_count"]["local_cores"]
+        log:
+            "logs/cellranger_count/{sample}.log",
+        benchmark:
+            "logs/benchmark/cellranger_run/{sample}.benchmark"
+        container:
+            "docker://litd/docker-cellranger:v7.1.0"
+        # NOTE: cellranger count function cannot specify the output directory, the output is the path you call it from.
+        # Therefore, a subshell is used here.
+        shell:
+            "(cd {params.cr_out}; "
+            "cellranger count "
+            "--id={wildcards.sample} "
+            "--sample={wildcards.sample} "
+            "--transcriptome={input.reference} "
+            "--localcores={params.local_cores} "
+            "--fastqs={params.fastq_dir} "
+            "--nosecondary "
+            "{params.variousParams} "
+            " 2>&1 | tee ../../{log}); "
+            "date > {output.success} "
 
-
-# Run cellranger v8. Some new parameters are required (e.g. --create-bam)
-rule cellranger_count_8:
-    input:
-        fastqs_dir=get_fastq_dir,
-        reference=config["resources"]["reference_transcriptome"],
-    output:
-        # the cellranger output cannot be specified directly because this would trigger Snakemake
-        # to create the directory before cellranger starts.
-        # Cellranger needs to create the directory itself (otherwise gives pipestance error and aborts).
-        success="results/cellranger_run/{sample}_success_cellranger.txt",
-    params:
-        cr_out="results/cellranger_run/{sample}/",
-        local_cores=config["tools"]["cellranger_count"]["local_cores"],
-        metrics_summary="results/cellranger_run/{sample}.metrics_summary.csv",
-        web_summary="results/cellranger_run/{sample}.web_summary.html",
-        create_bam=config["tools"]["cellranger_count"]["create_bam"],
-        # NOTE: no dots are allowed in sample names!
-        variousParams=config["tools"]["cellranger_count"]["variousParams"],
-    resources:
-        mem_mb=config["tools"]["cellranger_count"]["mem_mb"],
-        runtime=config["tools"]["cellranger_count"]["runtime"],
-    threads: config["tools"]["cellranger_count"]["local_cores"]
-    log:
-        "logs/cellranger_count/{sample}.log",
-    benchmark:
-        "logs/benchmark/cellranger_run/{sample}.benchmark"
-    shell:
-        "{config[tools][cellranger_count][call]} count "
-        "--id={wildcards.sample} "
-        "--transcriptome={input.reference} "
-        "--localcores={params.local_cores} "
-        "--fastqs={input.fastqs_dir} "
-        "--nosecondary "
-        "--create-bam={params.create_bam} "
-        "--output-dir={params.cr_out} "
-        "{params.variousParams} "
-        " 2>&1 | tee {log} ; "
-        "date > {output}"
+elif config['tools']['cellranger_count']['version']=="8.0.1":
+    # Run cellranger v8. Some new parameters are required (e.g. --create-bam)
+    rule cellranger_count_8:
+        input:
+            fastqs=get_fastq_links,
+            reference=config["resources"]["reference_transcriptome"],
+        output:
+            # the cellranger output cannot be specified directly because this would trigger Snakemake
+            # to create the directory before cellranger starts.
+            # Cellranger needs to create the directory itself (otherwise gives pipestance error and aborts).
+            success="results/cellranger_run/{sample}_success_cellranger.txt",
+        params:
+            fastq_dir=lambda wildcards, input: dirname(abspath(input.fastqs[0])),
+            cr_out="results/cellranger_run/{sample}/",
+            local_cores=config["tools"]["cellranger_count"]["local_cores"],
+            metrics_summary="results/cellranger_run/{sample}.metrics_summary.csv",
+            web_summary="results/cellranger_run/{sample}.web_summary.html",
+            create_bam=config["tools"]["cellranger_count"]["create_bam"],
+            # NOTE: no dots are allowed in sample names!
+            variousParams=config["tools"]["cellranger_count"]["variousParams"],
+        resources:
+            mem_mb=config["tools"]["cellranger_count"]["mem_mb"],
+            runtime=config["tools"]["cellranger_count"]["runtime"],
+        threads: config["tools"]["cellranger_count"]["local_cores"]
+        log:
+            "logs/cellranger_count/{sample}.log",
+        benchmark:
+            "logs/benchmark/cellranger_run/{sample}.benchmark"
+        container:
+            "docker://litd/docker-cellranger:v8.0.1"
+        shell:
+            "cellranger count "
+            "--id={wildcards.sample} "
+            "--transcriptome={input.reference} "
+            "--localcores={params.local_cores} "
+            "--fastqs={params.fastq_dir} "
+            "--nosecondary "
+            "--create-bam={params.create_bam} "
+            "--output-dir={params.cr_out} "
+            "{params.variousParams} "
+            " 2>&1 | tee {log} ; "
+            "date > {output}"
 
 
 # get sample ID to output files
@@ -121,7 +122,7 @@ rule gunzip_and_link_cellranger:
         "logs/rules/gunzip_and_link_cellranger/{sample}.log",
     # unzip and symlink raw cellranger features file
     shell:
-        "gunzip --keep {params.cr_out}/outs/filtered_feature_bc_matrix/features.tsv.gz 2>> {log} ; "
+        "gunzip --keep {params.cr_out}/outs/filtered_feature_bc_matrix/features.tsv.gz 2> {log} ; "
         "gunzip --keep {params.cr_out}/outs/filtered_feature_bc_matrix/barcodes.tsv.gz 2>> {log} ; "
         "gunzip --keep {params.cr_out}/outs/filtered_feature_bc_matrix/matrix.mtx.gz 2>> {log} ; "
         'ln -sr "{params.cr_out}/outs/filtered_feature_bc_matrix/features.tsv" "{output.features_file}" 2>> {log} ; '
