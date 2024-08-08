@@ -252,19 +252,15 @@ rule sctransform_preprocessing:
     input:
         hdf5_file="results/counts_filtered/{sample}.genes_cells_filtered.h5",
     output:
-        outfile="results/counts_corrected/{sample, '^(?!.*_seacells$).+'}.corrected.RDS",
-        highly_variable="results/counts_corrected/{sample, '^(?!.*_seacells$).+'}.corrected.variable_genes.h5",
+        outfile="results/counts_corrected/{sample}.corrected.RDS",
+        highly_variable="results/counts_corrected/{sample}.corrected.variable_genes.h5",
     params:
         sample="{sample}",
         number_genes=config["tools"]["sctransform_preprocessing"]["number_genes"],
         min_var=config["tools"]["sctransform_preprocessing"]["min_var"],
         n_nn=config["tools"]["sctransform_preprocessing"]["n_nn"],
         outDir="results/counts_corrected/",
-        #custom_script=workflow.source_path("../scripts/sctransform_preprocessing.R"),
-        custom_script="workflow/scripts/sctransform_preprocessing.R",
-        smooth_pc="100", # default value
-        max_count="0", # no effect
-        min_cells_per_gene="0" # do not filter
+        custom_script=workflow.source_path("../scripts/sctransform_preprocessing.R"),
     conda:
         "../envs/sctransform_preprocessing.yaml"
     resources:
@@ -282,9 +278,6 @@ rule sctransform_preprocessing:
         "--number_genes {params.number_genes} "
         "--min_var {params.min_var} "
         "--n_nn {params.n_nn} "
-        "--max_pc_smooth {params.smooth_pc} "
-        "--max_count {params.max_count} "
-        "--min_cells_per_gene {params.min_cells_per_gene} "
         "--outdir {params.outDir} "
         "&> {log} "
 
@@ -602,7 +595,7 @@ checkpoint diff_exp_analysis:
         sce_in="results/atypical_removed/{sample}.atypical_removed.RDS",
         cell_types="results/atypical_removed/{sample}.atypical_removed.phenograph_celltype_association.txt",
     output:
-        output=directory("results/diff_exp_analysis/{sample, '^(?!.*_seacells$).+'}"),
+        output=directory("results/diff_exp_analysis/{sample}"),
     params:
         sampleName="{sample}",
         malignant=config["inputOutput"]["malignant_cell_type"],

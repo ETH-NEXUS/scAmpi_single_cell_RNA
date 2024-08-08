@@ -22,6 +22,8 @@ configfile: "config/config.yaml"
 # Include report functionality
 report: "report/workflow.rst"
 
+# make sure seacell specific rules are applied if sample wildcard is followed by _seacells in the file names
+ruleorder: sctransform_preprocessing_filtered_seacells > sctransform_preprocessing
 
 # This file includes common functions used in the pipeline
 include: "rules/misc_snake.smk"
