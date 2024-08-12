@@ -1,4 +1,3 @@
-
 # this rule gets a raw h5 file and runs metacells2 to aggreate cells to metacells
 # it returns an h5 file with aggregated counts
 rule metacells2:
@@ -7,8 +6,7 @@ rule metacells2:
         celltypes="results/celltyping/{sample}.cts_final.txt",
     output:
         counts="results/metacells/{sample}.genes_cells_filtered_metacells2.h5",
-        barcodes="results/metacells/{sample}.genes_cells_filtered_metacells2_assignment.tsv", 
-        #dont care about soft mappings for now
+        barcodes="results/metacells/{sample}.genes_cells_filtered_metacells2_assignment.tsv",
     params:
         prefix="{sample}.genes_cells_filtered",
         outdir="results/metacells/",
@@ -35,8 +33,7 @@ rule metacells2:
             &> {log}
         """
 
-# for other rules inbetween, wildcard {sample} becomes {sample}.genes_cells_filtered_metacells2    
- 
+
 use rule sctransform_preprocessing as sctransform_preprocessing_filtered_metacells2 with:
     input:
         hdf5_file="results/metacells/{sample}.genes_cells_filtered_metacells2.h5",
@@ -45,15 +42,17 @@ use rule sctransform_preprocessing as sctransform_preprocessing_filtered_metacel
         highly_variable="results/counts_corrected/{sample}_metacells2.corrected.variable_genes.h5",
     params:
         sample="{sample}_metacells2",
-        number_genes=config["tools"]["sctransform_preprocessing"]["number_genes_metacells"],
+        number_genes=config["tools"]["sctransform_preprocessing"][
+            "number_genes_metacells"
+        ],
         min_var=config["tools"]["sctransform_preprocessing"]["min_var_metacells"],
         n_nn=config["tools"]["sctransform_preprocessing"]["n_nn_metacells"],
         outDir="results/counts_corrected/",
         #custom_script=workflow.source_path("../scripts/sctransform_preprocessing.R"),
         custom_script="workflow/scripts/sctransform_preprocessing.R",
         smooth_pc="20",
-        max_count="0", # no 
-        min_cells_per_gene="10"
+        max_count="0",  # no 
+        min_cells_per_gene="10",
     log:
         "logs/sctransform_preprocessing/{sample}_metacells2.log",
 
@@ -66,7 +65,7 @@ rule evaluate_metacells2:
     output:
         table="results/metacells/{sample}_metacells2_celltype_counts.tsv",
         plot="results/metacells/{sample}_metacells2_celltype_dens.png",
-        report="workflow/report/rules/metacells2/{sample}_celltyping_summary.rst"
+        report="workflow/report/rules/metacells2/{sample}_celltyping_summary.rst",
     params:
         prefix="{sample}_metacells2",
         outdir="results/metacells/",
@@ -81,7 +80,7 @@ rule evaluate_metacells2:
     log:
         "logs/metacells/{sample}_metacell_evaluation_metacells2.log",
     benchmark:
-        "logs/benchmark/metacells/{sample}_metacell_evaluation_metacells2.benchmark",
+        "logs/benchmark/metacells/{sample}_metacell_evaluation_metacells2.benchmark"
     shell:
         """
         python {params.custom_script} \

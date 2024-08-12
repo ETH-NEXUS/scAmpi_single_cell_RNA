@@ -1,4 +1,3 @@
-
 # this rule gets a raw h5 file and runs seacells to aggreate cells to metacells
 # it returns an h5 file with aggregated counts
 rule seacells:
@@ -7,13 +6,12 @@ rule seacells:
         celltypes="results/celltyping/{sample}.cts_final.txt",
     output:
         counts="results/metacells/{sample}.genes_cells_filtered_seacells.h5",
-        barcodes="results/metacells/{sample}.genes_cells_filtered_seacells_assignment.tsv", 
-        #dont care about soft mappings for now
+        barcodes="results/metacells/{sample}.genes_cells_filtered_seacells_assignment.tsv",
     params:
         prefix="{sample}.genes_cells_filtered",
         outdir="results/metacells/",
         custom_script="workflow/scripts/metacell_run_seacells.py",
-        various_params=config["tools"]["metacells"]["seacells"]["params"]
+        various_params=config["tools"]["metacells"]["seacells"]["params"],
     container:
         config["tools"]["metacells"]["seacells"]["container"]
     resources:
@@ -35,8 +33,7 @@ rule seacells:
             &> {log}
         """
 
-# for other rules inbetween, wildcard {sample} becomes {sample}.genes_cells_filtered_seacells    
- 
+
 use rule sctransform_preprocessing as sctransform_preprocessing_filtered_seacells with:
     input:
         hdf5_file="results/metacells/{sample}.genes_cells_filtered_seacells.h5",
@@ -45,16 +42,15 @@ use rule sctransform_preprocessing as sctransform_preprocessing_filtered_seacell
         highly_variable="results/counts_corrected/{sample}_seacells.corrected.variable_genes.h5",
     params:
         sample="{sample}_seacells",
-        number_genes=config["tools"]["sctransform_preprocessing"]["number_genes_metacells"],
+        number_genes=config["tools"]["sctransform_preprocessing"][
+            "number_genes_metacells"
+        ],
         min_var=config["tools"]["sctransform_preprocessing"]["min_var_metacells"],
         n_nn=config["tools"]["sctransform_preprocessing"]["n_nn_metacells"],
         outDir="results/counts_corrected/",
-        #custom_script=workflow.source_path("../scripts/sctransform_preprocessing.R"),
-        custom_script="workflow/scripts/sctransform_preprocessing.R",
+        custom_script=workflow.source_path("../scripts/sctransform_preprocessing.R"),
         smooth_pc="20",
-        min_cells_per_gene="10",
-        max_count="0"
-
+        patch="--patch_vst ../scripts/vst_check.R",  # leave empty to not apply patch
     log:
         "logs/sctransform_preprocessing/{sample}_seacells.log",
 
@@ -67,12 +63,12 @@ rule evaluate_seacells:
     output:
         table="results/metacells/{sample}_seacells_celltype_counts.tsv",
         plot="results/metacells/{sample}_seacells_celltype_dens.png",
-        report="workflow/report/rules/seacells/{sample}_celltyping_summary.rst"
+        report="workflow/report/rules/seacells/{sample}_celltyping_summary.rst",
     params:
         prefix="{sample}_seacells",
         outdir="results/metacells/",
-        custom_script="workflow/scripts/metacell_cmp_celltypes.py",     
-        ct_config=config["resources"]["celltype_config"],   
+        custom_script="workflow/scripts/metacell_cmp_celltypes.py",
+        ct_config=config["resources"]["celltype_config"],
     container:
         config["tools"]["metacells"]["seacells"]["container"]
     resources:
@@ -82,7 +78,7 @@ rule evaluate_seacells:
     log:
         "logs/metacells/{sample}_metacell_evaluation_seacells.log",
     benchmark:
-        "logs/benchmark/metacells/{sample}_metacell_evaluation_seacells.benchmark",
+        "logs/benchmark/metacells/{sample}_metacell_evaluation_seacells.benchmark"
     shell:
         """
         python {params.custom_script} \

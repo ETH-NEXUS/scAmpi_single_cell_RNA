@@ -4,21 +4,25 @@ try:
     from snakemake import logger
 except ImportError:
     # change in sm8
-    from snakemake.logging import logger # Retrieve the fastqs directory name (ie. uses cellranger sample name) corresponding to a given sample
+    from snakemake.logging import (
+        logger,
+    )  # Retrieve the fastqs directory name (ie. uses cellranger sample name) corresponding to a given sample
 
 
 # make symlinks to fastq files that work with cellranger
 # requires a file_stem column in the sample map that matches all fastqs for the sample
 rule fastq_symlinks:
     input:
-        lambda w: fq_link_dict[w.link_name]
+        lambda w: fq_link_dict[w.link_name],
     output:
-        target="results/input_fastq/{sample}/{link_name}"
+        target="results/input_fastq/{sample}/{link_name}",
     shell:
         "ln -s {input} {output.target}"
 
+
 # cellranger call to process the raw samples
-if config['tools']['cellranger_count']['version']=="7.1.0":
+if config["tools"]["cellranger_count"]["version"] == "7.1.0":
+
     rule cellranger_count_7_1:
         input:
             #fastqs_dir=config["inputOutput"]["input_fastqs"],
@@ -30,7 +34,7 @@ if config['tools']['cellranger_count']['version']=="7.1.0":
             cr_out="results/cellranger_run/",
             fastq_dir=lambda wildcards, input: dirname(abspath(input.fastqs[0])),
             local_cores=config["tools"]["cellranger_count"]["local_cores"],
-            local_mem=lambda wildcards, resources: round(resources.mem_mb/1024*.9),
+            local_mem=lambda wildcards, resources: round(resources.mem_mb / 1024 * 0.9),
             variousParams=config["tools"]["cellranger_count"]["variousParams"],
         resources:
             mem_mb=config["tools"]["cellranger_count"]["mem_mb"],
@@ -58,7 +62,8 @@ if config['tools']['cellranger_count']['version']=="7.1.0":
             " 2>&1 | tee ../../{log}); "
             "date > {output.success} "
 
-elif config['tools']['cellranger_count']['version']=="8.0.1":
+elif config["tools"]["cellranger_count"]["version"] == "8.0.1":
+
     # Run cellranger v8. Some new parameters are required (e.g. --create-bam)
     rule cellranger_count_8:
         input:
@@ -73,7 +78,7 @@ elif config['tools']['cellranger_count']['version']=="8.0.1":
             fastq_dir=lambda wildcards, input: dirname(abspath(input.fastqs[0])),
             cr_out="results/cellranger_run/{sample}/",
             local_cores=config["tools"]["cellranger_count"]["local_cores"],
-            local_mem=lambda wildcards, resources: round(resources.mem_mb/1024*.9),
+            local_mem=lambda wildcards, resources: round(resources.mem_mb / 1024 * 0.9),
             metrics_summary="results/cellranger_run/{sample}.metrics_summary.csv",
             web_summary="results/cellranger_run/{sample}.web_summary.html",
             create_bam=config["tools"]["cellranger_count"]["create_bam"],
@@ -134,8 +139,6 @@ rule gunzip_and_link_cellranger:
         'ln -sr "{params.cr_out}/outs/filtered_feature_bc_matrix/barcodes.tsv" "{output.barcodes_file}" 2>> {log} ; '
         'ln -sr "{params.cr_out}/outs/web_summary.html" "{params.web_summary}" 2>> {log} ; '
         'ln -sr "{params.cr_out}/outs/metrics_summary.csv" "{params.metrics_summary}" 2>> {log} '
-
-        
 
 
 # create hdf5 from count matrix, genes, and cell barcodes file
@@ -246,11 +249,13 @@ rule filter_genes_and_cells:
         "--outDir {params.outDir} "
         "&> {log} "
 
+
 def get_sctransform_param(wildcards, param):
-    if wildcards.sample.split('_')[-1]=='seacells':
-        return config["tools"]["sctransform_preprocessing"][param+'_metacells']
+    if wildcards.sample.split("_")[-1] == "seacells":
+        return config["tools"]["sctransform_preprocessing"][param + "_metacells"]
     else:
         return config["tools"]["sctransform_preprocessing"][param]
+
 
 # perform normalisation, cell cycle correction and other preprocessing using sctransform
 rule sctransform_preprocessing:
@@ -266,6 +271,8 @@ rule sctransform_preprocessing:
         n_nn=config["tools"]["sctransform_preprocessing"]["n_nn"],
         outDir="results/counts_corrected/",
         custom_script=workflow.source_path("../scripts/sctransform_preprocessing.R"),
+        smooth_pc="100",  # default value
+        patch="--patch_vst ../scripts/vst_check.R",  # leave empty to not apply patch
     conda:
         "../envs/sctransform_preprocessing.yaml"
     resources:
@@ -283,6 +290,8 @@ rule sctransform_preprocessing:
         "--number_genes {params.number_genes} "
         "--min_var {params.min_var} "
         "--n_nn {params.n_nn} "
+        "--max_pc_smooth {params.smooth_pc} "
+        "{params.patch}"
         "--outdir {params.outDir} "
         "&> {log} "
 
@@ -392,11 +401,13 @@ rule celltyping:
         "--outputDirec {params.outputDirec} "
         "&> {log} "
 
+
 def get_atypical_params(wildcard, key):
-    what='cells'  
-    if '_seacells' in wildcard['sample'] or '_metacells2' in wildcard['sample']:
-        what = 'metacells'
+    what = "cells"
+    if "_seacells" in wildcard["sample"] or "_metacells2" in wildcard["sample"]:
+        what = "metacells"
     return config["tools"]["remove_atypical_cells"][what][key]
+
 
 # filter out atypical cells from sce object
 rule remove_atypical_cells:
@@ -411,9 +422,9 @@ rule remove_atypical_cells:
         celltype_config=config["resources"]["celltype_config"],
         outputDirec="results/atypical_removed/",
         sample_name="{sample}",
-        threshold_filter=lambda w:get_atypical_params(w,"threshold_filter"),
-        min_threshold=lambda w:get_atypical_params(w,"min_threshold"),
-        threshold_type=lambda w:get_atypical_params(w,"threshold_type"),
+        threshold_filter=lambda w: get_atypical_params(w, "threshold_filter"),
+        min_threshold=lambda w: get_atypical_params(w, "min_threshold"),
+        threshold_type=lambda w: get_atypical_params(w, "threshold_type"),
         custom_script=workflow.source_path("../scripts/remove_atypical_cells.R"),
     conda:
         "../envs/remove_atypical_cells.yaml"
@@ -425,7 +436,7 @@ rule remove_atypical_cells:
         "logs/remove_atypical_cells/{sample}.log",
     benchmark:
         "logs/benchmark/remove_atypical_cells/{sample}.benchmark"
-    shell: 
+    shell:
         "Rscript {params.custom_script} "
         "--sce_in {input.infile} "
         "--cluster_table {input.cluster_table} "

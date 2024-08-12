@@ -22,8 +22,10 @@ configfile: "config/config.yaml"
 # Include report functionality
 report: "report/workflow.rst"
 
+
 # make sure seacell specific rules are applied if sample wildcard is followed by _seacells in the file names
 ruleorder: sctransform_preprocessing_filtered_seacells > sctransform_preprocessing
+
 
 # This file includes common functions used in the pipeline
 include: "rules/misc_snake.smk"
@@ -40,12 +42,17 @@ localrules:
 # final rule of pipeline
 # defines output of scampi seacells
 rule scAmpi_seacells:
-    input:       
+    input:
         expand("results/plotting/{sample}.celltype_barplot.png", sample=sample_ids),
-        expand("results/plotting/{sample}_seacells.celltype_barplot.png", sample=sample_ids),
+        expand(
+            "results/plotting/{sample}_seacells.celltype_barplot.png",
+            sample=sample_ids,
+        ),
         expand("results/gsva/{sample}.gsetscore_hm.png", sample=sample_ids),
         expand("results/diff_exp_analysis/{sample}/", sample=sample_ids),
-        expand("workflow/report/rules/seacells/{sample}_celltyping_summary.rst", sample=sample_ids),
+        expand(
+            "workflow/report/rules/seacells/{sample}_celltyping_summary.rst",
+            sample=sample_ids,
+        ),
         expand("results/gsva/{sample}_seacells.gsetscore_hm.png", sample=sample_ids),
         expand("results/gsva/{sample}.gsetscore_hm.png", sample=sample_ids),
-
