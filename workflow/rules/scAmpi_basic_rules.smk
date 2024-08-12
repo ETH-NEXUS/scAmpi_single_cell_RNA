@@ -30,6 +30,7 @@ if config['tools']['cellranger_count']['version']=="7.1.0":
             cr_out="results/cellranger_run/",
             fastq_dir=lambda wildcards, input: dirname(abspath(input.fastqs[0])),
             local_cores=config["tools"]["cellranger_count"]["local_cores"],
+            local_mem=lambda wildcards, resources: round(resources.mem_mb/1024*.9),
             variousParams=config["tools"]["cellranger_count"]["variousParams"],
         resources:
             mem_mb=config["tools"]["cellranger_count"]["mem_mb"],
@@ -50,6 +51,7 @@ if config['tools']['cellranger_count']['version']=="7.1.0":
             "--sample={wildcards.sample} "
             "--transcriptome={input.reference} "
             "--localcores={params.local_cores} "
+            "--localmem={params.local_mem} "
             "--fastqs={params.fastq_dir} "
             "--nosecondary "
             "{params.variousParams} "
@@ -71,6 +73,7 @@ elif config['tools']['cellranger_count']['version']=="8.0.1":
             fastq_dir=lambda wildcards, input: dirname(abspath(input.fastqs[0])),
             cr_out="results/cellranger_run/{sample}/",
             local_cores=config["tools"]["cellranger_count"]["local_cores"],
+            local_mem=lambda wildcards, resources: round(resources.mem_mb/1024*.9),
             metrics_summary="results/cellranger_run/{sample}.metrics_summary.csv",
             web_summary="results/cellranger_run/{sample}.web_summary.html",
             create_bam=config["tools"]["cellranger_count"]["create_bam"],
@@ -91,6 +94,7 @@ elif config['tools']['cellranger_count']['version']=="8.0.1":
             "--id={wildcards.sample} "
             "--transcriptome={input.reference} "
             "--localcores={params.local_cores} "
+            "--localmem={params.local_mem} "
             "--fastqs={params.fastq_dir} "
             "--nosecondary "
             "--create-bam={params.create_bam} "
