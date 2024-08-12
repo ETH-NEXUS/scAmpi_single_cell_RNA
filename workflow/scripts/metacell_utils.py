@@ -3,7 +3,6 @@
 # Description: Shared util functions for metacell scripts
 
 import h5py
-import numpy as np
 import pandas as pd
 import scanpy as sc
 from scipy.sparse import csr_matrix
@@ -25,13 +24,17 @@ def h5_to_ad(h5file, celltype_mapping_file=None):
         gene_names = f['gene_attrs/gene_names'][:]
         gene_names = [name.decode('utf-8') for name in gene_names]
     # Create AnnData object with sparse matrix representation
-    adata = sc.AnnData(X=counts, obs=pd.DataFrame(index=cell_names), var=pd.DataFrame({'gene_names':gene_names},index=gene_ids))
+    adata = sc.AnnData(X=counts, obs=pd.DataFrame(
+        index=cell_names), var=pd.DataFrame({'gene_names': gene_names}, index=gene_ids))
     if celltype_mapping_file is not None:
-        celltype_mapping = dict(pd.read_csv(celltype_mapping_file, sep='\t').set_index('barcodes')['celltype_final'])
+        celltype_mapping = dict(pd.read_csv(
+            celltype_mapping_file, sep='\t').set_index('barcodes')['celltype_final'])
         if not set(celltype_mapping.keys()).issubset(set(adata.obs_names)):
             print("WARNING: Some cell barcodes in the celltype mapping file do not match the cell barcodes in the h5 input")
-        bc_found=[bc in set(celltype_mapping.keys()) for bc in adata.obs_names]
-        print(f'found celltype assignments for {sum(bc_found)}/{len(bc_found)} cells')
+        bc_found = [bc in set(celltype_mapping.keys())
+                    for bc in adata.obs_names]
+        print(
+            f'found celltype assignments for {sum(bc_found)}/{len(bc_found)} cells')
         # Map the cell types to the AnnData object
         adata.obs['celltype'] = adata.obs_names.map(celltype_mapping)
     return adata
