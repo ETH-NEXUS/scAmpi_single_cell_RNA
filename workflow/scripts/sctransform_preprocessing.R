@@ -4,7 +4,9 @@
 #### Date created: June 2019
 #### R Version: 4.0
 ##################################################
-
+# Modiefied by: Matthias Lienhard
+# Date: 2024-08-12
+# Description of modification: Using a patched version of sctransform vst, that implements error handling
 
 suppressPackageStartupMessages({
   library(optparse)

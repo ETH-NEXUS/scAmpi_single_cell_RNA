@@ -1,3 +1,7 @@
+# Author: Matthias Lienhard
+# Date: 2024-08-12
+# Description: Shared util functions for metacell scripts
+
 import h5py
 import numpy as np
 import pandas as pd

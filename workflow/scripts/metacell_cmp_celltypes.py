@@ -1,4 +1,8 @@
-import pandas as pd
+# Author: Matthias Lienhard
+# Date: 2024-08-12
+# Description: This script analyses the metacell results, and compares the cell typing of metacells and single cells. 
+#   In addition, it genereates report .rst files for the snakemake documentation.
+
 import matplotlib
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -140,7 +144,7 @@ def get_metacell_counts(celltype_file, metacelltype_file, assignment_file, subce
 
 
 if __name__=="__main__":
-    parser = argparse.ArgumentParser(description="Running SEACells metacells identification")
+    parser = argparse.ArgumentParser(description="This script analyses the metacell results, and compares the cell typing of metacells and single cells. In addition, it genereates report .rst files for the snakemake documentation.")
     parser.add_argument("-i", metavar='individual_celltypes.cts_final.txt', required=True, help="celltypes called for individual cells from celltyping.R (rule celltyping)")
     parser.add_argument("-m", metavar='metacelltypes.cts_final.txt', required=True, help="celltypes called for aggregated metacells from celltyping.R (rule celltyping)")
     parser.add_argument("-a", metavar="metacell_assignment.tsv", required=True, help="table with cell to metacell assignment from metacell_run_[method].py")

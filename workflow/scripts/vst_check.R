@@ -4,7 +4,7 @@ NULL
 ## This file is a copy of vst.R, that includes exception handling in the major functions
 ## to facilitate debugging / finding the cause of the infamous glm errors 
 ## as well as tracing warnings (glm did not converge / max iter exceeded)
-## expect minor performance loss compared to the original
+## expect minimal performance loss compared to the original
 ## Modified by Matthias Lienhard, 10.7.2024
 library(sctransform)
 library(MASS)

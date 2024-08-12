@@ -1,3 +1,8 @@
+# Author: Matthias Lienhard
+# Date: 2024-08-12
+# Description: Running SeaCells metacells identification
+
+
 import h5py
 import numpy as np
 import pandas as pd

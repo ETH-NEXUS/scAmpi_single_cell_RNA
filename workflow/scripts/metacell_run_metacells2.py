@@ -1,3 +1,7 @@
+# Author: Matthias Lienhard
+# Date: 2024-08-12
+# Description: Running Metacells2 metacells identification
+
 import h5py
 import matplotlib.pyplot as plt  # For plotting
 import metacells as mc           # The Metacells package
@@ -143,7 +147,7 @@ def export_metacells(metacells, h5_out=None):
             f.create_dataset('cell_attrs/cells_on_rows', data=np.array(True))
     
 if __name__=="__main__":
-    parser = argparse.ArgumentParser(description="Running SEACells metacells identification")
+    parser = argparse.ArgumentParser(description="Running Metacells2 metacells identification")
     parser.add_argument("-i", metavar='in_file.h5', required=True, help="Input file with raw counts")
     parser.add_argument("-o", metavar='out_dir', required=True, help="Output directory")
     parser.add_argument("-p", metavar="out_prefix", required=True, help="Prefix for the output files")
