@@ -15,6 +15,9 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v2
 
+      - name: Create directories
+        run: mkdir -p /path/to/fastqs
+        
       - name: Lint Code Base
         uses: snakemake/snakemake-github-action@v1.25.1
         with:
