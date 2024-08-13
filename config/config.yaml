@@ -125,13 +125,12 @@ tools:
 
   metacells:
     seacells:
-      container: "docker://mlienhard/seacells"
       # number of metacells etc need to be set here
       # increased number of metacells to 200 (default:90) since sctransform wants to calculate 100 dim pca
       params: "--n_cells=200" 
     metacells2:
-      container:  "docker://mlienhard/metacells2"
-
+      params: "" # no additional parameters to be set
+      
   remove_atypical_cells:
     # threshold type, either "number_cells" or "percentage_cells"
     threshold_type: "percentage_cells"
