@@ -13,7 +13,7 @@ rule seacells:
         custom_script="workflow/scripts/metacell_run_seacells.py",
         various_params=config["tools"]["metacells"]["seacells"]["params"],
     container:
-        config["tools"]["metacells"]["seacells"]["container"]
+        "docker://mlienhard/seacells"
     resources:
         mem_mb=config["computingResources"]["mem_mb"]["medium"],
         runtime=config["computingResources"]["runtime"]["low"],
@@ -50,7 +50,7 @@ use rule sctransform_preprocessing as sctransform_preprocessing_filtered_seacell
         outDir="results/counts_corrected/",
         custom_script=workflow.source_path("../scripts/sctransform_preprocessing.R"),
         smooth_pc="20",
-        patch="--patch_vst ../scripts/vst_check.R",  # leave empty to not apply patch
+        patch="--patch_vst workflow/scripts/vst_check.R",  # leave empty to not apply patch
     log:
         "logs/sctransform_preprocessing/{sample}_seacells.log",
 

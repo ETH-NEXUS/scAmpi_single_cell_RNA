@@ -7,6 +7,7 @@ import argparse
 import matplotlib
 import seaborn as sns
 import matplotlib.pyplot as plt
+import pandas as pd
 matplotlib.use('Agg')  # Use Agg backend for rendering plots
 
 

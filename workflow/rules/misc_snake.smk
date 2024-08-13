@@ -48,7 +48,7 @@ assert cr_version in ["7.1.0", "8.0.1"], f"Unsuppoerted cellranger version {cr_v
 ### import sample map and retrieve sample names
 #################################################
 
-sample_table = pd.read_table(config["inputOutput"]["sample_map"], header=0)
+sample_table = pd.read_table(config["inputOutput"]["sample_map"], sep="/t", header=0)
 sample_ids = set(sample_table["sample"])
 # if samples specified in config, process only those
 if "samples" in config:

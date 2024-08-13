@@ -31,9 +31,9 @@ option_list <- list(
   make_option("--number_genes", type = "character", help = "Number of genes with the highest variance in the residuals that will be used for the calculation of umap coordinates and given out into an hdf5 file for the phenograph clustering."),
   make_option("--min_var", type = "character", help = "Minimum variance of the residuals for a gene to be used for the calculation of umap coordinates and given out into an hdf5 file for the phenograph clustering."),
   make_option("--n_nn", type = "character", help = "Number of nearest neighbours for the UMAP calculation."),
-  make_option("--max_pc_smooth", type = "integer", help = "Number of principle components for the smooth_via_pca step", default=100),
-  make_option("--patch_vst", type="character", help = "Path to patched vst.R script (optional)", default=NULL),
-  make_option("--cell_cycle_regression",type="locical", action="store_true", help="Optionally regress out cell cycle in the vst step")
+  make_option("--max_pc_smooth", type = "integer", help = "Number of principle components for the smooth_via_pca step.", default=100),
+  make_option("--patch_vst", type="character", help = "Path to patched vst.R script (optional).", default=NULL),
+  make_option("--cell_cycle_regression", action="store_true", default=FALSE, help="Optionally regress out cell cycle in the vst step."),
   make_option("--outdir", type = "character", help = "Path to output directory.")
 )
 

@@ -272,7 +272,7 @@ rule sctransform_preprocessing:
         outDir="results/counts_corrected/",
         custom_script=workflow.source_path("../scripts/sctransform_preprocessing.R"),
         smooth_pc="100",  # default value
-        patch="--patch_vst ../scripts/vst_check.R",  # leave empty to not apply patch
+        patch="--patch_vst workflow/scripts/vst_check.R",  # leave empty to not apply patch
     conda:
         "../envs/sctransform_preprocessing.yaml"
     resources:
@@ -291,7 +291,7 @@ rule sctransform_preprocessing:
         "--min_var {params.min_var} "
         "--n_nn {params.n_nn} "
         "--max_pc_smooth {params.smooth_pc} "
-        "{params.patch}"
+        "{params.patch} "
         "--outdir {params.outDir} "
         "&> {log} "
 
