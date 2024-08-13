@@ -4,9 +4,11 @@
 
 ### Changed
 - Added automated fastq file link creation for cell ranger
-  If an additional column "file_stem" is provided in the sample map, 
+  If an additional column `file_stem` is provided in the sample map, 
   the fastq files starting with this file stem are assumed to correspond to one sample and links to Cell Ranger compatible folder structure are created automatically. 
-  Otherwise, if there is just the sample column, fastq_dir is expected to point to Cell Ranger compatibe folder structure. 
+  Otherwise, if there is just the sample column, `fastq_dir` is expected to point to Cell Ranger compatible folder structure. 
+
+- Added option to specify `samples` in the config, e.g. to perform a testrun on a one or two samples, or to rerun specific samples. 
 
 - Using containers in the Cell Ranger count step. 
   Cell Ranger version is specified in the config. Currently supported versions 
