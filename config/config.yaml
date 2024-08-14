@@ -1,6 +1,6 @@
 inputOutput:
   # full path to directory with input files
-  input_fastqs: "./path/to/fastqs/"
+  input_fastqs: "/path/to/fastqs/"
   sample_map: config/sample_map.tsv
   malignant_cell_type: "Melanoma"
 

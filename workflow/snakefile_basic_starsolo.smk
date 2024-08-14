@@ -67,6 +67,8 @@ rule scAmpi_basic:
         expand("results/diff_exp_analysis/{sample}/", sample=sample_ids),
     output:
         "results/complete.txt",
+    conda:
+        "envs/base_env.yaml"
     shell:
         "date > {output}"
 

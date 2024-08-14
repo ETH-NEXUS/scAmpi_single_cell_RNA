@@ -31,7 +31,7 @@ include: "rules/scAmpi_basic_rules.smk"
 
 # include local rules
 localrules:
-    scAmpi_basic,
+    scAmpi_basic, fastq_symlinks,
 
 
 # final rule of pipeline
@@ -66,5 +66,10 @@ rule scAmpi_basic:
         expand("results/diff_exp_analysis/{sample}/", sample=sample_ids),
     output:
         "results/complete.txt",
+    conda:
+        "envs/base_env.yaml"
+    log:
+        "logs/scampi_basic/complete.log"
     shell:
-        "date > {output}"
+        "echo {input} &> {log}"
+        "date > {output} 2> {log}"

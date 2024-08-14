@@ -68,7 +68,9 @@ logger.info(f"processing {len(sample_ids)} samples: {', '.join(sample_ids)}")
 fq_files = {sa: [] for sa in sample_ids}
 link_names = {}
 fastq_dir = config["inputOutput"]["input_fastqs"]
-if "file_stem" in sample_table:
+if not isdir(fastq_dir):
+    logger.error(f"Cannot find fastq directory {fastq_dir}")
+elif "file_stem" in sample_table:
     for _, row in sample_table.iterrows():
         sa = row["sample"]
         fs = row["file_stem"]
@@ -177,3 +179,10 @@ def get_fastq_links(wildcards):
     if not link_names:
         return fq_list
     return [join("results/input_fastq", sa, link_names[fq]) for fq in fq_list]
+
+
+def get_params_remove_atypical_cells(wildcard, key):
+    what = "cells"
+    if "_seacells" in wildcard["sample"] or "_metacells2" in wildcard["sample"]:
+        what = "metacells"
+    return config["tools"]["remove_atypical_cells"][what][key]

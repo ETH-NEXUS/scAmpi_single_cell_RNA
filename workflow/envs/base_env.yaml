@@ -1,0 +1,3 @@
+# find env in scAmpi_single_cell_RNA/workflow/envs/base_env.yaml
+name: empty_env
+dependencies: []

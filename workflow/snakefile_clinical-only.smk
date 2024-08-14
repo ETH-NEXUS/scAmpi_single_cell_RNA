@@ -85,6 +85,8 @@ rule clinical_only:
         ),
     output:
         "results/complete.txt",
+    conda:
+        "envs/base_env.yaml"
     shell:
         "date > {output}"
 
