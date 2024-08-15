@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.1] - 2024-08-15
+
+### Changed
+
+- adapt example cell type classification genes for ovarian cancer and melanoma samples.
+
+
 ## [2.1.0] - 2024-07-30
 
 ### Changed
