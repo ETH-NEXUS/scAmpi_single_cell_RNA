@@ -26,4 +26,4 @@ M2.Macrophages_normal_literature	wheat	Subtype	Mel,OvCa
 TAM.Macrophages_normal_literature	lightsalmon	Subtype	Mel,OvCa
 TCRpos.Macrophages_normal_literature	gold	Subtype	Mel,OvCa
 CD169pos.Macrophages_normal_literature	darkgoldenrod3	Subtype	Mel,OvCa
-Plasmacytoid.dendritic.cell_melanoma_classifier	darkolivegreen1	Subtype	Mel,OvCa
+Plasmacytoid.dendritic.cell_melanoma_classifier.curated	darkolivegreen1	Subtype	Mel,OvCa
