@@ -4,6 +4,12 @@ inputOutput:
   sample_map: config/sample_map.tsv
   malignant_cell_type: "Melanoma"
 
+# in oder to run workflow on a subset of samples only, define these samples:
+#samples:
+#  - SAMPLE-1_scR
+#  - SAMPLE-2_scR
+
+
 resources:
   # cellranger
   # The following needs to point to the reference transcriptome that will be used by cellranger.
