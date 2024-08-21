@@ -132,13 +132,22 @@ tools:
       params: "" # no additional parameters to be set
       
   remove_atypical_cells:
-    # threshold type, either "number_cells" or "percentage_cells"
-    threshold_type: "percentage_cells"
-    # default is "percentage_cells" and "5":
-    # cells with cell type that less than 5 % of the cells in the cluster have are removed
-    threshold_filter: "5"
-    # absolute minimum number of cells of a cell type that will not be removed
-    min_threshold: "5"
+    cells: #on single cells
+      # threshold type, either "number_cells" or "percentage_cells"
+      threshold_type: "percentage_cells"
+      # default is "percentage_cells" and "5":
+      # cells with cell type that less than 5 % of the cells in the cluster have are removed
+      threshold_filter: "5"
+      # absolute minimum number of cells of a cell type that will not be removed
+      min_threshold: "5"
+    metacells: # on metacells
+      # threshold type, either "number_cells" or "percentage_cells"
+      threshold_type: "percentage_cells"
+      # default is "percentage_cells" and "5":
+      # cells with cell type that less than 5 % of the cells in the cluster have are removed
+      threshold_filter: "0"
+      # absolute minimum number of cells of a cell type that will not be removed
+      min_threshold: "0"
 
   clustering:
     phenograph:
