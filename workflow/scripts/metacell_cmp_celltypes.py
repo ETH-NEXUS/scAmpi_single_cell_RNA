@@ -18,7 +18,8 @@ matplotlib.use('Agg')  # Use Agg backend for rendering plots
 # metacell_assignment=f"results/metacells/{sample}.genes_cells_filtered_seacells_assignment.tsv"
 # main(celltypes, metacelltypes, metacell_assignment, "metacell_tests/SEACells/cmp", sample)
 
-def main(celltype_file, metacelltype_file, assignment_file, celltype_config_file, out_dir, out_prefix, reportfile):
+def main(celltype_file, metacelltype_file, assignment_file,
+         celltype_config_file, out_dir, out_prefix, reportfile):
     subcell_dict = get_subcell_dict(celltype_config_file)
     metacell_counts = get_metacell_counts(
         celltype_file, metacelltype_file, assignment_file, subcell_dict)
@@ -35,7 +36,7 @@ def main(celltype_file, metacelltype_file, assignment_file, celltype_config_file
     plt.ylabel('Density')
     plt.savefig(f'{out_dir}/{out_prefix}_celltype_hist.png')
 
-    sns.kdeplot(metacell_counts['purity'], shade=True)
+    sns.kdeplot(metacell_counts['purity'], fill=True)
     # Adding titles and labels
     plt.title('Distribution of Metacell Purity')
     plt.xlabel('Purity')
@@ -119,13 +120,13 @@ def get_metacell_counts(celltype_file, metacelltype_file, assignment_file, subce
     # the dominant celltype is set to "mixed".
     # If all celltypes of a mixed metacell contain one of the group substrings,
     # they are called group_mixed (e.g. "T.cell_mixed")
-    groups = ["B.cell", "T.cell", "Macrophage", "Melanoma"]
+    groups = set(subcell_dict.values())
     for cid, row in metacell_purity.iterrows():
         # sort by contribution
         fractions = row.sort_values(ascending=False)
         # consider all celltypes assigned to > 20% of the cells
         relevant = [celltype for celltype,
-                    frac in fractions.items() if frac > .2]
+                    frac in fractions.items() if frac >= min(.2, max(fractions))]
         # format to string
         composition_string = ", ".join(
             [f"{ct} ({row[ct]:.1%})" for ct in relevant])
@@ -137,7 +138,7 @@ def get_metacell_counts(celltype_file, metacelltype_file, assignment_file, subce
             # check for each group
             for gr in groups:
                 # whether all celltypes contain the groupname as substring
-                if all(gr in ct for ct in relevant):
+                if all(subcell_dict.get(ct) == gr for ct in relevant):
                     # in this case it gets group_mixed
                     dominant_string = f'{gr}_mixed'
         dominant.append(dominant_string)

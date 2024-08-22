@@ -43,16 +43,16 @@ localrules:
 # defines output of scampi seacells
 rule scAmpi_seacells:
     input:
-        expand("results/plotting/{sample}.celltype_barplot.png", sample=sample_ids),
+        #expand("results/plotting/{sample}.celltype_barplot.png", sample=sample_ids),
         expand(
             "results/plotting/{sample}_seacells.celltype_barplot.png",
             sample=sample_ids,
         ),
-        expand("results/gsva/{sample}.gsetscore_hm.png", sample=sample_ids),
-        expand("results/diff_exp_analysis/{sample}/", sample=sample_ids),
+        #expand("results/gsva/{sample}.gsetscore_hm.png", sample=sample_ids),
+        #expand("results/diff_exp_analysis/{sample}/", sample=sample_ids),
         expand(
             "workflow/report/rules/seacells/{sample}_celltyping_summary.rst",
             sample=sample_ids,
         ),
         expand("results/gsva/{sample}_seacells.gsetscore_hm.png", sample=sample_ids),
-        expand("results/gsva/{sample}.gsetscore_hm.png", sample=sample_ids),
+        "results/metacells/seacells_celltype_purity.png",

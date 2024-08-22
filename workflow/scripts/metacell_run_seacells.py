@@ -92,16 +92,19 @@ def main(h5file, out_dir, out_prefix, celltype_mapping_file, n_SEACells, n_pc, n
     plt.savefig(f'{out_dir}/{out_prefix}_seacells_umap_metacells_ncounts.png')
 
     # alternatively, "soft" (weighted) assignment
-    SEACell_soft_ad = SEACells.core.summarize_by_soft_SEACell(
-        adata, model.A_, summarize_layer='raw', minimum_weight=0.05)
-    SEACell_soft_ad.obs.index = SEACell_ad.obs.index
-    SEACell_soft_ad.obs['fractionMT'] = metacell_fractionMT
-    SEACell_soft_ad = prepare_seacells(
-        SEACell_soft_ad,  n_topvar_genes, n_pc, n_neighbors)
-    sc.pl.scatter(SEACell_soft_ad, basis='umap',
-                  frameon=False, color='n_counts')
-    plt.savefig(
-        f'{out_dir}/{out_prefix}_seacells_umap_metacells_soft_ncounts.png')
+    try:
+        SEACell_soft_ad = SEACells.core.summarize_by_soft_SEACell(
+            adata, model.A_, summarize_layer='raw', minimum_weight=0.05)
+        SEACell_soft_ad.obs.index = SEACell_ad.obs.index
+        SEACell_soft_ad.obs['fractionMT'] = metacell_fractionMT
+        SEACell_soft_ad = prepare_seacells(
+            SEACell_soft_ad,  n_topvar_genes, n_pc, n_neighbors)
+        sc.pl.scatter(SEACell_soft_ad, basis='umap',
+                    frameon=False, color='n_counts')
+        plt.savefig(
+            f'{out_dir}/{out_prefix}_seacells_umap_metacells_soft_ncounts.png')
+    except ValueError as e:
+            print(f"Value error in soft assignment: \n{e}")
 
     # export to h5 files
     # gene names are lost in the process and have to be added here
