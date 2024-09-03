@@ -90,7 +90,7 @@ elif config["tools"]["cellranger_count"]["version"] == "8.0.1":
             # NOTE: no dots are allowed in sample names!
             variousParams=config["tools"]["cellranger_count"]["variousParams"],
         resources:
-            mem_mb=config["tools"]["cellranger_count"]["mem_mb"]),
+            mem_mb=config["tools"]["cellranger_count"]["mem_mb"],
             runtime=config["tools"]["cellranger_count"]["runtime"],
         threads: config["tools"]["cellranger_count"]["local_cores"]
         log:
