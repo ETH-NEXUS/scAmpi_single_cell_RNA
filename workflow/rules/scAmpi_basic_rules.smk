@@ -83,14 +83,14 @@ elif config["tools"]["cellranger_count"]["version"] == "8.0.1":
             fastq_dir=lambda wildcards, input: dirname(abspath(input.fastqs[0])),
             outdir=lambda w, output: join(dirname(abspath(output.success)), w.sample),
             local_cores=config["tools"]["cellranger_count"]["local_cores"],
-            local_mem=lambda wildcards, resources: round(resources.mem_mb / 1024 * 0.9),
+            local_mem=lambda wildcards, resources: round(float(resources.mem_mb) / 1024 * 0.9),
             metrics_summary="results/cellranger_run/{sample}.metrics_summary.csv",
             web_summary="results/cellranger_run/{sample}.web_summary.html",
             create_bam=config["tools"]["cellranger_count"]["create_bam"],
             # NOTE: no dots are allowed in sample names!
             variousParams=config["tools"]["cellranger_count"]["variousParams"],
         resources:
-            mem_mb=config["tools"]["cellranger_count"]["mem_mb"],
+            mem_mb=config["tools"]["cellranger_count"]["mem_mb"]),
             runtime=config["tools"]["cellranger_count"]["runtime"],
         threads: config["tools"]["cellranger_count"]["local_cores"]
         log:
@@ -386,7 +386,7 @@ rule celltyping:
     conda:
         "../envs/celltyping.yaml"
     resources:
-        mem_mb=config["computingResources"]["mem_mb"]["medium"],
+        mem_mb=config["computingResources"]["mem_mb"]["high"],
         runtime=config["computingResources"]["runtime"]["medium"],
     threads: config["computingResources"]["threads"]["medium"]
     log:

@@ -16,7 +16,7 @@ rule seacells:
         "docker://mlienhard/seacells"
     resources:
         mem_mb=config["computingResources"]["mem_mb"]["medium"],
-        runtime=config["computingResources"]["runtime"]["low"],
+        runtime=config["computingResources"]["runtime"]["medium"],
     threads: config["computingResources"]["threads"]["medium"]
     log:
         "logs/metacells/{sample}.genes_cells_filtered_seacells.log",
@@ -89,5 +89,33 @@ rule evaluate_seacells:
             -o {params.outdir} \
             -p {params.prefix} \
             -r {output.report} \
+            &> {log}
+        """
+
+
+rule metacell_stats:
+    input:
+        celltypes=expand(
+            "results/metacells/{sample}_seacells_celltype_counts.tsv", 
+            sample=sample_ids),
+    output:
+        plot="results/metacells/seacells_celltype_purity.png",
+    params:
+        custom_script="workflow/scripts/metacell_stats.py",
+    container:
+        "docker://mlienhard/seacells"
+    resources:
+        mem_mb=config["computingResources"]["mem_mb"]["low"],
+        runtime=config["computingResources"]["runtime"]["low"],
+    threads: config["computingResources"]["threads"]["low"]
+    log:
+        "logs/metacells/metacell_stats.log",
+    benchmark:
+        "logs/benchmark/metacells/metacell_stats.benchmark"
+    shell:
+        """
+        python {params.custom_script} \
+            {output} \
+            {input} \
             &> {log}
         """
