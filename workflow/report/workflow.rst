@@ -27,7 +27,7 @@ Metacell Purity Analysis Report
 {{sample}}
 -------------
 
-.. include:: workflow/report/rules/metacell/{{sample}}_celltyping_summary.rst
+.. include:: workflow/report/rules/seacells/{{sample}}_celltyping_summary.rst
    
 .. image:: results/metacells/{{sample}}_seacells_celltype_dens.png
     :width: 600
