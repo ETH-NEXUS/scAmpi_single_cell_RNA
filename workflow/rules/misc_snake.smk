@@ -1,78 +1,129 @@
-import os.path
+import os
+from os.path import join, dirname, splitext, isdir, basename
+from glob import glob
 import sys
 import inspect
 import copy
 import pandas as pd
 from snakemake.utils import validate
 
-# import sample map and retrieve sample names
-samples_table = pd.read_table(config["inputOutput"]["sample_map"], header=0)
-samples = samples_table.set_index("sample", drop=False)
-sample_ids = samples_table["sample"].tolist()
-validate(samples, "../schema/sample_map.schema.yaml")
-
 
 #########################################
 ###  Check config file for missing values
 #########################################
 
-fail_instantly = False
 
-# define error object and message
-class Error(object):
-    def __init__(self, key, name):
-        self.__key = key
-        self.__name = name
-
-    def __add__(self, other):
-        return self
-
-    def __call__(self, wildcards=None):
-        sys.exit(
-            """
-            ===============================================
-            You have not specified '{}' for '{}'
-            ===============================================
-            """.format(
-                self.__key, self.__name
-            )
-        )
-
-    def __getitem__(self, value):
-        return Error(key=self.__key, name=self.__name)
-
-
-# define config object
-class Config(object):
+# Define config object
+# it behaves like a dict, but prints a helpfull error message if something is missing
+class Config:
     def __init__(self, kwargs, name="Config"):
         self.__name = name
         self.__members = {}
-        for (key, value) in kwargs.items():
+        for key, value in kwargs.items():
             if isinstance(value, dict):
-                self.__members[key] = Config(kwargs=value, name=key)
+                self.__members[key] = Config(kwargs=value, name=f"{self.__name}->{key}")
             else:
                 self.__members[key] = value
+
+    def __contains__(self, obj):
+        return obj in self.__members
 
     def __getitem__(self, key):
         if key in self.__members:
             return self.__members[key]
         else:
-            if fail_instantly:
-                sys.exit(
-                    """
-                    ===============================================
-                    You have not specified '{}' for '{}'
-                    ===============================================
-                    """.format(
-                        key, self.__name
-                    )
-                )
-            else:
-                return Error(key=key, name=self.__name)
+            raise KeyError(f'You have not specified key "{key}" for {self.__name}')
+
+    def __setitem__(self, key, value):
+        self.__members[key] = value
+
+    def items(self):
+        return self.__members.items()
 
 
-# check with the above class definitions if the config file contains all necessary values
-config = Config(config)
+# Check with the above class definitions if the config file contains all necessary values
+# config = Config(config)
+
+
+cr_version = config["tools"]["cellranger_count"]["version"]
+assert cr_version in ["7.1.0", "8.0.1"], f"Unsuppoerted cellranger version {cr_version}"
+
+#################################################
+### import sample map and retrieve sample names
+#################################################
+
+sample_table = pd.read_table(config["inputOutput"]["sample_map"], sep="\t", header=0)
+sample_ids = set(sample_table["sample"])
+# if samples specified in config, process only those
+if "samples" in config:
+    if isinstance(config["samples"], str):
+        config["samples"] = [config["samples"]]
+    assert all(
+        sa in sample_ids for sa in config["samples"]
+    ), "specified samples in config which are not present in sample table"
+    assert sample_ids, "empty sample ids list specified"
+    sample_ids = set(config["samples"])
+    sample_table = sample_table.query("sample in @sample_ids")
+# for the reporting, we need the samples in the config dict.
+config["samples"] = sample_ids
+
+logger.info(f"processing {len(sample_ids)} samples: {', '.join(sample_ids)}")
+
+fq_files = {sa: [] for sa in sample_ids}
+link_names = {}
+fastq_dir = config["inputOutput"]["input_fastqs"]
+if not isdir(fastq_dir):
+    logger.error(f"Cannot find fastq directory {fastq_dir}")
+elif "file_stem" in sample_table:
+    for _, row in sample_table.iterrows():
+        sa = row["sample"]
+        fs = row["file_stem"]
+        if not isdir(join(fastq_dir, sa)):
+            found = [
+                join(fastq_dir, f)
+                for f in os.listdir(fastq_dir)
+                if f.startswith(fs) and f.endswith(".fastq.gz")
+            ]
+        else:
+            found = [
+                join(fastq_dir, sa, f)
+                for f in os.listdir(join(fastq_dir, sa))
+                if f.startswith(fs) and f.endswith(".fastq.gz")
+            ]
+        fq_files[sa].extend(found)
+        for fq in found:
+            link_names[fq] = basename(fq).replace(fs, sa)
+            logger.debug(f"{fs=}, {sa=}, {link_names[fq]=}")
+    fq_link_dict = {v: k for k, v in link_names.items()}
+else:  # folder structure is already fastq_dir/sample/sample_S1_L001_I1_001.fastq.gz
+    for _, row in sample_table.iterrows():
+        sa = row["sample"]
+        if isdir(join(fastq_dir, sa)):
+            fq_files[sa].extend(
+                [
+                    join(fastq_dir, sa, f)
+                    for f in os.listdir(join(fastq_dir, sa))
+                    if f.startswith(sa) and f.endswith(".fastq.gz")
+                ]
+            )
+for sa, fq_list in fq_files.items():
+    logger.info(f"found {len(fq_list)} fastq files for sample {sa}")
+
+
+validate(sample_table, "../schema/sample_map.schema.yaml")
+
+
+#################################################
+### Resources
+#################################################
+
+
+max_mem_mb=config["computingResources"]["max_mem_mb"]
+
+
+#################################################
+### helper functions for rules
+#################################################
 
 
 # input function for local rule `clinical_mode` in snakefile.smk
@@ -120,3 +171,30 @@ def count_clusters(wildcards):
             "results/finished/{sample}.clinical_nonmalignant.txt",
             sample=wildcards.sample,
         )
+
+
+def get_extension(filename):
+    """
+    Extracts the extension from a filename.
+    Handles compound extensions like '.fq.gz' or '.fastq.gz'.
+    """
+    _, ext = splitext(filename)  # Split off the last extension
+    if ext == ".gz":
+        _, ext2 = splitext(filename[:-3])  # Split again if the file is gzipped
+        ext = ext2 + ext
+    return ext
+
+
+def get_fastq_links(wildcards):
+    sa = wildcards.sample
+    fq_list = fq_files[sa]
+    if not link_names:
+        return fq_list
+    return [join("results/input_fastq", sa, link_names[fq]) for fq in fq_list]
+
+
+def get_params_remove_atypical_cells(wildcard, key):
+    what = "cells"
+    if "_seacells" in wildcard["sample"] or "_metacells2" in wildcard["sample"]:
+        what = "metacells"
+    return config["tools"]["remove_atypical_cells"][what][key]

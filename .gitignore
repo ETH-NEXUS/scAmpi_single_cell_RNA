@@ -1,7 +1,9 @@
-results
+results*
 logs
 .lintr
 .snakemake
 *__pycache__*
 .DS_Store
 workflow/.DS_Store
+.cache
+workflow/report/rules/

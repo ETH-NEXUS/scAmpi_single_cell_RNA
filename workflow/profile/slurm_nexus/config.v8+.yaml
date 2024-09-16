@@ -1,0 +1,41 @@
+executor: slurm
+jobs: 20 
+printshellcmds: True # this is -p option
+restart-times: 0 
+rerun-triggers: mtime
+keep-going: True # this is -k option
+
+# Slurm default resources
+# note: this gets overwritten by the definitions 
+# in the rule and by set-resources
+default-resources:
+  slurm_account: "nexus"
+  slurm_partition: "compute"
+  runtime: 60 
+  mem_mb: 4000
+  nodes: 1
+ # Non-standard resource specifications
+ # slurm_extra: "'--exclude=some_node'"
+
+# rule specific resources
+#set-resources:
+#    myrule:
+#        mem: 500MB
+
+
+# containers
+use-apptainer: True
+# apptainer-prefix: /path/to/images
+# apptainer-args: "--bind /path/to/bindings"
+
+# conda env
+#use-conda: True
+#conda-prefix: DIR
+#conda-frontend: {conda,mamba}
+
+# depends on a plugin: Error: Error loading Snakemake plugin fs: The package snakemake-storage-plugin-fs is not installed.
+# default-storage-provider: fs
+# set scratch folder for login node
+# local-storage-prefix: /scratch/$USER/snakemake-scratch
+# and for compute node
+# remote-job-local-storage-prefix: /scratch/$USER/snakemake-scratch

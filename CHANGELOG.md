@@ -1,5 +1,35 @@
 # Changelog
 
+## [2.2.0] - 2024-08-12
+
+### Changed
+- Added automated fastq file link creation for cell ranger
+  If an additional column `file_stem` is provided in the sample map, 
+  the fastq files starting with this file stem are assumed to correspond to one sample and links to Cell Ranger compatible folder structure are created automatically. 
+  Otherwise, if there is just the sample column, `fastq_dir` is expected to point to Cell Ranger compatible folder structure. 
+
+- Added option to specify `samples` in the config, e.g. to perform a testrun on a one or two samples, or to rerun specific samples. 
+
+- Using containers in the Cell Ranger count step. 
+  Cell Ranger version is specified in the config. Currently supported versions 
+  include "7.2.0" and "8.0.1".
+
+- added SeaCells und Metacells2 metacell approaches, using the dedicated snakefiles 
+  snakefile_seacells.smk or snakefile_metacells2.smk, respectively. These produce
+  the same results as on single cells, but in addition all results also on metacells.
+  Further, celltyping is compared between metacells and single cells, and report files are generated.
+
+- added files to generate basic snakemake reporting, including rule specific reporting on results. 
+  At the current state, this feature is prove of concept only. 
+  
+- made cell cycle regression optional in sctransform, default is no correction. 
+  Can be switched on with --cell_cycle_correction command line argument. 
+
+- added error handling to sctransform::vst. This prevents the script from crashing, 
+  as well as reports genes where the algorithm did not converge, which previously
+  gave an unspecific warning.
+
+- added some logging. 
 ## [2.1.1] - 2024-08-15
 
 ### Changed

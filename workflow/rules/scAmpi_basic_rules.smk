@@ -1,84 +1,118 @@
+from os.path import join, dirname, abspath
+
+try:
+    from snakemake import logger
+except ImportError:
+    # change in sm8
+    from snakemake.logging import (
+        logger,
+    )  
+    
+
 # Retrieve the fastqs directory name (ie. uses cellranger sample name) corresponding to a given sample
-def get_fastq_dir(wildcards):
-    "return fastq directory of one sample"
-    sample = wildcards.sample
-    fastqs_dir = config["inputOutput"]["input_fastqs"]
-    sample_fastq_dir = fastqs_dir + sample
-    return sample_fastq_dir
+# make symlinks to fastq files that work with cellranger
+# requires a file_stem column in the sample map that matches all fastqs for the sample
+rule fastq_symlinks:
+    input:
+        lambda w: fq_link_dict[w.link_name],
+    output:
+        target="results/input_fastq/{sample}/{link_name}",
+    conda:
+        "../envs/base_env.yaml"
+    log:
+        "logs/create_links/{sample}_{link_name}.log",
+    shell:
+        "echo 'creating symlink for {input} to {output}' &> {log}"
+        "ln -s {input} {output.target} &> {log}"
 
 
 # cellranger call to process the raw samples
-rule cellranger_count:
-    input:
-        reference=config["resources"]["reference_transcriptome"],
-    output:
-        success="results/cellranger_run/{sample}_success_cellranger.txt",
-    params:
-        cr_out="results/cellranger_run/",
-        local_cores=config["tools"]["cellranger_count"]["local_cores"],
-        variousParams=config["tools"]["cellranger_count"]["variousParams"],
-    resources:
-        mem_mb=config["tools"]["cellranger_count"]["mem_mb"],
-        runtime=config["tools"]["cellranger_count"]["runtime"],
-    threads: config["tools"]["cellranger_count"]["local_cores"]
-    log:
-        "logs/cellranger_count/{sample}.log",
-    benchmark:
-        "logs/benchmark/cellranger_run/{sample}.benchmark"
-    # NOTE: cellranger count function cannot specify the output directory, the output is the path you call it from.
-    # Therefore, a subshell is used here.
-    shell:
-        "(cd {params.cr_out}; "
-        "{config[tools][cellranger_count][call]} count "
-        "--id={wildcards.sample} "
-        "--sample={wildcards.sample} "
-        "--transcriptome={input.reference} "
-        "--localcores={params.local_cores} "
-        "--fastqs={input.fastqs_dir} "
-        "--nosecondary "
-        "{params.variousParams} "
-        " 2>&1 | tee ../../{log} ; "
-        "date > {wildcards.sample}_success_cellranger.txt ) "
+if config["tools"]["cellranger_count"]["version"] == "7.1.0":
 
+    rule cellranger_count_7_1:
+        input:
+            #fastqs_dir=config["inputOutput"]["input_fastqs"],
+            fastqs=get_fastq_links,
+            reference=config["resources"]["reference_transcriptome"],
+        output:
+            success="results/cellranger_run/{sample}_success_cellranger.txt",
+        params:
+            outdir=lambda w, output: join(dirname(abspath(output.succcess)), w.sample),
+            fastq_dir=lambda w, input: dirname(abspath(input.fastqs[0])),
+            local_cores=config["tools"]["cellranger_count"]["local_cores"],
+            local_mem=lambda w, resources: round(resources.mem_mb / 1024 * 0.9),
+            variousParams=config["tools"]["cellranger_count"]["variousParams"],
+        resources:
+            mem_mb=config["tools"]["cellranger_count"]["mem_mb"],
+            runtime=config["tools"]["cellranger_count"]["runtime"],
+        threads: config["tools"]["cellranger_count"]["local_cores"]
+        log:
+            "logs/cellranger_count/{sample}.log",
+        benchmark:
+            "logs/benchmark/cellranger_run/{sample}.benchmark"
+        container:
+            "docker://litd/docker-cellranger:v7.1.0"
+        # NOTE: cellranger count function cannot specify the output directory, the output is the path you call it from.
+        # Therefore, a subshell is used here.
+        shell:
+            "(cd {params.outdir}; "
+            "cellranger count "
+            "--id={wildcards.sample} "
+            "--sample={wildcards.sample} "
+            "--transcriptome={input.reference} "
+            "--localcores={params.local_cores} "
+            "--localmem={params.local_mem} "
+            "--fastqs={params.fastq_dir} "
+            "--nosecondary "
+            "{params.variousParams} "
+            " 2>&1 | tee ../../{log}); "
+            "date > {output.success} "
 
-# Run cellranger v8. Some new parameters are required (e.g. --create-bam)
-rule cellranger_count_8:
-    input:
-        fastqs_dir=get_fastq_dir,
-        reference=config["resources"]["reference_transcriptome"],
-    output:
-        # the cellranger output cannot be specified directly because this would trigger Snakemake
-        # to create the directory before cellranger starts.
-        # Cellranger needs to create the directory itself (otherwise gives pipestance error and aborts).
-        success="results/cellranger_run/{sample}_success_cellranger.txt",
-    params:
-        cr_out="results/cellranger_run/{sample}/",
-        local_cores=config["tools"]["cellranger_count"]["local_cores"],
-        metrics_summary="results/cellranger_run/{sample}.metrics_summary.csv",
-        web_summary="results/cellranger_run/{sample}.web_summary.html",
-        create_bam=config["tools"]["cellranger_count"]["create_bam"],
-        # NOTE: no dots are allowed in sample names!
-        variousParams=config["tools"]["cellranger_count"]["variousParams"],
-    resources:
-        mem_mb=config["tools"]["cellranger_count"]["mem_mb"],
-        runtime=config["tools"]["cellranger_count"]["runtime"],
-    threads: config["tools"]["cellranger_count"]["local_cores"]
-    log:
-        "logs/cellranger_count/{sample}.log",
-    benchmark:
-        "logs/benchmark/cellranger_run/{sample}.benchmark"
-    shell:
-        "{config[tools][cellranger_count][call]} count "
-        "--id={wildcards.sample} "
-        "--transcriptome={input.reference} "
-        "--localcores={params.local_cores} "
-        "--fastqs={input.fastqs_dir} "
-        "--nosecondary "
-        "--create-bam={params.create_bam} "
-        "--output-dir={params.cr_out} "
-        "{params.variousParams} "
-        " 2>&1 | tee {log} ; "
-        "date > {output}"
+elif config["tools"]["cellranger_count"]["version"] == "8.0.1":
+
+    # Run cellranger v8. Some new parameters are required (e.g. --create-bam)
+    rule cellranger_count_8:
+        input:
+            fastqs=get_fastq_links,
+            reference=config["resources"]["reference_transcriptome"],
+        output:
+            # the cellranger output cannot be specified directly because this would trigger Snakemake
+            # to create the directory before cellranger starts.
+            # Cellranger needs to create the directory itself (otherwise gives pipestance error and aborts).
+            success="results/cellranger_run/{sample}_success_cellranger.txt",
+        params:
+            fastq_dir=lambda wildcards, input: dirname(abspath(input.fastqs[0])),
+            outdir=lambda w, output: join(dirname(abspath(output.success)), w.sample),
+            local_cores=config["tools"]["cellranger_count"]["local_cores"],
+            local_mem=lambda wildcards, resources: round(float(resources.mem_mb) / 1024 * 0.9),
+            metrics_summary="results/cellranger_run/{sample}.metrics_summary.csv",
+            web_summary="results/cellranger_run/{sample}.web_summary.html",
+            create_bam=config["tools"]["cellranger_count"]["create_bam"],
+            # NOTE: no dots are allowed in sample names!
+            variousParams=config["tools"]["cellranger_count"]["variousParams"],
+        resources:
+            mem_mb=config["tools"]["cellranger_count"]["mem_mb"],
+            runtime=config["tools"]["cellranger_count"]["runtime"],
+        threads: config["tools"]["cellranger_count"]["local_cores"]
+        log:
+            "logs/cellranger_count/{sample}.log",
+        benchmark:
+            "logs/benchmark/cellranger_run/{sample}.benchmark"
+        container:
+            "docker://litd/docker-cellranger:v8.0.1"
+        shell:
+            "cellranger count "
+            "--id={wildcards.sample} "
+            "--transcriptome={input.reference} "
+            "--localcores={params.local_cores} "
+            "--localmem={params.local_mem} "
+            "--fastqs={params.fastq_dir} "
+            "--nosecondary "
+            "--create-bam={params.create_bam} "
+            "--output-dir={params.outdir} "
+            "{params.variousParams} "
+            " 2>&1 | tee {log} ; "
+            "date > {output}"
 
 
 # get sample ID to output files
@@ -93,6 +127,8 @@ rule gunzip_and_link_cellranger:
         cr_out="results/cellranger_run/{sample}/",
         metrics_summary="results/cellranger_run/{sample}.metrics_summary.csv",
         web_summary="results/cellranger_run/{sample}.web_summary.html",
+    conda:
+        "../envs/base_env.yaml"
     resources:
         mem_mb=config["computingResources"]["mem_mb"]["low"],
         runtime=config["computingResources"]["runtime"]["low"],
@@ -103,7 +139,7 @@ rule gunzip_and_link_cellranger:
         "logs/rules/gunzip_and_link_cellranger/{sample}.log",
     # unzip and symlink raw cellranger features file
     shell:
-        "gunzip --keep {params.cr_out}/outs/filtered_feature_bc_matrix/features.tsv.gz 2>> {log} ; "
+        "gunzip --keep {params.cr_out}/outs/filtered_feature_bc_matrix/features.tsv.gz 2> {log} ; "
         "gunzip --keep {params.cr_out}/outs/filtered_feature_bc_matrix/barcodes.tsv.gz 2>> {log} ; "
         "gunzip --keep {params.cr_out}/outs/filtered_feature_bc_matrix/matrix.mtx.gz 2>> {log} ; "
         'ln -sr "{params.cr_out}/outs/filtered_feature_bc_matrix/features.tsv" "{output.features_file}" 2>> {log} ; '
@@ -150,7 +186,7 @@ rule identify_doublets:
         outfile="results/identify_doublets/{sample}.doublet_barcodes.txt",
     params:
         sample="{sample}",
-        outdir="results/identify_doublets/",
+        outdir=lambda w, output: dirname(output.outfile),
         custom_script=workflow.source_path("../scripts/identify_doublets.R"),
     conda:
         "../envs/identify_doublets.yaml"
@@ -166,7 +202,7 @@ rule identify_doublets:
         "Rscript {params.custom_script} "
         "--hdf5File {input.infile} "
         "--sample {params.sample} "
-        "--outdir {params.outdir} "
+        "--outdir {params.outdir}/ "
         "&> {log} "
 
 
@@ -191,7 +227,7 @@ rule filter_genes_and_cells:
         protein_coding_only=config["tools"]["filter_genes_and_cells"][
             "protein_coding_only"
         ],
-        outDir="results/counts_filtered/",
+        outdir=lambda w, output: dirname(output.outfile),
         genomeVersion=config["tools"]["filter_genes_and_cells"]["genomeVersion"],
         sample="{sample}",
         custom_script=workflow.source_path("../scripts/filter_genes_and_cells.R"),
@@ -218,8 +254,10 @@ rule filter_genes_and_cells:
         "--minNumberCells {params.minNumberCells} "
         "--protein_coding_only {params.protein_coding_only} "
         "--sample {params.sample} "
-        "--outDir {params.outDir} "
+        "--outDir {params.outdir}/ "
         "&> {log} "
+
+
 
 
 # perform normalisation, cell cycle correction and other preprocessing using sctransform
@@ -234,12 +272,14 @@ rule sctransform_preprocessing:
         number_genes=config["tools"]["sctransform_preprocessing"]["number_genes"],
         min_var=config["tools"]["sctransform_preprocessing"]["min_var"],
         n_nn=config["tools"]["sctransform_preprocessing"]["n_nn"],
-        outDir="results/counts_corrected/",
+        outdir=lambda w, output: dirname(output.outfile),
         custom_script=workflow.source_path("../scripts/sctransform_preprocessing.R"),
+        smooth_pc="100",  # default value
+        patch="--patch_vst workflow/scripts/vst_check.R",  # leave empty to not apply patch
     conda:
         "../envs/sctransform_preprocessing.yaml"
     resources:
-        mem_mb=config["computingResources"]["mem_mb"]["medium"],
+        mem_mb=config["computingResources"]["mem_mb"]["high"],
         runtime=config["computingResources"]["runtime"]["medium"],
     threads: config["computingResources"]["threads"]["medium"]
     log:
@@ -253,7 +293,9 @@ rule sctransform_preprocessing:
         "--number_genes {params.number_genes} "
         "--min_var {params.min_var} "
         "--n_nn {params.n_nn} "
-        "--outdir {params.outDir} "
+        "--max_pc_smooth {params.smooth_pc} "
+        "{params.patch} "
+        "--outdir {params.outdir}/ "
         "&> {log} "
 
 
@@ -303,13 +345,13 @@ rule prepare_celltyping:
     output:
         outfile="results/prep_celltyping/{sample}.prep_celltyping.RDS",
     params:
-        outputDirec="results/prep_celltyping/",
+        outdir=lambda w, output: dirname(output.outfile),
         sampleName="{sample}",
         custom_script=workflow.source_path("../scripts/prepare_celltyping.R"),
     conda:
         "../envs/prepare_celltyping.yaml"
     resources:
-        mem_mb=config["computingResources"]["mem_mb"]["medium"],
+        mem_mb=lambda wc, input: max(20 * input.size_mb, max_mem_mb),
         runtime=config["computingResources"]["runtime"]["low"],
     threads: config["computingResources"]["threads"]["medium"]
     log:
@@ -320,7 +362,7 @@ rule prepare_celltyping:
         "Rscript {params.custom_script} "
         "--in_sce {input.RDS_file} "
         "--phenograph_cluster {input.cluster} "
-        "--outputDirec {params.outputDirec} "
+        "--outputDirec {params.outdir}/ "
         "--sampleName {params.sampleName} "
         "--distanceMatrix {input.distanceMatrix} "
         "--modularity_score {input.modularity_score} "
@@ -334,17 +376,18 @@ rule celltyping:
     output:
         outfile="results/celltyping/{sample}.celltyping.phenograph_celltype_association.txt",
         out_sce="results/celltyping/{sample}.celltyping.RDS",
+        out_barcodes="results/celltyping/{sample}.cts_final.txt",
     params:
         min_genes=config["tools"]["celltyping"]["min_genes"],
         celltype_lists=config["resources"]["celltype_lists"],
         celltype_config=config["resources"]["celltype_config"],
-        outputDirec="results/celltyping/",
+        outdir=lambda w, output: dirname(output.outfile),
         sampleName="{sample}",
         custom_script=workflow.source_path("../scripts/celltyping.R"),
     conda:
         "../envs/celltyping.yaml"
     resources:
-        mem_mb=config["computingResources"]["mem_mb"]["medium"],
+        mem_mb=lambda wc, input: max(20 * input.size_mb, max_mem_mb),
         runtime=config["computingResources"]["runtime"]["medium"],
     threads: config["computingResources"]["threads"]["medium"]
     log:
@@ -358,7 +401,7 @@ rule celltyping:
         "--celltype_config {params.celltype_config} "
         "--sampleName {params.sampleName} "
         "--min_genes {params.min_genes} "
-        "--outputDirec {params.outputDirec} "
+        "--outputDirec {params.outdir}/ "
         "&> {log} "
 
 
@@ -370,18 +413,19 @@ rule remove_atypical_cells:
     output:
         out_sce="results/atypical_removed/{sample}.atypical_removed.RDS",
         out_table="results/atypical_removed/{sample}.atypical_removed.phenograph_celltype_association.txt",
+        out_h5file="results/atypical_removed/{sample}.atypical_removed.h5",
     params:
         celltype_config=config["resources"]["celltype_config"],
-        outputDirec="results/atypical_removed/",
+        outdir=lambda w, output: dirname(output.out_table),
         sample_name="{sample}",
-        threshold_filter=config["tools"]["remove_atypical_cells"]["threshold_filter"],
-        min_threshold=config["tools"]["remove_atypical_cells"]["min_threshold"],
-        threshold_type=config["tools"]["remove_atypical_cells"]["threshold_type"],
+        threshold_filter=lambda w: get_params_remove_atypical_cells(w, "threshold_filter"),
+        min_threshold=lambda w: get_params_remove_atypical_cells(w, "min_threshold"),
+        threshold_type=lambda w: get_params_remove_atypical_cells(w, "threshold_type"),
         custom_script=workflow.source_path("../scripts/remove_atypical_cells.R"),
     conda:
         "../envs/remove_atypical_cells.yaml"
     resources:
-        mem_mb=config["computingResources"]["mem_mb"]["medium"],
+        mem_mb=lambda wc, input: max(20 * input.size_mb, max_mem_mb),
         runtime=config["computingResources"]["runtime"]["low"],
     threads: config["computingResources"]["threads"]["medium"]
     log:
@@ -396,7 +440,7 @@ rule remove_atypical_cells:
         "--threshold_filter {params.threshold_filter} "
         "--min_threshold {params.min_threshold} "
         "--threshold_type {params.threshold_type} "
-        "--outDir {params.outputDirec} "
+        "--outDir {params.outdir}/ "
         "--sample_name {params.sample_name} "
         "&> {log} "
 
@@ -408,14 +452,14 @@ rule gsva:
     output:
         outfile="results/gsva/{sample}.gsetscore_hm.png",
     params:
-        outputDirec="results/gsva/",
+        outdir=lambda w, output: dirname(output.outfile),
         sampleName="{sample}",
         genesets=config["resources"]["genesets"],
         custom_script=workflow.source_path("../scripts/gsva.R"),
     conda:
         "../envs/gsva.yaml"
     resources:
-        mem_mb=config["computingResources"]["mem_mb"]["medium"],
+        mem_mb=lambda wc, input: max(20 * input.size_mb, max_mem_mb),
         runtime=config["computingResources"]["runtime"]["medium"],
     threads: config["computingResources"]["threads"]["medium"]
     log:
@@ -426,10 +470,37 @@ rule gsva:
         "Rscript {params.custom_script} "
         "--SCE {input.infile} "
         "--geneset {params.genesets} "
-        "--outputDirec {params.outputDirec} "
+        "--outputDirec {params.outdir}/ "
         "--sampleName {params.sampleName} "
         "&> {log} "
 
+
+
+rule celltype_gsva:
+    input:
+        "results/atypical_removed/{sample}.atypical_removed.RDS"
+    output:
+        outfile="results/celltype_gsva_c6/{sample}_celltype_GSVA.tsv"
+    params:
+        outdir=lambda w, output: dirname(output.outfile),
+        sampleName="{sample}",
+        genesets=config["resources"]["genesets_c6"],
+        tumor_celltypes=config["tools"]["celltype_gsva"]["celltype_set"],
+        min_set_size=config["tools"]["celltype_gsva"]["min_set_size"],
+        method="gsva",
+        custom_script=workflow.source_path("../scripts/2024-01_compute_gsva_scores_per_celltype.R"),
+    conda:
+        "../envs/gsva.yaml"
+    resources:
+        mem_mb=lambda wc, input: max(20 * input.size_mb, max_mem_mb),
+        runtime=config["computingResources"]["runtime"]["medium"],
+    threads: config["computingResources"]["threads"]["medium"],
+    log:
+        "logs/celltype_gsva_c6/{sample}.log",
+    benchmark:
+        "logs/benchmark/celltype_gsva_c6/{sample}.benchmark"
+    script:
+        "../scripts/2024-01_compute_gsva_scores_per_celltype.R"
 
 # generate plots about sample composition and gene expression
 rule plotting:
@@ -438,7 +509,7 @@ rule plotting:
     output:
         outfile="results/plotting/{sample}.celltype_barplot.png",
     params:
-        outputDirec="results/plotting/",
+        outdir=lambda w, output: dirname(output.outfile),
         sampleName="{sample}",
         genes_of_interest=config["resources"]["priority_genes"],
         colour_config=config["resources"]["colour_config"],
@@ -458,7 +529,7 @@ rule plotting:
         "Rscript {params.custom_script} "
         "--sce_in {input.infile} "
         "--genelist {params.genes_of_interest} "
-        "--outDir {params.outputDirec} "
+        "--outDir {params.outdir}/ "
         "--sampleName {params.sampleName} "
         "--colour_config {params.colour_config} "
         "--toggle_label {params.use_alias} "
@@ -473,7 +544,7 @@ rule gene_exp:
         out="results/gene_exp/{sample}.gene_expression_per_cluster.tsv",
     params:
         sampleName="{sample}",
-        outpath="results/gene_exp/",
+        outdir=lambda w, output: dirname(output.out),
         threshold_sample=config["tools"]["gene_exp"]["threshold_sample"],
         type_sample=config["tools"]["gene_exp"]["type_sample"],
         priority_genes=config["resources"]["priority_genes"],
@@ -494,7 +565,7 @@ rule gene_exp:
         "--priority_genes {params.priority_genes} "
         "--filtering_threshold_sample {params.threshold_sample} "
         "--filter_type_sample {params.type_sample} "
-        "--outDir {params.outpath} "
+        "--outDir {params.outdir}/ "
         "--sample_name {params.sampleName} "
         "&> {log} "
 
@@ -506,9 +577,9 @@ rule generate_qc_plots_raw:
     output:
         out="results/qc_plots/raw/{sample}.raw.histogram_library_sizes.png",
     params:
-        custom_script=workflow.source_path("../scripts/generate_QC_plots.R"),
-        outdir="results/qc_plots/raw/",
-        sample_status="raw",
+        custom_script = workflow.source_path("../scripts/generate_QC_plots.R"),
+        outdir = lambda w, output: dirname(output.out),
+        sample_status = "raw",
     conda:
         "../envs/generate_qc_plots.yaml"
     resources:
@@ -524,7 +595,7 @@ rule generate_qc_plots_raw:
         "--hdf5File {input.infile} "
         "--sample_name {wildcards.sample} "
         "--sample_status {params.sample_status} "
-        "--outdir {params.outdir} "
+        "--outdir {params.outdir}/ "
         "&> {log} "
 
 
@@ -536,7 +607,7 @@ rule generate_qc_plots_filtered:
         out="results/qc_plots/filtered/{sample}.genes_cells_filtered.histogram_library_sizes.png",
     params:
         custom_script=workflow.source_path("../scripts/generate_QC_plots.R"),
-        outdir="results/qc_plots/filtered/",
+        outdir=lambda w,output: dirname(output.out),
         sample_status="genes_cells_filtered",
     conda:
         "../envs/generate_qc_plots.yaml"
@@ -553,7 +624,7 @@ rule generate_qc_plots_filtered:
         "--hdf5File {input.infile} "
         "--sample_name {wildcards.sample} "
         "--sample_status {params.sample_status} "
-        "--outdir {params.outdir} "
+        "--outdir {params.outdir}/ "
         "&> {log} "
 
 
@@ -576,12 +647,12 @@ checkpoint diff_exp_analysis:
         minNumberNonMalignant=config["tools"]["diff_exp_analysis"][
             "minNumberNonMalignant"
         ],
-        outpath="results/diff_exp_analysis/{sample}/",
+        outdir="results/diff_exp_analysis/{sample}/",
         custom_script=workflow.source_path("../scripts/diff_exp_analysis.R"),
     conda:
         "../envs/diff_exp_analysis.yaml"
     resources:
-        mem_mb=config["computingResources"]["mem_mb"]["medium"],
+        mem_mb=config["computingResources"]["mem_mb"]["high"],
         runtime=config["computingResources"]["runtime"]["high"],
     threads: config["computingResources"]["threads"]["medium"]
     log:
@@ -589,7 +660,7 @@ checkpoint diff_exp_analysis:
     benchmark:
         "logs/benchmark/diff_exp_analysis/{sample}.benchmark"
     shell:
-        "mkdir {params.outpath} ; "
+        "mkdir {params.outdir} ; "
         "Rscript {params.custom_script} "
         "--sample_data {input.sce_in} "
         "--sampleName {params.sampleName} "
@@ -600,5 +671,5 @@ checkpoint diff_exp_analysis:
         "--mindiff2second {params.mindiff2second} "
         "--threshold_comparison {params.threshold_comparison} "
         "--minNumberNonMalignant {params.minNumberNonMalignant} "
-        "--outdir {params.outpath} "
+        "--outdir {params.outdir} "
         "&> {log} "

@@ -4,6 +4,11 @@
 #### Date created: June 2019
 #### R Version: 4.0
 ##################################################
+# Modiefied by: Matthias Lienhard
+# Date: 2024-08-12
+# Description of modification: 
+#   * Using a patched version of sctransform vst, that implements error handling
+#   * Making cell cycle regression optional (default off)
 
 suppressPackageStartupMessages({
   library(optparse)
@@ -16,10 +21,6 @@ suppressPackageStartupMessages({
   library(igraph)
 })
 
-# give out session Info
-cat("\n\n\nPrint sessionInfo:\n\n")
-print(sessionInfo())
-cat("\n\n\n\n")
 
 # convenience function for string concatenation
 "%&%" <- function(a, b) paste(a, b, sep = "")
@@ -30,11 +31,27 @@ option_list <- list(
   make_option("--number_genes", type = "character", help = "Number of genes with the highest variance in the residuals that will be used for the calculation of umap coordinates and given out into an hdf5 file for the phenograph clustering."),
   make_option("--min_var", type = "character", help = "Minimum variance of the residuals for a gene to be used for the calculation of umap coordinates and given out into an hdf5 file for the phenograph clustering."),
   make_option("--n_nn", type = "character", help = "Number of nearest neighbours for the UMAP calculation."),
+  make_option("--max_pc_smooth", type = "integer", help = "Number of principle components for the smooth_via_pca step.", default=100),
+  make_option("--patch_vst", type="character", help = "Path to patched vst.R script (optional).", default=NULL),
+  make_option("--cell_cycle_regression", action="store_true", default=FALSE, help="Optionally regress out cell cycle in the vst step."),
   make_option("--outdir", type = "character", help = "Path to output directory.")
 )
 
 opt_parser <- OptionParser(option_list = option_list)
 opt <- parse_args(opt_parser)
+
+if (!is.null(opt$patch_vst)) {
+  # If --patch_vst is provided, source the patched script
+  message("Using patched vst.R script from: ", opt$patch_vst)
+  source(opt$patch_vst)
+} else {
+  message("Using original sctransform::vst.R")
+}
+
+# give out session Info
+cat("\n\n\nPrint sessionInfo:\n\n")
+print(sessionInfo())
+cat("\n\n\n\n")
 
 
 dat <- h5read(opt$inHDF5, "raw_counts")
@@ -84,15 +101,19 @@ cell_desc$s_score <- cecy$normalized.scores$S
 cell_desc$cycle_phase <- cecy$phases
 ## variance stabilizing transformation:
 set.seed(44)
-print("Start performing sctransform::vst: ")
-vst_out <- sctransform::vst(dat,
-  cell_attr = cell_desc, method = "nb_fast",
-  latent_var = c("log_umi"),
-  latent_var_nonreg = c("g2m_score", "s_score"),
-  return_gene_attr = T, return_cell_attr = T
-)
+if (opt$cell_cycle_regression){
+  lat_var_nonreg=c("g2m_score", "s_score")
+  print("Start performing vst with cell cycle correction: ")
+}else{
+  lat_var_nonreg=c()
+  print("Start performing vst without cell cycle correction: ")
+}
+vst_out = vst(dat, cell_attr = cell_desc, method="nb_fast",
+                           latent_var = c('log_umi'),
+                           latent_var_nonreg = lat_var_nonreg,
+                           return_gene_attr = T, return_cell_attr = T)
 print("Start performing sctransform::smooth_via_pca: ")
-y_smooth <- sctransform::smooth_via_pca(vst_out$y, do_plot = FALSE)
+y_smooth = sctransform::smooth_via_pca(vst_out$y, do_plot = FALSE, max_pc=opt$max_pc_smooth)
 print("Start performing sctransform::correct: ")
 dat_cor <- sctransform::correct(vst_out,
   data = y_smooth,

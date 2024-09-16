@@ -20,7 +20,7 @@ configfile: "config/config.yaml"
 
 
 # Include report functionality
-# report: "../report/workflow.rst"
+report: "report/workflow.rst"
 
 
 # This file includes common functions used in the pipeline
@@ -29,14 +29,9 @@ include: "rules/misc_snake.smk"
 include: "rules/scAmpi_basic_rules.smk"
 
 
-# run up-to-date cellranger_8 rule
-# if cellranger version earlier than 8 is used, have instead "ruleorder: cellranger_count > cellranger_count_8"
-ruleorder: cellranger_count_8 > cellranger_count
-
-
 # include local rules
 localrules:
-    scAmpi_basic,
+    scAmpi_basic, fastq_symlinks,
 
 
 # final rule of pipeline
@@ -71,5 +66,10 @@ rule scAmpi_basic:
         expand("results/diff_exp_analysis/{sample}/", sample=sample_ids),
     output:
         "results/complete.txt",
+    conda:
+        "envs/base_env.yaml"
+    log:
+        "logs/scampi_basic/complete.log"
     shell:
-        "date > {output}"
+        "echo {input} &> {log}"
+        "date > {output} 2> {log}"

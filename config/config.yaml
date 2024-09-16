@@ -4,6 +4,12 @@ inputOutput:
   sample_map: config/sample_map.tsv
   malignant_cell_type: "Melanoma"
 
+# in oder to run workflow on a subset of samples only, define these samples:
+#samples:
+#  - SAMPLE-1_scR
+#  - SAMPLE-2_scR
+
+
 resources:
   # cellranger
   # The following needs to point to the reference transcriptome that will be used by cellranger.
@@ -55,12 +61,12 @@ computingResources:
 
 tools:
   # Cellranger cannot be installed through Conda currently.
-  # It needs to be installed manually & the call in both cellranger rules needs to be adapted.
+  # we use container
   # variousParams can be set as described in the Cellranger documentation
   cellranger_count:
-    call: cellranger
+    version: "8.0.1"
     local_cores: 12
-    mem_mb: 40000
+    mem_mb: 60000
     runtime: 1440
     create_bam: "true"
     variousParams: ""
@@ -113,19 +119,41 @@ tools:
     min_var: "1.5"
     # number of nearest neighbours for UMAP calculation
     n_nn: "30"
+    # same parameters for metacells
+    number_genes_metacells: "2000"
+    min_var_metacells: "1.5"
+    n_nn_metacells: "5"
 
   celltyping:
     # minimum number of cell-type-specific genes expressed by a cell to consider cell type, default is "5"
     min_genes: "5"
 
+
+  metacells:
+    seacells:
+      # number of metacells etc need to be set here
+      # increased number of metacells to 200 (default:90) since sctransform wants to calculate 100 dim pca
+      params: "--n_cells=200" 
+    metacells2:
+      params: "" # no additional parameters to be set
+      
   remove_atypical_cells:
-    # threshold type, either "number_cells" or "percentage_cells"
-    threshold_type: "percentage_cells"
-    # default is "percentage_cells" and "5":
-    # cells with cell type that less than 5 % of the cells in the cluster have are removed
-    threshold_filter: "5"
-    # absolute minimum number of cells of a cell type that will not be removed
-    min_threshold: "5"
+    cells: #on single cells
+      # threshold type, either "number_cells" or "percentage_cells"
+      threshold_type: "percentage_cells"
+      # default is "percentage_cells" and "5":
+      # cells with cell type that less than 5 % of the cells in the cluster have are removed
+      threshold_filter: "5"
+      # absolute minimum number of cells of a cell type that will not be removed
+      min_threshold: "5"
+    metacells: # on metacells
+      # threshold type, either "number_cells" or "percentage_cells"
+      threshold_type: "percentage_cells"
+      # default is "percentage_cells" and "5":
+      # cells with cell type that less than 5 % of the cells in the cluster have are removed
+      threshold_filter: "0"
+      # absolute minimum number of cells of a cell type that will not be removed
+      min_threshold: "0"
 
   clustering:
     phenograph:

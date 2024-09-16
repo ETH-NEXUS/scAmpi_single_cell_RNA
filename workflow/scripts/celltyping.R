@@ -431,7 +431,7 @@ if (length(minor_types) > 0) {
   }
 }
 # loop over all phenograph clusters. Need not be continuous or numeric but unique
-clu.pu <- data.frame("Cluster" = rownames(tab[seq(left), ]), "Dominant.celltype" = NA,
+clu.pu <- data.frame("Cluster" = rownames(tab[seq(left), ,drop=FALSE]), "Dominant.celltype" = NA,
   "Celltype composition" = NA, stringsAsFactors = F, check.names = F)
 for (ii in unique(res$phenograph_clusters)) {
   # ii = unique(res$phenograph_clusters)[1]
