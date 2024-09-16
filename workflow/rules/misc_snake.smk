@@ -37,9 +37,13 @@ class Config:
     def __setitem__(self, key, value):
         self.__members[key] = value
 
+    def items(self):
+        return self.__members.items()
+
 
 # Check with the above class definitions if the config file contains all necessary values
-config = Config(config)
+# config = Config(config)
+
 
 cr_version = config["tools"]["cellranger_count"]["version"]
 assert cr_version in ["7.1.0", "8.0.1"], f"Unsuppoerted cellranger version {cr_version}"
@@ -107,6 +111,14 @@ for sa, fq_list in fq_files.items():
 
 
 validate(sample_table, "../schema/sample_map.schema.yaml")
+
+
+#################################################
+### Resources
+#################################################
+
+
+max_mem_mb=config["computingResources"]["max_mem_mb"]
 
 
 #################################################

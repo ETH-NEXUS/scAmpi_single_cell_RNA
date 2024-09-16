@@ -13,10 +13,14 @@ matplotlib.use('Agg')  # Use Agg backend for rendering plots
 
 # test call
 # sample="MAHACEB-T"
-# celltypes=f"results/celltyping/{sample}.cts_final.txt"
-# metacelltypes=f"results/celltyping/{sample}_seacells.cts_final.txt"
-# metacell_assignment=f"results/metacells/{sample}.genes_cells_filtered_seacells_assignment.tsv"
-# main(celltypes, metacelltypes, metacell_assignment, "metacell_tests/SEACells/cmp", sample)
+# celltype_file = f"results/celltyping/{sample}.cts_final.txt"
+# metacelltype_file = f"results/celltyping/{sample}_seacells.cts_final.txt"
+# assignment_file = f"results/metacells/{sample}.genes_cells_filtered_seacells_assignment.tsv"
+# out_dir = "metacell_tests/SEACells/cmp"
+# out_prefix = sample
+# reportfile = f"metacell_tests/SEACells/{sample}_report.rst"
+# celltype_config_file = "required_files/melanoma/celltype_config_melanoma.tsv"
+
 
 def main(celltype_file, metacelltype_file, assignment_file,
          celltype_config_file, out_dir, out_prefix, reportfile):
@@ -31,17 +35,18 @@ def main(celltype_file, metacelltype_file, assignment_file,
     plt.figure(figsize=(10, 6))
     sns.histplot(metacell_counts['purity'], kde=True, bins=30)
     # Adding titles and labels
-    plt.title('Distribution of Metacell Purity')
+    plt.title('Distribution of Metacell Celltype Purity')
     plt.xlabel('Purity')
     plt.ylabel('Density')
     plt.savefig(f'{out_dir}/{out_prefix}_celltype_hist.png')
 
-    sns.kdeplot(metacell_counts['purity'], fill=True)
+    plt.figure(figsize=(10, 6))
+    sns.histplot(metacell_counts['sub_purity'], kde=True, bins=30)
     # Adding titles and labels
-    plt.title('Distribution of Metacell Purity')
+    plt.title('Distribution of Metacell Subcelltype Purity')
     plt.xlabel('Purity')
     plt.ylabel('Density')
-    plt.savefig(f'{out_dir}/{out_prefix}_celltype_dens.png')
+    plt.savefig(f'{out_dir}/{out_prefix}_subcelltype_hist.png')
 
 
 def get_subcell_dict(celltype_config_file):
@@ -105,12 +110,18 @@ def get_metacell_counts(celltype_file, metacelltype_file, assignment_file, subce
                          'cell_barcode', 'metacell1_id']], celltypes_df, left_on='cell_barcode', right_on='barcodes', how='left')
     merged_df = merged_df[['cell_barcode', 'metacell1_id', 'celltype_final']]
     # Rename columns for clarity
-    merged_df.columns = ['cell_barcode', 'metacell_id', 'celltype']
+    merged_df.columns = ['cell_barcode', 'metacell_id', 'subcelltype']
+    # get major ct
+    merged_df["celltype"] = [subcell_dict.get(
+        ct, ct) for ct in merged_df["subcelltype"]]
+
     # Calculate the cell counts for each metacell
     metacell_counts = merged_df.groupby(
-        'metacell_id')['celltype'].value_counts().unstack().fillna(0).astype(int)
+        'metacell_id')['subcelltype'].value_counts().unstack().fillna(0).astype(int)
     # Calculate the purity for each metacell
     metacell_purity = merged_df.groupby('metacell_id')['celltype'].value_counts(
+        normalize=True).unstack().fillna(0)
+    metacell_subpurity = merged_df.groupby('metacell_id')['subcelltype'].value_counts(
         normalize=True).unstack().fillna(0)
     # dominant = metacell_purity.idxmax(axis=1)
     dominant, composition = [], []
@@ -121,7 +132,7 @@ def get_metacell_counts(celltype_file, metacelltype_file, assignment_file, subce
     # If all celltypes of a mixed metacell contain one of the group substrings,
     # they are called group_mixed (e.g. "T.cell_mixed")
     groups = set(subcell_dict.values())
-    for cid, row in metacell_purity.iterrows():
+    for cid, row in metacell_subpurity.iterrows():
         # sort by contribution
         fractions = row.sort_values(ascending=False)
         # consider all celltypes assigned to > 20% of the cells
@@ -138,7 +149,7 @@ def get_metacell_counts(celltype_file, metacelltype_file, assignment_file, subce
             # check for each group
             for gr in groups:
                 # whether all celltypes contain the groupname as substring
-                if all(subcell_dict.get(ct) == gr for ct in relevant):
+                if all(subcell_dict.get(ct, ct) == gr for ct in relevant):
                     # in this case it gets group_mixed
                     dominant_string = f'{gr}_mixed'
         dominant.append(dominant_string)
@@ -146,11 +157,14 @@ def get_metacell_counts(celltype_file, metacelltype_file, assignment_file, subce
 
     # add the gathered information to the cell count table
     n_cells = metacell_counts.sum(1)
-    metacell_type = [metacelltypes_dict.get(
+    metacell_subtype = [metacelltypes_dict.get(
         cid, 'no_call') for cid in metacell_counts.index]
+    metacell_type = [subcell_dict.get(ct, ct) for ct in metacell_subtype]
+    metacell_counts.insert(0, 'sub_purity', metacell_subpurity.max(axis=1))
     metacell_counts.insert(0, 'purity', metacell_purity.max(axis=1))
     metacell_counts.insert(0, 'dominant', dominant)
     metacell_counts.insert(1, 'composition', composition)
+    metacell_counts.insert(0, 'metacell_subtype', metacell_subtype)
     metacell_counts.insert(0, 'metacell_type', metacell_type)
     metacell_counts.insert(0, 'n_cells', n_cells)
 
@@ -159,7 +173,8 @@ def get_metacell_counts(celltype_file, metacelltype_file, assignment_file, subce
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="This script analyses the metacell results, and compares the cell typing of metacells and single cells. In addition, it genereates report .rst files for the snakemake documentation.")
+        description="This script analyses the metacell results, and compares the cell typing of metacells and single cells. "
+                    "In addition, it generates report .rst files for the snakemake documentation.")
     parser.add_argument("-i", metavar='individual_celltypes.cts_final.txt', required=True,
                         help="celltypes called for individual cells from celltyping.R (rule celltyping)")
     parser.add_argument("-m", metavar='metacelltypes.cts_final.txt', required=True,

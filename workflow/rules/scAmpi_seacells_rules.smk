@@ -53,6 +53,8 @@ use rule sctransform_preprocessing as sctransform_preprocessing_filtered_seacell
         patch="--patch_vst workflow/scripts/vst_check.R",  # leave empty to not apply patch
     log:
         "logs/sctransform_preprocessing/{sample}_seacells.log",
+    benchmark:
+        "logs/benchmark/sctransform_preprocessing/{sample}.benchmark"
 
 
 rule evaluate_seacells:
@@ -62,11 +64,11 @@ rule evaluate_seacells:
         assignment="results/metacells/{sample}.genes_cells_filtered_seacells_assignment.tsv",
     output:
         table="results/metacells/{sample}_seacells_celltype_counts.tsv",
-        plot="results/metacells/{sample}_seacells_celltype_dens.png",
+        plot="results/metacells/{sample}_seacells_celltype_hist.png",
         report="workflow/report/rules/seacells/{sample}_celltyping_summary.rst",
     params:
         prefix="{sample}_seacells",
-        outdir="results/metacells/",
+        outdir=lambda w, output: dirname(output.table),
         custom_script="workflow/scripts/metacell_cmp_celltypes.py",
         ct_config=config["resources"]["celltype_config"],
     container:
@@ -99,23 +101,28 @@ rule metacell_stats:
             "results/metacells/{sample}_seacells_celltype_counts.tsv", 
             sample=sample_ids),
     output:
-        plot="results/metacells/seacells_celltype_purity.png",
+        purity="results/metacells/seacells_celltype_purity.png",
+        subpurity="results/metacells/seacells_subcelltype_purity.png",
+        ncells="results/metacells/seacells_cells_per_metacell.png",
     params:
         custom_script="workflow/scripts/metacell_stats.py",
+        outprefix=lambda w, output: join(dirname(output.purity), "seacells_"),
     container:
         "docker://mlienhard/seacells"
     resources:
         mem_mb=config["computingResources"]["mem_mb"]["low"],
         runtime=config["computingResources"]["runtime"]["low"],
-    threads: config["computingResources"]["threads"]["low"]
+    threads: config["computingResources"]["threads"]["low"],
     log:
         "logs/metacells/metacell_stats.log",
     benchmark:
-        "logs/benchmark/metacells/metacell_stats.benchmark"
+        "logs/benchmark/metacells/metacell_stats.benchmark",
     shell:
         """
         python {params.custom_script} \
-            {output} \
+            {params.outprefix} \
             {input} \
             &> {log}
         """
+
+

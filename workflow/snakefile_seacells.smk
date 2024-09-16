@@ -48,7 +48,7 @@ rule scAmpi_seacells:
             "results/plotting/{sample}_seacells.celltype_barplot.png",
             sample=sample_ids,
         ),
-        #expand("results/gsva/{sample}.gsetscore_hm.png", sample=sample_ids),
+        expand("results/gsva/{sample}.gsetscore_hm.png", sample=sample_ids),
         #expand("results/diff_exp_analysis/{sample}/", sample=sample_ids),
         expand(
             "workflow/report/rules/seacells/{sample}_celltyping_summary.rst",
@@ -56,3 +56,6 @@ rule scAmpi_seacells:
         ),
         expand("results/gsva/{sample}_seacells.gsetscore_hm.png", sample=sample_ids),
         "results/metacells/seacells_celltype_purity.png",
+        expand("results/celltype_gsva_c6/{sample}_seacells_celltype_GSVA.tsv", sample=sample_ids),
+        expand("results/celltype_gsva_c6/{sample}_celltype_GSVA.tsv", sample=sample_ids),
+        
