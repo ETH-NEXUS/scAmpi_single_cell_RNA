@@ -162,7 +162,7 @@ rule create_hdf5:
     conda:
         "../envs/create_hdf5.yaml"
     resources:
-        mem_mb=config["computingResources"]["mem_mb"]["medium"],
+        mem_mb=lambda wc, input: min(2000 + 20 * input.size_mb, max_mem_mb),
         runtime=config["computingResources"]["runtime"]["low"],
     threads: config["computingResources"]["threads"]["medium"]
     log:
@@ -191,7 +191,7 @@ rule identify_doublets:
     conda:
         "../envs/identify_doublets.yaml"
     resources:
-        mem_mb=config["computingResources"]["mem_mb"]["medium"],
+        mem_mb=lambda wc, input: min(2000 + 20 * input.size_mb, max_mem_mb),
         runtime=config["computingResources"]["runtime"]["low"],
     threads: config["computingResources"]["threads"]["medium"]
     log:
@@ -234,7 +234,7 @@ rule filter_genes_and_cells:
     conda:
         "../envs/filter_genes_and_cells.yaml"
     resources:
-        mem_mb=config["computingResources"]["mem_mb"]["medium"],
+        mem_mb=lambda wc, input: min(2000 + 20 * input.size_mb, max_mem_mb),
         runtime=config["computingResources"]["runtime"]["low"],
     threads: config["computingResources"]["threads"]["medium"]
     log:
@@ -279,7 +279,7 @@ rule sctransform_preprocessing:
     conda:
         "../envs/sctransform_preprocessing.yaml"
     resources:
-        mem_mb=config["computingResources"]["mem_mb"]["high"],
+        mem_mb=lambda wc, input: min(4000 + 20 * input.size_mb, max_mem_mb),
         runtime=config["computingResources"]["runtime"]["medium"],
     threads: config["computingResources"]["threads"]["medium"]
     log:
@@ -315,7 +315,7 @@ rule phenograph:
     conda:
         "../envs/phenograph.yaml"
     resources:
-        mem_mb=config["computingResources"]["mem_mb"]["medium"],
+        mem_mb=lambda wc, input: min(2000 + 20 * input.size_mb, max_mem_mb),
         runtime=config["computingResources"]["runtime"]["low"],
     threads: config["computingResources"]["threads"]["medium"]
     log:
@@ -351,7 +351,7 @@ rule prepare_celltyping:
     conda:
         "../envs/prepare_celltyping.yaml"
     resources:
-        mem_mb=lambda wc, input: max(20 * input.size_mb, max_mem_mb),
+        mem_mb=lambda wc, input: min(2000 + 20 * input.size_mb, max_mem_mb),
         runtime=config["computingResources"]["runtime"]["low"],
     threads: config["computingResources"]["threads"]["medium"]
     log:
@@ -387,7 +387,7 @@ rule celltyping:
     conda:
         "../envs/celltyping.yaml"
     resources:
-        mem_mb=lambda wc, input: max(20 * input.size_mb, max_mem_mb),
+        mem_mb=lambda wc, input: min(2000 + 20 * input.size_mb, max_mem_mb),
         runtime=config["computingResources"]["runtime"]["medium"],
     threads: config["computingResources"]["threads"]["medium"]
     log:
@@ -425,7 +425,7 @@ rule remove_atypical_cells:
     conda:
         "../envs/remove_atypical_cells.yaml"
     resources:
-        mem_mb=lambda wc, input: max(20 * input.size_mb, max_mem_mb),
+        mem_mb=lambda wc, input: min(2000 + 20 * input.size_mb, max_mem_mb),
         runtime=config["computingResources"]["runtime"]["low"],
     threads: config["computingResources"]["threads"]["medium"]
     log:
@@ -459,7 +459,7 @@ rule gsva:
     conda:
         "../envs/gsva.yaml"
     resources:
-        mem_mb=lambda wc, input: max(20 * input.size_mb, max_mem_mb),
+        mem_mb=lambda wc, input: min(5000 + 20 * input.size_mb, max_mem_mb),
         runtime=config["computingResources"]["runtime"]["medium"],
     threads: config["computingResources"]["threads"]["medium"]
     log:
@@ -488,11 +488,11 @@ rule celltype_gsva:
         tumor_celltypes=config["tools"]["celltype_gsva"]["celltype_set"],
         min_set_size=config["tools"]["celltype_gsva"]["min_set_size"],
         method="gsva",
-        custom_script=workflow.source_path("../scripts/2024-01_compute_gsva_scores_per_celltype.R"),
+        #custom_script=workflow.source_path("../scripts/compute_gsva_scores_per_celltype.R"),
     conda:
         "../envs/gsva.yaml"
     resources:
-        mem_mb=lambda wc, input: max(20 * input.size_mb, max_mem_mb),
+        mem_mb=lambda wc, input: min(5000 + 20 * input.size_mb, max_mem_mb),
         runtime=config["computingResources"]["runtime"]["medium"],
     threads: config["computingResources"]["threads"]["medium"],
     log:
@@ -500,16 +500,18 @@ rule celltype_gsva:
     benchmark:
         "logs/benchmark/celltype_gsva_c6/{sample}.benchmark"
     script:
-        "../scripts/2024-01_compute_gsva_scores_per_celltype.R"
-
+        "../scripts/compute_gsva_scores_per_celltype.R"
 # generate plots about sample composition and gene expression
 rule plotting:
     input:
         infile="results/atypical_removed/{sample}.atypical_removed.RDS",
     output:
-        outfile="results/plotting/{sample}.celltype_barplot.png",
+        barplot="results/plotting/{sample}.celltype_barplot.png",
+        celltype_umap=report("results/plotting/{sample}.first_celltype.png", category="Results", subcategory="{sample}"),
+        cluster_umap=report("results/plotting/{sample}.phenograph.png", category="Results", subcategory="{sample}"),
+
     params:
-        outdir=lambda w, output: dirname(output.outfile),
+        outdir=lambda w, output: dirname(output.barplot),
         sampleName="{sample}",
         genes_of_interest=config["resources"]["priority_genes"],
         colour_config=config["resources"]["colour_config"],
@@ -518,7 +520,7 @@ rule plotting:
     conda:
         "../envs/plotting.yaml"
     resources:
-        mem_mb=config["computingResources"]["mem_mb"]["medium"],
+        mem_mb=lambda wc, input: min(3000 + 20 * input.size_mb, max_mem_mb),
         runtime=config["computingResources"]["runtime"]["medium"],
     threads: config["computingResources"]["threads"]["medium"]
     log:
@@ -552,7 +554,7 @@ rule gene_exp:
     conda:
         "../envs/gene_exp.yaml"
     resources:
-        mem_mb=config["computingResources"]["mem_mb"]["medium"],
+        mem_mb=lambda wc, input: min(2000 + 20 * input.size_mb, max_mem_mb),
         runtime=config["computingResources"]["runtime"]["low"],
     threads: config["computingResources"]["threads"]["medium"]
     log:
@@ -583,7 +585,7 @@ rule generate_qc_plots_raw:
     conda:
         "../envs/generate_qc_plots.yaml"
     resources:
-        mem_mb=config["computingResources"]["mem_mb"]["medium"],
+        mem_mb=lambda wc, input: min(2000 + 20 * input.size_mb, max_mem_mb),
         runtime=config["computingResources"]["runtime"]["low"],
     threads: config["computingResources"]["threads"]["medium"]
     log:
@@ -612,7 +614,7 @@ rule generate_qc_plots_filtered:
     conda:
         "../envs/generate_qc_plots.yaml"
     resources:
-        mem_mb=config["computingResources"]["mem_mb"]["medium"],
+        mem_mb=lambda wc, input: min(2000 + 20 * input.size_mb, max_mem_mb),
         runtime=config["computingResources"]["runtime"]["low"],
     threads: config["computingResources"]["threads"]["medium"]
     log:
@@ -652,7 +654,7 @@ checkpoint diff_exp_analysis:
     conda:
         "../envs/diff_exp_analysis.yaml"
     resources:
-        mem_mb=config["computingResources"]["mem_mb"]["high"],
+        mem_mb=lambda wc, input: min(2000 + 20 * input.size_mb, max_mem_mb),
         runtime=config["computingResources"]["runtime"]["high"],
     threads: config["computingResources"]["threads"]["medium"]
     log:

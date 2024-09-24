@@ -34,7 +34,7 @@ rule seacells:
         """
 
 
-use rule sctransform_preprocessing as sctransform_preprocessing_filtered_seacells with:
+use rule sctransform_preprocessing as sctransform_preprocessing_seacells with:
     input:
         hdf5_file="results/metacells/{sample}.genes_cells_filtered_seacells.h5",
     output:
@@ -56,6 +56,24 @@ use rule sctransform_preprocessing as sctransform_preprocessing_filtered_seacell
     benchmark:
         "logs/benchmark/sctransform_preprocessing/{sample}.benchmark"
 
+use rule phenograph as phenograph_seacells with:
+    input:
+        infile="results/counts_corrected/{sample}_seacells.corrected.variable_genes.h5",
+    output:
+        outfile="results/clustering/{sample}_seacells.clusters_phenograph.csv",
+        distance_matrix="results/clustering/{sample}_seacells.distance_matrix.tsv",
+        modularity_score="results/clustering/{sample}_seacells.modularity_score.txt",
+    params:
+        n_neighbours=config["tools"]["clustering"]["phenograph"]["seacells"]["n_neighbours"],
+        min_cluster_size=config["tools"]["clustering"]["phenograph"]["seacells"]["min_cluster_size"],
+        log_normalize=config["tools"]["clustering"]["phenograph"]["seacells"]["log_normalize"],
+        custom_script=workflow.source_path("../scripts/apply_phenograph.py"),
+    log:
+        "logs/phenograph/{sample}_seacells.log",
+    benchmark:
+        "logs/benchmark/phenograph/{sample}_seacells.benchmark"
+    
+
 
 rule evaluate_seacells:
     input:
@@ -64,7 +82,7 @@ rule evaluate_seacells:
         assignment="results/metacells/{sample}.genes_cells_filtered_seacells_assignment.tsv",
     output:
         table="results/metacells/{sample}_seacells_celltype_counts.tsv",
-        plot="results/metacells/{sample}_seacells_celltype_hist.png",
+        plot=report("results/metacells/{sample}_seacells_celltype_hist.png", category="metacell_stats"),
         report="workflow/report/rules/seacells/{sample}_celltyping_summary.rst",
     params:
         prefix="{sample}_seacells",
@@ -101,9 +119,9 @@ rule metacell_stats:
             "results/metacells/{sample}_seacells_celltype_counts.tsv", 
             sample=sample_ids),
     output:
-        purity="results/metacells/seacells_celltype_purity.png",
-        subpurity="results/metacells/seacells_subcelltype_purity.png",
-        ncells="results/metacells/seacells_cells_per_metacell.png",
+        purity=report("results/metacells/seacells_celltype_purity.png", category = "metacell stats"),
+        subpurity=report("results/metacells/seacells_subcelltype_purity.png", category = "metacell stats"),
+        ncells=report("results/metacells/seacells_cells_per_metacell.png", category = "metacell stats"),
     params:
         custom_script="workflow/scripts/metacell_stats.py",
         outprefix=lambda w, output: join(dirname(output.purity), "seacells_"),

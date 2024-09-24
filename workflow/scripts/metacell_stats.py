@@ -10,8 +10,14 @@ import os
 import argparse
 import seaborn as sns
 import pandas as pd
+import logging
+
 import matplotlib
 matplotlib.use('Agg')
+
+
+logger = logging.getLogger("metacell_stats")
+logger.setLevel(logging.INFO)
 
 
 def main(input_files, output_prefix):
@@ -61,7 +67,7 @@ def plot_cells_per_metacell(ct_mapping_files, out_prefix):
     plt.xticks(rotation=90)  # Rotate sample labels for better readability
     plt.title("Number of Cells per Metacell")
     plt.tight_layout()
-    logger.info(f'writing image to ')
+    logger.info(f'writing image to {out_prefix}cells_per_metacell.png')
     plt.savefig(f'{out_prefix}cells_per_metacell.png')
 
 
@@ -74,5 +80,6 @@ if __name__ == '__main__':
     parser.add_argument('input_files', type=str, nargs='+',
                         help="Paths to the input CSV files\
                               containing the purity information.")
+
     args = parser.parse_args()
     main(args.input_files, args.output_prefix)

@@ -24,7 +24,8 @@ report: "report/workflow.rst"
 
 
 # make sure seacell specific rules are applied if sample wildcard is followed by _seacells in the file names
-ruleorder: sctransform_preprocessing_filtered_seacells > sctransform_preprocessing
+ruleorder: sctransform_preprocessing_seacells > sctransform_preprocessing
+ruleorder: phenograph_seacells > phenograph
 
 
 # This file includes common functions used in the pipeline
@@ -43,11 +44,19 @@ localrules:
 # defines output of scampi seacells
 rule scAmpi_seacells:
     input:
-        #expand("results/plotting/{sample}.celltype_barplot.png", sample=sample_ids),
+        expand("results/plotting/{sample}.celltype_barplot.png", sample=sample_ids),
         expand(
             "results/plotting/{sample}_seacells.celltype_barplot.png",
             sample=sample_ids,
         ),
+        expand("results/plotting/{sample}.first_celltype.png", sample=sample_ids),
+        expand(
+            "results/plotting/{sample}_seacells.first_celltype.png",
+            sample=sample_ids,
+        ),
+        
+        
+        
         expand("results/gsva/{sample}.gsetscore_hm.png", sample=sample_ids),
         #expand("results/diff_exp_analysis/{sample}/", sample=sample_ids),
         expand(
