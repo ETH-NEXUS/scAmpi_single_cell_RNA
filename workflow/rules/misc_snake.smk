@@ -16,46 +16,32 @@ from snakemake.utils import validate
 # Define config object
 # it behaves like a dict, but prints a helpfull error message if something is missing
 class ConfigDict(dict):
-
     def __init__(self, *args, parent_path=None, **kwargs):
         super().__init__(*args, **kwargs)
-        self.parent_path = parent_path or []
-
+        self.parent_path = parent_path or ["Config"]
     def __getitem__(self, key):
         try:
+            # logger.debug(f"get {self.full_path} -> {key}")
             value = super().__getitem__(key)
-            if isinstance(value, dict):
-                # If the value is a dictionary, wrap it in the same class to track the key path.
-                return ConfigDict(value, parent_path=self.parent_path + [key])
-            return value
         except KeyError:
-            full_path = ' -> '.join(map(str, self.parent_path + [key]))
-            logger.error(f"KeyError: Did not find '{key}' in {full_path}")
+            logger.error(f"KeyError: Did not find '{key}' in {self.full_path}")
             raise
-
+        return value
     def __setitem__(self, key, value):
         if isinstance(value, dict):
             # Ensure that nested dicts are also wrapped in ConfigDict.
-            value = ConfigDict(value, parent_path=self.parent_path + [key])
+            value = ConfigDict.from_dict(value, parent_path=self.parent_path + [key])
         super().__setitem__(key, value)
-
-    def get(self, key, default=None):
-        try:
-            return self.__getitem__(key)
-        except KeyError:
-            return default
-
+    @property 
+    def full_path(self):
+        return ' -> '.join(map(str, self.parent_path ))
     @classmethod
     def from_dict(cls, dct, parent_path=None):
         """Convert a regular dictionary to ConfigDict, recursively."""
         parent_path = parent_path or ["Config"]
-        obj = cls(name=[parent_path])        
+        obj = cls(parent_path=parent_path)        
         for key, value in dct.items():
-            if isinstance(value, dict):
-                # Recursively convert nested dictionaries
-                obj[key] = cls.from_dict(value, parent_path=parent_path + [key])
-            else:
-                obj[key] = value        
+            obj[key] = value        
         return obj
 
 
