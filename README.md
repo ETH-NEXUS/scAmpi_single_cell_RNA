@@ -203,6 +203,25 @@ Due to the output of metacells2, as well as the suggested manual filtering proce
 * config adaptations: NA
 
 
+## Reporting
+
+Reports are designed to be rendered with the "custom" report plugin. This package needs to be installed in the SnakeMake v8+ env, e.g. with
+``` bash
+# install the stable branch from PyPI
+# [TODO]: Not yet published on PyPI]
+# alternatively, install the dev branch from git:
+pip install git+ssh://git@github.com/ETH-NEXUS/snakemake-report-plugin-custom.git@dev
+```
+Then, the report can be rendered with:
+```bash
+snakemake -s path/to/snakefile -c path/to/config.yaml --reporter custom --report-custom-results path/to/result_report/ --report-custom-resources /path/to/resources_report.html
+```
+The to parameters defining the output, '--report-custom-results' and '--report-custom-resources' can either point to a path, or to a html file. In the first case the images and other result files are stored as individual files, with the same directory structure as the snakemake result folder. When providing a html file, the results are embedded in the file.
+
+
+
+
+
 ## Adapting/Integrating rules in Snakemake
 
 Snakemake is a Python-based workflow management system for building and executing pipelines. A pipeline is made up of ["rules"](snake/scAmpi_basic_rules.py) that represent single steps of the analysis. In a [yaml config file](config/config_scAmpi.yaml) parameters and rule-specific input can be adjusted to a new analysis without changing the rules. In a ["master" snake file](snake/snake_scAmpi_basic_master.snake) the desired end points of the analysis are specified. With the input and the desired output defined, Snakemake is able infer all steps that have to be performed in-between.

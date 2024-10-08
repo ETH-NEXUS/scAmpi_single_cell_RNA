@@ -7,3 +7,4 @@ logs
 workflow/.DS_Store
 .cache
 workflow/report/rules/
+*report*
