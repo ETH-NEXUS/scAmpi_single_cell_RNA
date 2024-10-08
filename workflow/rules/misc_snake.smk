@@ -15,34 +15,52 @@ from snakemake.utils import validate
 
 # Define config object
 # it behaves like a dict, but prints a helpfull error message if something is missing
-class Config:
-    def __init__(self, kwargs, name="Config"):
-        self.__name = name
-        self.__members = {}
-        for key, value in kwargs.items():
-            if isinstance(value, dict):
-                self.__members[key] = Config(kwargs=value, name=f"{self.__name}->{key}")
-            else:
-                self.__members[key] = value
+class ConfigDict(dict):
 
-    def __contains__(self, obj):
-        return obj in self.__members
+    def __init__(self, *args, parent_path=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.parent_path = parent_path or []
 
     def __getitem__(self, key):
-        if key in self.__members:
-            return self.__members[key]
-        else:
-            raise KeyError(f'You have not specified key "{key}" for {self.__name}')
+        try:
+            value = super().__getitem__(key)
+            if isinstance(value, dict):
+                # If the value is a dictionary, wrap it in the same class to track the key path.
+                return ConfigDict(value, parent_path=self.parent_path + [key])
+            return value
+        except KeyError:
+            full_path = ' -> '.join(map(str, self.parent_path + [key]))
+            logger.error(f"KeyError: Did not find '{key}' in {full_path}")
+            raise
 
     def __setitem__(self, key, value):
-        self.__members[key] = value
+        if isinstance(value, dict):
+            # Ensure that nested dicts are also wrapped in ConfigDict.
+            value = ConfigDict(value, parent_path=self.parent_path + [key])
+        super().__setitem__(key, value)
 
-    def items(self):
-        return self.__members.items()
+    def get(self, key, default=None):
+        try:
+            return self.__getitem__(key)
+        except KeyError:
+            return default
+
+    @classmethod
+    def from_dict(cls, dct, parent_path=None):
+        """Convert a regular dictionary to ConfigDict, recursively."""
+        parent_path = parent_path or ["Config"]
+        obj = cls(name=[parent_path])        
+        for key, value in dct.items():
+            if isinstance(value, dict):
+                # Recursively convert nested dictionaries
+                obj[key] = cls.from_dict(value, parent_path=parent_path + [key])
+            else:
+                obj[key] = value        
+        return obj
 
 
 # Check with the above class definitions if the config file contains all necessary values
-# config = Config(config)
+config = ConfigDict.from_dict(config)
 
 
 cr_version = config["tools"]["cellranger_count"]["version"]
