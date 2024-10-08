@@ -46,9 +46,12 @@ resources:
 # The tools in this pipeline use a broad range of resources and have been assigned to the following three categories.
 # If there aren't enough resources specified it can be adapted in the tools corresponding section.
 computingResources:
+  # upper limit for dynamic memory allocation (e.g. 20x input file size)
+  max_mem_mb: 100000
+  # static memory specs
   mem_mb:
     low: 2000
-    medium: 16000
+    medium: 24000
     high: 40000
   runtime:
     low: 60
@@ -58,6 +61,7 @@ computingResources:
     low: 1
     medium: 4
     high: 8
+
 
 tools:
   # Cellranger cannot be installed through Conda currently.
@@ -134,8 +138,7 @@ tools:
       # number of metacells etc need to be set here
       # increased number of metacells to 200 (default:90) since sctransform wants to calculate 100 dim pca
       params: "--n_cells=200" 
-    metacells2:
-      params: "" # no additional parameters to be set
+
       
   remove_atypical_cells:
     cells: #on single cells
@@ -162,6 +165,11 @@ tools:
       log_normalize: false
       # minimum number of cells to form a cluster
       min_cluster_size: 20
+      # metacell specific parameters
+      seacells:
+        n_neighbours: 10
+        log_normalize: false
+        min_cluster_size: 3
 
   diff_exp_analysis:
     # minimum number of cells to be tested in DE analysis
@@ -279,3 +287,27 @@ tools:
   find_minSetCover:
     # considerClusterSize "yes" or "no"
     variousParams: "--considerClusterSize no"
+
+
+
+# Report params
+report:
+  # in case the Name is a Category or subcategorie, it is followed by all relevant results
+  toc:
+    Introduction: 
+      template: "report/workflow.rst"
+  image:
+    suffix:
+      - "jpg"
+      - "png"
+    width: 512
+    link: False
+  table:
+    suffix:
+      - "csv"
+      - "tsv"
+    sep:
+      default: "\t"
+      csv: ","
+    max_row: 10
+    link: True
