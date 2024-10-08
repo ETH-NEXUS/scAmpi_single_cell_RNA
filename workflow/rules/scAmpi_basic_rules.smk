@@ -279,7 +279,7 @@ rule sctransform_preprocessing:
     conda:
         "../envs/sctransform_preprocessing.yaml"
     resources:
-        mem_mb=lambda wc, input: min(4000 + 20 * input.size_mb, max_mem_mb),
+        mem_mb=lambda wc, input: min(8000 + 20 * input.size_mb, max_mem_mb),
         runtime=config["computingResources"]["runtime"]["medium"],
     threads: config["computingResources"]["threads"]["medium"]
     log:
