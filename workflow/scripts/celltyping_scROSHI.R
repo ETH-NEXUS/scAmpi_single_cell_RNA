@@ -29,11 +29,6 @@ if (!all(unlist(resp))) {
   rm(resp, lby)
 }
 
-# give out session Info
-cat("\n\n\nPrint sessionInfo:\n\n")
-print(sessionInfo())
-cat("\n\n\n\n")
-
 # command line arguments are parsed
 option_list <- list(
   make_option("--SCE", type = "character", help = "Path to sce onject file with input data (sce_basic.RDS)."),
@@ -45,6 +40,18 @@ option_list <- list(
 )
 opt_parser <- OptionParser(option_list = option_list)
 opt <- parse_args(opt_parser)
+
+
+# give out session Info
+cat("\n\n")
+print(Sys.time())
+cat("\n\n\nPrint sessionInfo:\n\n")
+print(sessionInfo())
+cat("\n\n\n")
+cat("\nInput files:\n\n")
+print(opt)
+cat("\n\n")
+
 
 path <- opt$outputDirec %&% opt$sampleName
 min_genes <- as.numeric(opt$min_genes)
@@ -65,16 +72,16 @@ f.round.preserve.sum <- function(x, digits = 0) {
 }
 
 ################################################################################
-## main code starts here
+## main code starts here  ####
 ################################################################################
-## load input data
+## load input data ####
 sce_data <- readRDS(opt$SCE)
 
 # celltype config file, sub types are individual for each major type
 type_config <- as.data.frame(read.table(opt$celltype_config, sep = "\t", head = T, stringsAsFactors = F))
 major_types <- type_config$Major
-print("str(major_types):")
-print(str(major_types))
+cat("\n\nstr(major_types):\n")
+str(major_types)
 minor_types <- lapply(type_config$Subtype, function(x) strsplit(x, ",")[[1]])
 names(minor_types) <- type_config$Major
 # remove "none"
@@ -86,10 +93,10 @@ minor_types <- minor_types[which(idx == 0)]
 idx <- sapply(minor_types, length)
 minor_types <- minor_types[idx > 0]
 # final list
-print("str(minor_types):")
-print(str(minor_types))
+cat("\n\nstr(minor_types):\n")
+str(minor_types)
 
-##################################################### scROSHI
+##################################################### scROSHI ####
 
 sce_data <- scROSHI(
   sce_data = sce_data,
@@ -98,7 +105,7 @@ sce_data <- scROSHI(
   count_data = "normcounts",
   gene_symbol = "SYMBOL",
   cell_scores = TRUE,
-  min_genes = opt$min_genes,
+  min_genes = min_genes,
   min_var = 1.5,
   n_top_genes = 2000,
   n_nn = 5,
@@ -109,20 +116,25 @@ sce_data <- scROSHI(
 
 ##################################################### scROSHI
 
-# keep sce object including cluster 0
-sce_data_incl_cluster0 <- sce_data
-
-# remove cells that are in cluster 0
+# remove cells that are in phenograph cluster 0
+# those are cells that were not similar enough to other cells to be
+# assigned to a cluster
 mask_keep_cells <- colData(sce_data)$phenograph_clusters != 0
 cat("\n\nNumber of cells that remain after filtering out cluster 0:\n\n")
-print(sum(mask_keep_cells))
-cat("\n\nsce object before filtering out cells that are in cluster 0:\n\n")
-print(sce_data)
+print(table(mask_keep_cells))
+
+## write information about cells in cluster 0 into table
+sce_data_cluster0 <- sce_data[, !mask_keep_cells]
+info_cluster0 <- as.data.frame(colData(sce_data_cluster0))
+write.table(info_cluster0, file = path %&% ".info_cells_cluster_0.tsv",
+            sep = "\t",
+            row.names = F)
+rm(info_cluster0)
+rm(sce_data_cluster0)
 
 sce_data <- sce_data[, mask_keep_cells]
 reducedDims(sce_data)$phenodist <- reducedDims(sce_data)$phenodist[, mask_keep_cells]
-cat("\n\nsce object after filtering out cells that are in cluster 0:\n\n")
-print(sce_data)
+
 
 ## write final celltype to disk
 res <- colData(sce_data)[, c("barcodes", "celltype_final")]
@@ -141,7 +153,7 @@ rownames(tab)[nrow(tab)] <- "Percent"
 
 
 #########################################
-## begin new cluster purity calculations
+## begin new cluster purity calculations ####
 # if at least one minor_type, make major-minor dictionary:
 
 all.major.types <- sort(c(metadata(sce_data)$all_major_types, "uncertain", "unknown"))
@@ -224,7 +236,7 @@ write.table(clu.pu, file = path %&% ".celltyping.phenograph_celltype_association
 ## end new cluster purity calculations
 
 
-# print out percentages of cell types, major and final
+# print out percentages of cell types, major and final ####
 perc_major <- as.data.frame(round(prop.table(table(res$celltype_major)), 3) * 100)
 perc_major <- perc_major[order(perc_major$Freq, decreasing = TRUE), ]
 cat("\n\n Frequencies major cell types:\n")
@@ -247,7 +259,5 @@ cat("\n\n Frequencies dominant cell types of clusters:\n")
 print(dom_types)
 
 ################################################################################
-## save sce object for later use
+## save sce object for later use ####
 saveRDS(sce_data, path %&% ".celltyping.RDS")
-# also save sce_data object that including the cells that are in cluster 0
-saveRDS(sce_data_incl_cluster0, path %&% ".celltyping.all_cells.RDS")
