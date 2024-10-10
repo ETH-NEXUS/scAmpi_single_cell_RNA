@@ -42,14 +42,15 @@ rule scAmpi_basic:
         expand("results/starsolo/{sample}.features.tsv", sample=sample_ids),
         expand("results/counts_raw/{sample}.h5", sample=sample_ids),
         expand(
-            "results/counts_filtered/{sample}.doublet_barcodes.txt", sample=sample_ids
-        ),
-        expand(
-            "results/counts_raw/{sample}.raw.histogram_library_sizes.png",
+            "results/identify_doublets/{sample}.doublet_barcodes.txt",
             sample=sample_ids,
         ),
         expand(
-            "results/counts_filtered/{sample}.genes_cells_filtered.histogram_library_sizes.png",
+            "results/qc_plots/raw/{sample}.raw.histogram_library_sizes.png",
+            sample=sample_ids,
+        ),
+        expand(
+            "results/qc_plots/filtered/{sample}.genes_cells_filtered.histogram_library_sizes.png",
             sample=sample_ids,
         ),
         expand("results/counts_corrected/{sample}.corrected.RDS", sample=sample_ids),

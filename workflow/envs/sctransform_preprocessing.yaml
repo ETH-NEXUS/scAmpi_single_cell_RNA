@@ -15,3 +15,4 @@ dependencies:
     - "r-ggplot2>=3.3.3"
     - "r-uwot>=0.1.10"
     - "r-igraph>=1.2.6"
+    - "r-matrix==1.6_1"
