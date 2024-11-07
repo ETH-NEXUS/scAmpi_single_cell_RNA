@@ -279,7 +279,7 @@ rule sctransform_preprocessing:
     conda:
         "../envs/sctransform_preprocessing.yaml"
     resources:
-        mem_mb=lambda wc, input: min(8000 + 20 * input.size_mb, max_mem_mb),
+        mem_mb=config["computingResources"]["mem_mb"]["medium"],
         runtime=config["computingResources"]["runtime"]["medium"],
     threads: config["computingResources"]["threads"]["medium"]
     log:
@@ -480,11 +480,11 @@ rule celltype_gsva:
     input:
         "results/atypical_removed/{sample}.atypical_removed.RDS"
     output:
-        outfile="results/celltype_gsva_c6/{sample}_celltype_GSVA.tsv"
+        outfile="results/celltype_gsva/{gene_set}/{sample}_celltype_GSVA.tsv"
     params:
         outdir=lambda w, output: dirname(output.outfile),
         sampleName="{sample}",
-        genesets=config["resources"]["genesets_c6"],
+        genesets=lambda w: config["tools"]["celltype_gsva"]["gene_set"][w.gene_set],
         tumor_celltypes=config["tools"]["celltype_gsva"]["celltype_set"],
         min_set_size=config["tools"]["celltype_gsva"]["min_set_size"],
         method="gsva",
@@ -496,11 +496,13 @@ rule celltype_gsva:
         runtime=config["computingResources"]["runtime"]["medium"],
     threads: config["computingResources"]["threads"]["medium"],
     log:
-        "logs/celltype_gsva_c6/{sample}.log",
+        "logs/celltype_gsva_c6/{sample}_{gene_set}.log",
     benchmark:
-        "logs/benchmark/celltype_gsva_c6/{sample}.benchmark"
+        "logs/benchmark/celltype_gsva_c6/{sample}_{gene_set}.benchmark"
     script:
         "../scripts/compute_gsva_scores_per_celltype.R"
+
+
 # generate plots about sample composition and gene expression
 rule plotting:
     input:

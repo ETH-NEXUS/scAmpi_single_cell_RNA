@@ -40,6 +40,9 @@ localrules:
     scAmpi_seacells,
 
 
+# gene sets for celltype GSVA
+GENE_SETS=set(config["tools"]["celltype_gsva"]["gene_set"].keys()) 
+
 # final rule of pipeline
 # defines output of scampi seacells
 rule scAmpi_seacells:
@@ -54,9 +57,6 @@ rule scAmpi_seacells:
             "results/plotting/{sample}_seacells.first_celltype.png",
             sample=sample_ids,
         ),
-        
-        
-        
         expand("results/gsva/{sample}.gsetscore_hm.png", sample=sample_ids),
         #expand("results/diff_exp_analysis/{sample}/", sample=sample_ids),
         expand(
@@ -65,6 +65,5 @@ rule scAmpi_seacells:
         ),
         expand("results/gsva/{sample}_seacells.gsetscore_hm.png", sample=sample_ids),
         "results/metacells/seacells_celltype_purity.png",
-        expand("results/celltype_gsva_c6/{sample}_seacells_celltype_GSVA.tsv", sample=sample_ids),
-        expand("results/celltype_gsva_c6/{sample}_celltype_GSVA.tsv", sample=sample_ids),
+        expand("results/celltype_gsva/{gene_set}/{sample}_seacells_celltype_GSVA.tsv", sample=sample_ids, gene_set=GENE_SETS),
         
