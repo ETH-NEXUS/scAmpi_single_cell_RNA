@@ -1,5 +1,14 @@
 # Changelog
 
+## [2.2.0] - 2025-06-12
+
+### Changed
+
+- use `scROSHI` CRAN package in `celltyping.R` script.
+  Previously, the functions were included in the script.
+  Now the CRAN package can be downloaded via conda and included in the environment.
+
+
 ## [2.1.1] - 2024-08-15
 
 ### Changed
