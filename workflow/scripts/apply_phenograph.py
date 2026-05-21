@@ -22,17 +22,6 @@ def str2bool(v):
     else:
         raise argparse.ArgumentTypeError('Boolean value expected.')
 
-parser = argparse.ArgumentParser()
-parser.add_argument("--input_file", dest="input_file", required=True, help="input matrix hdf5 file")
-parser.add_argument("--output_file", dest="output_file", required=True, help="path to the output csv file")
-parser.add_argument("--distance_matrix", dest="distance_matrix", required=True, help="the distance matrix (output file) used by the louvain clustering")
-parser.add_argument("--modularity_score", dest="modularity_score", required=True, help="text file containing the louvain modularity score")
-parser.add_argument("--n_neighbours", dest="n_neighbours", required=True, help="the number of neighbours", type=int)
-parser.add_argument("--min_size", dest="min_size", required=True, help="minimum cluster size", type=int)
-parser.add_argument("--n_threads", dest="n_threads", required=True, help="the number of threads", type=int, default=1)
-parser.add_argument("-l", "--log_normalize", dest="log_normalize", required=True, help="Boolean switch for the log normalization", type=str2bool)
-args = parser.parse_args()
-
 
 class UnsupervisedMethod(metaclass=ABCMeta):
 
@@ -151,5 +140,18 @@ def apply_pheno(input_file, output_file, distance_matrix, modularity_score, n_ne
     f.close()
 
 
+if __name__ == "__main__":
+    freeze_support()
 
-apply_pheno(args.input_file, args.output_file, args.distance_matrix, args.modularity_score, args.n_neighbours, args.min_size, args.n_threads, args.log_normalize)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--input_file", dest="input_file", required=True, help="input matrix hdf5 file")
+    parser.add_argument("--output_file", dest="output_file", required=True, help="path to the output csv file")
+    parser.add_argument("--distance_matrix", dest="distance_matrix", required=True, help="the distance matrix (output file) used by the louvain clustering")
+    parser.add_argument("--modularity_score", dest="modularity_score", required=True, help="text file containing the louvain modularity score")
+    parser.add_argument("--n_neighbours", dest="n_neighbours", required=True, help="the number of neighbours", type=int)
+    parser.add_argument("--min_size", dest="min_size", required=True, help="minimum cluster size", type=int)
+    parser.add_argument("--n_threads", dest="n_threads", required=True, help="the number of threads", type=int, default=1)
+    parser.add_argument("-l", "--log_normalize", dest="log_normalize", required=True, help="Boolean switch for the log normalization", type=str2bool)
+    args = parser.parse_args()
+
+    apply_pheno(args.input_file, args.output_file, args.distance_matrix, args.modularity_score, args.n_neighbours, args.min_size, args.n_threads, args.log_normalize)
