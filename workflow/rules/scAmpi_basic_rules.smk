@@ -152,8 +152,8 @@ rule identify_doublets:
         sample="{sample}",
         outdir="results/identify_doublets/",
         custom_script=workflow.source_path("../scripts/identify_doublets.R"),
-    conda:
-        "../envs/identify_doublets.yaml"
+    container:
+        "docker://ethnexus/scampi_bioconductor:r4.5.2-bioconductor3.22-amd64"
     resources:
         mem_mb=config["computingResources"]["mem_mb"]["medium"],
         runtime=config["computingResources"]["runtime"]["low"],
@@ -195,8 +195,8 @@ rule filter_genes_and_cells:
         genomeVersion=config["tools"]["filter_genes_and_cells"]["genomeVersion"],
         sample="{sample}",
         custom_script=workflow.source_path("../scripts/filter_genes_and_cells.R"),
-    conda:
-        "../envs/filter_genes_and_cells.yaml"
+    container:
+        "docker://ethnexus/scampi_bioconductor:r4.5.2-bioconductor3.22-amd64"
     resources:
         mem_mb=config["computingResources"]["mem_mb"]["medium"],
         runtime=config["computingResources"]["runtime"]["low"],
@@ -236,8 +236,8 @@ rule sctransform_preprocessing:
         n_nn=config["tools"]["sctransform_preprocessing"]["n_nn"],
         outDir="results/counts_corrected/",
         custom_script=workflow.source_path("../scripts/sctransform_preprocessing.R"),
-    conda:
-        "../envs/sctransform_preprocessing.yaml"
+    container:
+        "docker://ethnexus/scampi_bioconductor:r4.5.2-bioconductor3.22-amd64"
     resources:
         mem_mb=config["computingResources"]["mem_mb"]["medium"],
         runtime=config["computingResources"]["runtime"]["medium"],
@@ -306,8 +306,8 @@ rule prepare_celltyping:
         outputDirec="results/prep_celltyping/",
         sampleName="{sample}",
         custom_script=workflow.source_path("../scripts/prepare_celltyping.R"),
-    conda:
-        "../envs/prepare_celltyping.yaml"
+    container:
+        "docker://ethnexus/scampi_bioconductor:r4.5.2-bioconductor3.22-amd64"
     resources:
         mem_mb=config["computingResources"]["mem_mb"]["medium"],
         runtime=config["computingResources"]["runtime"]["low"],
@@ -378,8 +378,8 @@ rule remove_atypical_cells:
         min_threshold=config["tools"]["remove_atypical_cells"]["min_threshold"],
         threshold_type=config["tools"]["remove_atypical_cells"]["threshold_type"],
         custom_script=workflow.source_path("../scripts/remove_atypical_cells.R"),
-    conda:
-        "../envs/remove_atypical_cells.yaml"
+    container:
+        "docker://ethnexus/scampi_bioconductor:r4.5.2-bioconductor3.22-amd64"
     resources:
         mem_mb=config["computingResources"]["mem_mb"]["medium"],
         runtime=config["computingResources"]["runtime"]["low"],
@@ -412,8 +412,8 @@ rule gsva:
         sampleName="{sample}",
         genesets=config["resources"]["genesets"],
         custom_script=workflow.source_path("../scripts/gsva.R"),
-    conda:
-        "../envs/gsva.yaml"
+    container:
+        "docker://ethnexus/scampi_bioconductor:r4.5.2-bioconductor3.22-amd64"
     resources:
         mem_mb=config["computingResources"]["mem_mb"]["medium"],
         runtime=config["computingResources"]["runtime"]["medium"],
@@ -444,8 +444,8 @@ rule plotting:
         colour_config=config["resources"]["colour_config"],
         use_alias=config["tools"]["plotting"]["use_alias"],
         custom_script=workflow.source_path("../scripts//plotting.R"),
-    conda:
-        "../envs/plotting.yaml"
+    container:
+        "docker://ethnexus/scampi_bioconductor:r4.5.2-bioconductor3.22-amd64"
     resources:
         mem_mb=config["computingResources"]["mem_mb"]["medium"],
         runtime=config["computingResources"]["runtime"]["medium"],
@@ -478,8 +478,8 @@ rule gene_exp:
         type_sample=config["tools"]["gene_exp"]["type_sample"],
         priority_genes=config["resources"]["priority_genes"],
         custom_script=workflow.source_path("../scripts/gene_exp.R"),
-    conda:
-        "../envs/gene_exp.yaml"
+    container:
+        "docker://ethnexus/scampi_bioconductor:r4.5.2-bioconductor3.22-amd64"
     resources:
         mem_mb=config["computingResources"]["mem_mb"]["medium"],
         runtime=config["computingResources"]["runtime"]["low"],
@@ -509,8 +509,8 @@ rule generate_qc_plots_raw:
         custom_script=workflow.source_path("../scripts/generate_QC_plots.R"),
         outdir="results/qc_plots/raw/",
         sample_status="raw",
-    conda:
-        "../envs/generate_qc_plots.yaml"
+    container:
+        "docker://ethnexus/scampi_bioconductor:r4.5.2-bioconductor3.22-amd64"
     resources:
         mem_mb=config["computingResources"]["mem_mb"]["medium"],
         runtime=config["computingResources"]["runtime"]["low"],
@@ -538,8 +538,8 @@ rule generate_qc_plots_filtered:
         custom_script=workflow.source_path("../scripts/generate_QC_plots.R"),
         outdir="results/qc_plots/filtered/",
         sample_status="genes_cells_filtered",
-    conda:
-        "../envs/generate_qc_plots.yaml"
+    container:
+        "docker://ethnexus/scampi_bioconductor:r4.5.2-bioconductor3.22-amd64"
     resources:
         mem_mb=config["computingResources"]["mem_mb"]["medium"],
         runtime=config["computingResources"]["runtime"]["low"],
@@ -578,8 +578,8 @@ checkpoint diff_exp_analysis:
         ],
         outpath="results/diff_exp_analysis/{sample}/",
         custom_script=workflow.source_path("../scripts/diff_exp_analysis.R"),
-    conda:
-        "../envs/diff_exp_analysis.yaml"
+    container:
+        "docker://ethnexus/scampi_bioconductor:r4.5.2-bioconductor3.22-amd64"
     resources:
         mem_mb=config["computingResources"]["mem_mb"]["medium"],
         runtime=config["computingResources"]["runtime"]["high"],
