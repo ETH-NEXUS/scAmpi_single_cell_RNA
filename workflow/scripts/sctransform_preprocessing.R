@@ -24,6 +24,8 @@ cat("\n\n\n\n")
 # convenience function for string concatenation
 "%&%" <- function(a, b) paste(a, b, sep = "")
 
+options(future.globals.maxSize = 2 * 1024^3)
+
 option_list <- list(
   make_option("--inHDF5", type = "character", help = "Path to hdf5 input file. It includes raw expression matrix, gene & cell attributes."),
   make_option("--sample", type = "character", help = "Sample name."),
