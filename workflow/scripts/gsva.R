@@ -75,7 +75,8 @@ all.genes <- unique(as.numeric(unlist(idxs)))
 t.m <- assay(sce_data, "pearson_resid")[all.genes, ]
 
 # estimate geneset-sample matrix from gene-sample matrix
-rgsa <- gsva(t.m, gset, method = "gsva")
+gsvapar <- gsvaParam(exprData = t.m, geneSets = gset)
+rgsa <- gsva(gsvapar, verbose = FALSE)
 # prepare gsva results for plotting
 gsva_results <- melt(rgsa)
 names(gsva_results) <- c("gene.set", "barcodes", "value")

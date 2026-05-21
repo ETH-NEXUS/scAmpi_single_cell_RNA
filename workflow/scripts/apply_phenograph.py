@@ -9,6 +9,7 @@ import phenograph
 from abc import ABCMeta, abstractmethod
 import h5py
 import pandas as pd
+from multiprocessing import freeze_support
 
 logging.basicConfig(level=logging.DEBUG)
 
