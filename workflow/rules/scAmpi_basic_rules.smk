@@ -125,7 +125,7 @@ rule create_hdf5:
     output:
         outfile="results/counts_raw/{sample}.h5",
     params:
-        custom_script=workflow.source_path("../scripts/create_hdf5.py"),
+        custom_script="workflow/scripts/create_hdf5.py",
     conda:
         "../envs/create_hdf5.yaml"
     resources:
@@ -154,7 +154,7 @@ rule identify_doublets:
     params:
         sample="{sample}",
         outdir="results/identify_doublets/",
-        custom_script=workflow.source_path("../scripts/identify_doublets.R"),
+        custom_script="workflow/scripts/identify_doublets.R",
     container:
         "docker://ethnexus/scampi_bioconductor:r4.5.2-bioconductor3.22-amd64"
     resources:
@@ -197,7 +197,7 @@ rule filter_genes_and_cells:
         outDir="results/counts_filtered/",
         genomeVersion=config["tools"]["filter_genes_and_cells"]["genomeVersion"],
         sample="{sample}",
-        custom_script=workflow.source_path("../scripts/filter_genes_and_cells.R"),
+        custom_script="workflow/scripts/filter_genes_and_cells.R",
     container:
         "docker://ethnexus/scampi_bioconductor:r4.5.2-bioconductor3.22-amd64"
     resources:
@@ -238,7 +238,7 @@ rule sctransform_preprocessing:
         min_var=config["tools"]["sctransform_preprocessing"]["min_var"],
         n_nn=config["tools"]["sctransform_preprocessing"]["n_nn"],
         outDir="results/counts_corrected/",
-        custom_script=workflow.source_path("../scripts/sctransform_preprocessing.R"),
+        custom_script="workflow/scripts/sctransform_preprocessing.R",
     container:
         "docker://ethnexus/scampi_bioconductor:r4.5.2-bioconductor3.22-amd64"
     resources:
@@ -272,7 +272,7 @@ rule phenograph:
         n_neighbours=config["tools"]["clustering"]["phenograph"]["n_neighbours"],
         min_cluster_size=config["tools"]["clustering"]["phenograph"]["min_cluster_size"],
         log_normalize=config["tools"]["clustering"]["phenograph"]["log_normalize"],
-        custom_script=workflow.source_path("../scripts/apply_phenograph.py"),
+        custom_script="workflow/scripts/apply_phenograph.py",
     conda:
         "../envs/phenograph.yaml"
     resources:
@@ -308,7 +308,7 @@ rule prepare_celltyping:
     params:
         outputDirec="results/prep_celltyping/",
         sampleName="{sample}",
-        custom_script=workflow.source_path("../scripts/prepare_celltyping.R"),
+        custom_script="workflow/scripts/prepare_celltyping.R",
     container:
         "docker://ethnexus/scampi_bioconductor:r4.5.2-bioconductor3.22-amd64"
     resources:
@@ -343,9 +343,9 @@ rule celltyping:
         celltype_config=config["resources"]["celltype_config"],
         outputDirec="results/celltyping/",
         sampleName="{sample}",
-        custom_script=workflow.source_path("../scripts/celltyping.R"),
-    conda:
-        "../envs/celltyping.yaml"
+        custom_script="workflow/scripts/celltyping.R",
+    container:
+        "docker://ethnexus/scampi_bioconductor:r4.5.2-bioconductor3.22-amd64"
     resources:
         mem_mb=config["computingResources"]["mem_mb"]["medium"],
         runtime=config["computingResources"]["runtime"]["medium"],
@@ -380,7 +380,7 @@ rule remove_atypical_cells:
         threshold_filter=config["tools"]["remove_atypical_cells"]["threshold_filter"],
         min_threshold=config["tools"]["remove_atypical_cells"]["min_threshold"],
         threshold_type=config["tools"]["remove_atypical_cells"]["threshold_type"],
-        custom_script=workflow.source_path("../scripts/remove_atypical_cells.R"),
+        custom_script="workflow/scripts/remove_atypical_cells.R",
     container:
         "docker://ethnexus/scampi_bioconductor:r4.5.2-bioconductor3.22-amd64"
     resources:
@@ -414,7 +414,7 @@ rule gsva:
         outputDirec="results/gsva/",
         sampleName="{sample}",
         genesets=config["resources"]["genesets"],
-        custom_script=workflow.source_path("../scripts/gsva.R"),
+        custom_script="workflow/scripts/gsva.R",
     container:
         "docker://ethnexus/scampi_bioconductor:r4.5.2-bioconductor3.22-amd64"
     resources:
@@ -445,8 +445,8 @@ rule plotting:
         sampleName="{sample}",
         genes_of_interest=config["resources"]["priority_genes"],
         colour_config=config["resources"]["colour_config"],
-        use_alias=config["tools"]["plotting"]["use_alias"],
-        custom_script=workflow.source_path("../scripts//plotting.R"),
+        use_alias=lambda wildcards: "--toggle_label" if config["tools"]["plotting"]["use_alias"] else "",
+        custom_script="workflow/scripts/plotting.R",
     container:
         "docker://ethnexus/scampi_bioconductor:r4.5.2-bioconductor3.22-amd64"
     resources:
@@ -464,7 +464,7 @@ rule plotting:
         "--outDir {params.outputDirec} "
         "--sampleName {params.sampleName} "
         "--colour_config {params.colour_config} "
-        "--toggle_label {params.use_alias} "
+        "{params.use_alias} "
         "&> {log} "
 
 
@@ -480,7 +480,7 @@ rule gene_exp:
         threshold_sample=config["tools"]["gene_exp"]["threshold_sample"],
         type_sample=config["tools"]["gene_exp"]["type_sample"],
         priority_genes=config["resources"]["priority_genes"],
-        custom_script=workflow.source_path("../scripts/gene_exp.R"),
+        custom_script="workflow/scripts/gene_exp.R",
     container:
         "docker://ethnexus/scampi_bioconductor:r4.5.2-bioconductor3.22-amd64"
     resources:
@@ -509,7 +509,7 @@ rule generate_qc_plots_raw:
     output:
         out="results/qc_plots/raw/{sample}.raw.histogram_library_sizes.png",
     params:
-        custom_script=workflow.source_path("../scripts/generate_QC_plots.R"),
+        custom_script="workflow/scripts/generate_QC_plots.R",
         outdir="results/qc_plots/raw/",
         sample_status="raw",
     container:
@@ -538,7 +538,7 @@ rule generate_qc_plots_filtered:
     output:
         out="results/qc_plots/filtered/{sample}.genes_cells_filtered.histogram_library_sizes.png",
     params:
-        custom_script=workflow.source_path("../scripts/generate_QC_plots.R"),
+        custom_script="workflow/scripts/generate_QC_plots.R",
         outdir="results/qc_plots/filtered/",
         sample_status="genes_cells_filtered",
     container:
@@ -580,7 +580,7 @@ checkpoint diff_exp_analysis:
             "minNumberNonMalignant"
         ],
         outpath="results/diff_exp_analysis/{sample}/",
-        custom_script=workflow.source_path("../scripts/diff_exp_analysis.R"),
+        custom_script="workflow/scripts/diff_exp_analysis.R",
     container:
         "docker://ethnexus/scampi_bioconductor:r4.5.2-bioconductor3.22-amd64"
     resources:
