@@ -53,16 +53,18 @@ rule cellranger_count_8:
         success="results/cellranger_run/{sample}_success_cellranger.txt",
     params:
         cr_out="results/cellranger_run/{sample}/",
-        local_cores=config["tools"]["cellranger_count"]["local_cores"],
         metrics_summary="results/cellranger_run/{sample}.metrics_summary.csv",
         web_summary="results/cellranger_run/{sample}.web_summary.html",
         create_bam=config["tools"]["cellranger_count"]["create_bam"],
         # NOTE: no dots are allowed in sample names!
         variousParams=config["tools"]["cellranger_count"]["variousParams"],
+        mem_gb=lambda wildcards, resources: int(resources.mem_mb / 1024),
+    container:
+        "docker://etycksen/cellranger:10.0.0_lsf"
     resources:
-        mem_mb=config["tools"]["cellranger_count"]["mem_mb"],
-        runtime=config["tools"]["cellranger_count"]["runtime"],
-    threads: config["tools"]["cellranger_count"]["local_cores"]
+        mem_mb=32768,
+        runtime=1440,
+    threads: 12
     log:
         "logs/cellranger_count/{sample}.log",
     benchmark:
@@ -71,7 +73,8 @@ rule cellranger_count_8:
         "{config[tools][cellranger_count][call]} count "
         "--id={wildcards.sample} "
         "--transcriptome={input.reference} "
-        "--localcores={params.local_cores} "
+        "--localcores={threads} "
+        "--localmem={params.mem_gb} "
         "--fastqs={input.fastqs_dir} "
         "--nosecondary "
         "--create-bam={params.create_bam} "
