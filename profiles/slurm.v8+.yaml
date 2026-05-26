@@ -1,0 +1,24 @@
+executor: slurm
+latency-wait: 20
+jobs: 20
+printshellcmds: True
+restart-times: 0
+rerun-triggers: mtime
+keep-going: True
+
+cores: 28 # the minimum number of CPUS on a compute node
+local-cores: 2
+
+default-resources:
+        slurm_account: "nexus"
+        slurm_partition: "compute" # default: compute
+        runtime: 60
+        mem_mb: 4000
+        nodes: 1
+        threads: 1
+
+software-deployment-method: [conda, apptainer]
+# shared-fs-usage: [input-output, persistence, software-deployment, sources , source-cache]
+apptainer-prefix: "/cluster/apps/nexus/sharedutils/snakemake-containers/"
+# apptainer-args: "--bind $PWD" # in shell command
+conda-prefix: "/cluster/apps/nexus/sharedutils/snakemake_workflow_envs/scAmpi_single_cell_RNA"

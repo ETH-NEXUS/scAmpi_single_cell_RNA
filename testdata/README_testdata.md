@@ -43,14 +43,21 @@ Set the full path to the input directory in `testdata/config.yaml`, section `[in
 
 Perform a dry run to check if all preparations were correct:
 
-```
-snakemake -s workflow/snakefile_basic.smk --configfile testdata/config.yaml -n -p -r
+```bash
+snakemake --profile profiles/slurm.v8+.yaml \
+  -s workflow/snakefile_basic.smk \
+  --configfile testdata/config.yaml \
+  --apptainer-args "--bind $PWD" \
+  --dry-run
 ```
 
 Call the actual run:
 
-```
-snakemake -s workflow/snakefile_basic.smk --configfile testdata/config.yaml -p -r
+```bash
+snakemake --profile profiles/slurm.v8+.yaml \
+  -s workflow/snakefile_basic.smk \
+  --configfile testdata/config.yaml \
+  --apptainer-args "--bind $PWD"
 ```
 
 If you are working on a cluster with a job scheduling system (e.g. LSF, Slurm) you need to adjust the commands accordingly.
