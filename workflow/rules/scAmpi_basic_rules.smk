@@ -10,6 +10,7 @@ def get_fastq_dir(wildcards):
 # cellranger call to process the raw samples
 rule cellranger_count:
     input:
+        fastqs_dir=get_fastq_dir,
         reference=config["resources"]["reference_transcriptome"],
     output:
         success="results/cellranger_run/{sample}_success_cellranger.txt",
