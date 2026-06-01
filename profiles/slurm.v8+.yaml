@@ -20,5 +20,5 @@ default-resources:
 software-deployment-method: [conda, apptainer]
 # shared-fs-usage: [input-output, persistence, software-deployment, sources , source-cache]
 apptainer-prefix: "/cluster/apps/nexus/sharedutils/snakemake-containers/"
-# apptainer-args: "--bind $PWD" # in shell command
+apptainer-args: "--env TENX_DISABLE_TELEMETRY=1 --bind $PWD" 
 conda-prefix: "/cluster/apps/nexus/sharedutils/snakemake_workflow_envs/scAmpi_single_cell_RNA"
